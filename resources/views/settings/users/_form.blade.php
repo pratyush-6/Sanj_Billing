@@ -39,7 +39,7 @@
 
     <div>
         <x-input-label for="password" :value="$user ? 'New Password (leave blank to keep current)' : 'Password *'" />
-        <x-text-input id="password" name="password" type="password" class="mt-1 block w-full" @if (! $user) required @endif />
+        <x-text-input id="password" name="password" type="password" class="mt-1 block w-full" :required="! $user" />
         <x-input-error :messages="$errors->get('password')" class="mt-2" />
     </div>
 

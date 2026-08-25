@@ -37,7 +37,7 @@
 
     <div>
         <x-input-label for="opening_balance" value="Opening Balance *" />
-        <x-text-input id="opening_balance" name="opening_balance" type="number" step="0.01" class="mt-1 block w-full" :value="old('opening_balance', $bankAccount?->opening_balance ?? 0)" required @if($bankAccount) readonly @endif />
+        <x-text-input id="opening_balance" name="opening_balance" type="number" step="0.01" class="mt-1 block w-full" :value="old('opening_balance', $bankAccount?->opening_balance ?? 0)" required :readonly="(bool) $bankAccount" />
         @if ($bankAccount)
             <p class="text-xs text-ink-400 mt-1">Opening balance can't be changed after creation.</p>
         @endif
