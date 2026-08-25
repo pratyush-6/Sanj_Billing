@@ -1,0 +1,41 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('New Financial Year') }}
+        </h2>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                <form method="POST" action="{{ route('financial-years.store') }}" class="space-y-6">
+                    @csrf
+
+                    <div>
+                        <x-input-label for="name" value="Name * (e.g. FY 2026-27)" />
+                        <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name')" required />
+                        <x-input-error :messages="$errors->get('name')" class="mt-2" />
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <x-input-label for="start_date" value="Start Date *" />
+                            <x-text-input id="start_date" name="start_date" type="date" class="mt-1 block w-full" :value="old('start_date')" required />
+                            <x-input-error :messages="$errors->get('start_date')" class="mt-2" />
+                        </div>
+                        <div>
+                            <x-input-label for="end_date" value="End Date *" />
+                            <x-text-input id="end_date" name="end_date" type="date" class="mt-1 block w-full" :value="old('end_date')" required />
+                            <x-input-error :messages="$errors->get('end_date')" class="mt-2" />
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        <x-primary-button>{{ __('Create') }}</x-primary-button>
+                        <a href="{{ route('financial-years.index') }}" class="text-sm text-gray-600 hover:underline">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</x-app-layout>
