@@ -15,7 +15,10 @@ class ExpenseSubCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'expense_category_id' => ['required', 'exists:expense_categories,id'],
+            'expense_category_id' => [
+                'required',
+                Rule::exists('expense_categories', 'id')->where('company_id', current_company()?->id),
+            ],
             'name' => ['required', 'string', 'max:255'],
             'code' => ['nullable', 'string', 'max:50'],
             'description' => ['nullable', 'string'],

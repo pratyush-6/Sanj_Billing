@@ -2,20 +2,25 @@
 
 namespace App\Http\Controllers\Expense;
 
+use App\Http\Controllers\Concerns\EnsuresCompanyOwnership;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ExpenseCategoryRequest;
-use App\Models\Company;
 use App\Models\ExpenseCategory;
 use App\Services\MasterDataService;
 use Illuminate\Http\RedirectResponse;
 
 class ExpenseCategoryController extends Controller
 {
+    use EnsuresCompanyOwnership;
+
     public function __construct(private MasterDataService $masterDataService) {}
 
     public function index()
     {
-        $categories = ExpenseCategory::with('subCategories')->orderBy('name')->get();
+        $categories = ExpenseCategory::where('company_id', current_company()?->id)
+            ->with('subCategories')
+            ->orderBy('name')
+            ->get();
 
         return view('expense-categories.index', ['categories' => $categories]);
     }
@@ -27,7 +32,7 @@ class ExpenseCategoryController extends Controller
 
     public function store(ExpenseCategoryRequest $request): RedirectResponse
     {
-        $company = Company::firstOrFail();
+        $company = current_company_or_fail();
 
         $this->masterDataService->create(ExpenseCategory::class, [
             ...$request->validated(),
@@ -39,6 +44,8 @@ class ExpenseCategoryController extends Controller
 
     public function edit(ExpenseCategory $expenseCategory)
     {
+        $this->ensureBelongsToCurrentCompany($expenseCategory);
+
         return view('expense-categories.edit', [
             'category' => $expenseCategory,
             'natureOptions' => config('expense.nature_options'),
@@ -47,6 +54,8 @@ class ExpenseCategoryController extends Controller
 
     public function update(ExpenseCategoryRequest $request, ExpenseCategory $expenseCategory): RedirectResponse
     {
+        $this->ensureBelongsToCurrentCompany($expenseCategory);
+
         $this->masterDataService->update($expenseCategory, $request->validated(), 'Expense Category');
 
         return redirect()->route('expense-categories.index')->with('status', 'Category updated.');

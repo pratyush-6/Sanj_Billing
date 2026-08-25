@@ -48,3 +48,21 @@
         <x-text-input id="password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" />
     </div>
 </div>
+
+<div class="mt-6 pt-6 border-t border-ink-100">
+    <x-input-label value="Company Access" />
+    <p class="text-xs text-ink-400 mb-3">Which companies can this user see and work in. Super Admins automatically have access to every company.</p>
+    <div class="space-y-2">
+        @forelse ($companies as $company)
+            @php($selected = old('companies', $user?->companies->pluck('id')->all() ?? []))
+            <label class="flex items-center gap-2 text-sm text-ink-700">
+                <input type="checkbox" name="companies[]" value="{{ $company->id }}" class="rounded border-ink-300 text-brand-600 focus:ring-brand-500"
+                    @checked(in_array($company->id, $selected))>
+                {{ $company->name }}
+            </label>
+        @empty
+            <p class="text-sm text-ink-400">No companies exist yet.</p>
+        @endforelse
+    </div>
+    <x-input-error :messages="$errors->get('companies')" class="mt-2" />
+</div>

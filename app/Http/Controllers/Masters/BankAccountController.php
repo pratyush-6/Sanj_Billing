@@ -2,20 +2,24 @@
 
 namespace App\Http\Controllers\Masters;
 
+use App\Http\Controllers\Concerns\EnsuresCompanyOwnership;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BankAccountRequest;
 use App\Models\BankAccount;
-use App\Models\Company;
 use App\Services\MasterDataService;
 use Illuminate\Http\RedirectResponse;
 
 class BankAccountController extends Controller
 {
+    use EnsuresCompanyOwnership;
+
     public function __construct(private MasterDataService $masterDataService) {}
 
     public function index()
     {
-        return view('masters.bank-accounts.index', ['bankAccounts' => BankAccount::orderBy('account_name')->get()]);
+        $bankAccounts = BankAccount::where('company_id', current_company()?->id)->orderBy('account_name')->get();
+
+        return view('masters.bank-accounts.index', ['bankAccounts' => $bankAccounts]);
     }
 
     public function create()
@@ -25,7 +29,7 @@ class BankAccountController extends Controller
 
     public function store(BankAccountRequest $request): RedirectResponse
     {
-        $company = Company::firstOrFail();
+        $company = current_company_or_fail();
         $data = $request->validated();
         $data['current_balance'] = $data['opening_balance'];
 
@@ -39,11 +43,15 @@ class BankAccountController extends Controller
 
     public function edit(BankAccount $bankAccount)
     {
+        $this->ensureBelongsToCurrentCompany($bankAccount);
+
         return view('masters.bank-accounts.edit', ['bankAccount' => $bankAccount]);
     }
 
     public function update(BankAccountRequest $request, BankAccount $bankAccount): RedirectResponse
     {
+        $this->ensureBelongsToCurrentCompany($bankAccount);
+
         $data = $request->validated();
         unset($data['opening_balance']);
 

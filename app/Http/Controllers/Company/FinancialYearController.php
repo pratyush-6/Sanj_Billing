@@ -2,20 +2,22 @@
 
 namespace App\Http\Controllers\Company;
 
+use App\Http\Controllers\Concerns\EnsuresCompanyOwnership;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\FinancialYearRequest;
-use App\Models\Company;
 use App\Models\FinancialYear;
 use App\Services\FinancialYearService;
 use Illuminate\Http\RedirectResponse;
 
 class FinancialYearController extends Controller
 {
+    use EnsuresCompanyOwnership;
+
     public function __construct(private FinancialYearService $financialYearService) {}
 
     public function index()
     {
-        $company = Company::first();
+        $company = current_company();
 
         $financialYears = $company
             ? $company->financialYears()->orderByDesc('start_date')->get()
@@ -29,12 +31,12 @@ class FinancialYearController extends Controller
 
     public function create()
     {
-        return view('financial-years.create', ['company' => Company::firstOrFail()]);
+        return view('financial-years.create', ['company' => current_company_or_fail()]);
     }
 
     public function store(FinancialYearRequest $request): RedirectResponse
     {
-        $company = Company::firstOrFail();
+        $company = current_company_or_fail();
 
         $financialYear = $this->financialYearService->create([
             ...$request->validated(),
@@ -50,6 +52,8 @@ class FinancialYearController extends Controller
 
     public function activate(FinancialYear $financialYear): RedirectResponse
     {
+        $this->ensureBelongsToCurrentCompany($financialYear);
+
         $this->financialYearService->activate($financialYear);
 
         return redirect()->route('financial-years.index')->with('status', 'Financial year activated.');
@@ -57,6 +61,8 @@ class FinancialYearController extends Controller
 
     public function lock(FinancialYear $financialYear): RedirectResponse
     {
+        $this->ensureBelongsToCurrentCompany($financialYear);
+
         $this->financialYearService->lock($financialYear);
 
         return redirect()->route('financial-years.index')->with('status', 'Financial year locked.');
@@ -64,6 +70,8 @@ class FinancialYearController extends Controller
 
     public function unlock(FinancialYear $financialYear): RedirectResponse
     {
+        $this->ensureBelongsToCurrentCompany($financialYear);
+
         $this->financialYearService->unlock($financialYear);
 
         return redirect()->route('financial-years.index')->with('status', 'Financial year unlocked.');
@@ -71,6 +79,8 @@ class FinancialYearController extends Controller
 
     public function close(FinancialYear $financialYear): RedirectResponse
     {
+        $this->ensureBelongsToCurrentCompany($financialYear);
+
         $this->financialYearService->close($financialYear);
 
         return redirect()->route('financial-years.index')->with('status', 'Financial year closed.');

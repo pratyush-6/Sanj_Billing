@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Company;
 use App\Models\Expense;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $company = Company::first();
+        $company = current_company();
         $activeFinancialYear = $company?->activeFinancialYear();
 
         $stats = null;

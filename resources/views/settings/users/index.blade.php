@@ -25,6 +25,7 @@
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 uppercase tracking-wide">Name</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 uppercase tracking-wide">Email</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 uppercase tracking-wide">Role</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 uppercase tracking-wide">Companies</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 uppercase tracking-wide">Status</th>
                             <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 uppercase tracking-wide">Actions</th>
                         </tr>
@@ -35,6 +36,9 @@
                                 <td class="px-4 py-3.5 text-sm font-medium text-ink-900">{{ $user->name }}</td>
                                 <td class="px-4 py-3.5 text-sm text-ink-600">{{ $user->email }}</td>
                                 <td class="px-4 py-3.5 text-sm text-ink-600">{{ $user->roles->pluck('name')->join(', ') ?: '—' }}</td>
+                                <td class="px-4 py-3.5 text-sm text-ink-600">
+                                    {{ $user->hasRole('Super Admin') ? 'All companies' : ($user->companies->pluck('name')->join(', ') ?: '—') }}
+                                </td>
                                 <td class="px-4 py-3.5 text-sm">
                                     <x-ui.badge :variant="$user->status === 'active' ? 'success' : 'neutral'">{{ ucfirst($user->status) }}</x-ui.badge>
                                 </td>

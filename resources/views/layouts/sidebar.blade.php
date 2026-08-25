@@ -36,7 +36,7 @@ if (auth()->user()->can('financial-years.manage')) {
     $companyItems[] = ['route' => 'financial-years.index', 'label' => 'Financial Years', 'pattern' => 'financial-years.*'];
 }
 if (auth()->user()->can('companies.manage')) {
-    $companyItems[] = ['route' => 'company.edit', 'label' => 'Company Profile', 'pattern' => 'company.*'];
+    $companyItems[] = ['route' => 'companies.index', 'label' => 'Companies', 'pattern' => 'companies.*'];
 }
 if ($companyItems) {
     $navGroups['Company'] = ['icon' => 'building', 'items' => $companyItems];
@@ -52,6 +52,9 @@ if (auth()->user()->can('audit-logs.view')) {
 if ($adminItems) {
     $navGroups['Administration'] = ['icon' => 'shield', 'items' => $adminItems];
 }
+
+$accessibleCompanies = app(\App\Services\CompanyContextService::class)->accessibleCompanies();
+$currentCompany = current_company();
 
 $icons = [
     'home' => 'M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 101.06-1.06l-8.689-8.69a2.25 2.25 0 00-3.182 0l-8.69 8.69a.75.75 0 001.061 1.06l8.69-8.69zM12 5.432l8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 01-.75-.75v-4.5a.75.75 0 00-.75-.75h-3a.75.75 0 00-.75.75V21a.75.75 0 01-.75.75H5.625a1.875 1.875 0 01-1.875-1.875v-6.198a2.29 2.29 0 00.091-.086L12 5.43z',
@@ -69,6 +72,34 @@ $icons = [
             <x-application-logo />
         </a>
     </div>
+
+    @if ($currentCompany && $accessibleCompanies->count() > 1)
+        <div class="px-3 pt-3" x-data="{ open: false }" @click.outside="open = false">
+            <div class="relative">
+                <button @click="open = ! open" type="button" class="flex w-full items-center justify-between gap-2 rounded-lg border border-ink-200 px-3 py-2 text-sm hover:bg-ink-50">
+                    <span class="truncate font-medium text-ink-800">{{ $currentCompany->name }}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-ink-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" /></svg>
+                </button>
+                <div x-show="open" x-transition style="display: none;" class="absolute z-40 mt-1 w-full rounded-lg border border-ink-200 bg-white shadow-lg py-1">
+                    @foreach ($accessibleCompanies as $company)
+                        <form method="POST" action="{{ route('companies.switch', $company) }}">
+                            @csrf
+                            <button type="submit" @class([
+                                'flex w-full items-center justify-between px-3 py-2 text-sm text-left hover:bg-ink-50',
+                                'text-brand-700 font-medium' => $company->id === $currentCompany->id,
+                                'text-ink-700' => $company->id !== $currentCompany->id,
+                            ])>
+                                {{ $company->name }}
+                                @if ($company->id === $currentCompany->id)
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-brand-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                                @endif
+                            </button>
+                        </form>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    @endif
 
     <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
         <a href="{{ route('dashboard') }}"

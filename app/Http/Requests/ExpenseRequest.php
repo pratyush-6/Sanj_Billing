@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\ExpenseCategory;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -14,15 +15,23 @@ class ExpenseRequest extends FormRequest
 
     public function rules(): array
     {
+        $companyId = current_company()?->id;
+
         return [
             'expense_date' => ['required', 'date'],
-            'expense_category_id' => ['required', 'exists:expense_categories,id'],
-            'expense_sub_category_id' => ['nullable', 'exists:expense_sub_categories,id'],
-            'vendor_id' => ['nullable', 'exists:vendors,id'],
+            'expense_category_id' => ['required', Rule::exists('expense_categories', 'id')->where('company_id', $companyId)],
+            'expense_sub_category_id' => [
+                'nullable',
+                Rule::exists('expense_sub_categories', 'id')->whereIn(
+                    'expense_category_id',
+                    ExpenseCategory::where('company_id', $companyId)->pluck('id')
+                ),
+            ],
+            'vendor_id' => ['nullable', Rule::exists('vendors', 'id')->where('company_id', $companyId)],
             'description' => ['nullable', 'string', 'max:500'],
 
             'quantity' => ['nullable', 'numeric', 'min:0', 'required_with:rate'],
-            'unit_id' => ['nullable', 'exists:units,id'],
+            'unit_id' => ['nullable', Rule::exists('units', 'id')->where('company_id', $companyId)],
             'rate' => ['nullable', 'numeric', 'min:0', 'required_with:quantity'],
             'taxable_amount' => ['required_without_all:quantity,rate', 'nullable', 'numeric', 'min:0'],
 
@@ -34,8 +43,8 @@ class ExpenseRequest extends FormRequest
             'business_amount' => ['required_if:nature_of_use,Mixed', 'nullable', 'numeric', 'min:0'],
             'personal_amount' => ['required_if:nature_of_use,Mixed', 'nullable', 'numeric', 'min:0'],
 
-            'payment_method_id' => ['required', 'exists:payment_methods,id'],
-            'bank_account_id' => ['required', 'exists:bank_accounts,id'],
+            'payment_method_id' => ['required', Rule::exists('payment_methods', 'id')->where('company_id', $companyId)],
+            'bank_account_id' => ['required', Rule::exists('bank_accounts', 'id')->where('company_id', $companyId)],
 
             'invoice_number' => ['nullable', 'string', 'max:100'],
             'invoice_date' => ['nullable', 'date'],

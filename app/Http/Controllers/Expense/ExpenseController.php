@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Expense;
 
+use App\Http\Controllers\Concerns\EnsuresCompanyOwnership;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ExpenseRequest;
 use App\Models\BankAccount;
-use App\Models\Company;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\PaymentMethod;
@@ -19,15 +19,17 @@ use RuntimeException;
 
 class ExpenseController extends Controller
 {
+    use EnsuresCompanyOwnership;
+
     public function __construct(private ExpenseService $expenseService) {}
 
     public function index(Request $request)
     {
-        $company = Company::first();
+        $company = current_company();
 
         $expenses = Expense::query()
             ->with(['category', 'subCategory', 'vendor', 'paymentMethod', 'bankAccount', 'documents'])
-            ->when($company, fn ($query) => $query->where('company_id', $company->id))
+            ->where('company_id', $company?->id)
             ->when($request->filled('date_from'), fn ($query) => $query->whereDate('expense_date', '>=', $request->date('date_from')))
             ->when($request->filled('date_to'), fn ($query) => $query->whereDate('expense_date', '<=', $request->date('date_to')))
             ->when($request->filled('expense_category_id'), fn ($query) => $query->where('expense_category_id', $request->integer('expense_category_id')))
@@ -45,10 +47,10 @@ class ExpenseController extends Controller
 
         return view('expenses.index', [
             'expenses' => $expenses,
-            'categories' => ExpenseCategory::orderBy('name')->get(),
-            'vendors' => Vendor::orderBy('name')->get(),
-            'paymentMethods' => PaymentMethod::orderBy('name')->get(),
-            'bankAccounts' => BankAccount::orderBy('account_name')->get(),
+            'categories' => ExpenseCategory::where('company_id', $company?->id)->orderBy('name')->get(),
+            'vendors' => Vendor::where('company_id', $company?->id)->orderBy('name')->get(),
+            'paymentMethods' => PaymentMethod::where('company_id', $company?->id)->orderBy('name')->get(),
+            'bankAccounts' => BankAccount::where('company_id', $company?->id)->orderBy('account_name')->get(),
             'financialYears' => $company?->financialYears()->orderByDesc('start_date')->get() ?? collect(),
             'natureOptions' => config('expense.use_options'),
         ]);
@@ -61,7 +63,7 @@ class ExpenseController extends Controller
 
     public function store(ExpenseRequest $request): RedirectResponse
     {
-        $company = Company::firstOrFail();
+        $company = current_company_or_fail();
         $financialYear = $company->activeFinancialYear();
 
         if (! $financialYear) {
@@ -104,11 +106,15 @@ class ExpenseController extends Controller
 
     public function edit(Expense $expense)
     {
+        $this->ensureBelongsToCurrentCompany($expense);
+
         return $this->formData($expense);
     }
 
     public function update(ExpenseRequest $request, Expense $expense): RedirectResponse
     {
+        $this->ensureBelongsToCurrentCompany($expense);
+
         $data = $request->validated();
 
         if (! $request->boolean('confirm_duplicate')) {
@@ -140,6 +146,8 @@ class ExpenseController extends Controller
 
     public function cancel(Expense $expense): RedirectResponse
     {
+        $this->ensureBelongsToCurrentCompany($expense);
+
         try {
             $this->expenseService->cancel($expense);
         } catch (RuntimeException $exception) {
@@ -151,15 +159,15 @@ class ExpenseController extends Controller
 
     private function formData(?Expense $expense = null)
     {
-        $company = Company::firstOrFail();
+        $company = current_company_or_fail();
 
         return view('expenses.form', [
             'expense' => $expense,
-            'categories' => ExpenseCategory::where('status', 'active')->with('subCategories')->orderBy('name')->get(),
-            'vendors' => Vendor::where('status', 'active')->orderBy('name')->get(),
-            'units' => Unit::where('status', 'active')->orderBy('name')->get(),
-            'paymentMethods' => PaymentMethod::where('status', 'active')->orderBy('name')->get(),
-            'bankAccounts' => BankAccount::where('status', 'active')->orderBy('account_name')->get(),
+            'categories' => ExpenseCategory::where('company_id', $company->id)->where('status', 'active')->with('subCategories')->orderBy('name')->get(),
+            'vendors' => Vendor::where('company_id', $company->id)->where('status', 'active')->orderBy('name')->get(),
+            'units' => Unit::where('company_id', $company->id)->where('status', 'active')->orderBy('name')->get(),
+            'paymentMethods' => PaymentMethod::where('company_id', $company->id)->where('status', 'active')->orderBy('name')->get(),
+            'bankAccounts' => BankAccount::where('company_id', $company->id)->where('status', 'active')->orderBy('account_name')->get(),
             'natureOptions' => config('expense.use_options'),
             'expenseNatureOptions' => config('expense.nature_options'),
             'activeFinancialYear' => $company->activeFinancialYear(),

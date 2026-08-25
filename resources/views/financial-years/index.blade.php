@@ -10,7 +10,7 @@
 
         @if (! $company)
             <x-ui.card>
-                <p class="text-sm text-ink-500">Please set up the <a href="{{ route('company.edit') }}" class="text-brand-600 hover:underline font-medium">company profile</a> first.</p>
+                <p class="text-sm text-ink-500">Please set up the <a href="{{ route('companies.index') }}" class="text-brand-600 hover:underline font-medium">company profile</a> first.</p>
             </x-ui.card>
         @else
             <div class="flex justify-end">

@@ -17,13 +17,13 @@ class UserManagementService
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'phone' => $data['phone'] ?? null,
-                'company_id' => $data['company_id'] ?? null,
                 'status' => $data['status'] ?? 'active',
                 'password' => Hash::make($data['password']),
                 'email_verified_at' => now(),
             ]);
 
             $user->syncRoles([$data['role']]);
+            $user->companies()->sync($data['companies'] ?? []);
 
             $this->auditLog->log('User Created', 'User', $user, null, $user->toArray());
 
@@ -51,6 +51,10 @@ class UserManagementService
 
             if (! empty($data['role'])) {
                 $user->syncRoles([$data['role']]);
+            }
+
+            if (array_key_exists('companies', $data)) {
+                $user->companies()->sync($data['companies'] ?? []);
             }
 
             $this->auditLog->log('User Updated', 'User', $user, $old, $user->toArray());

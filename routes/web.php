@@ -29,9 +29,10 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    Route::post('/companies/{company}/switch', [CompanyController::class, 'switch'])->name('companies.switch');
+
     Route::middleware('can:companies.manage')->group(function () {
-        Route::get('/settings/company', [CompanyController::class, 'edit'])->name('company.edit');
-        Route::put('/settings/company', [CompanyController::class, 'update'])->name('company.update');
+        Route::resource('companies', CompanyController::class)->except(['show', 'destroy']);
     });
 
     Route::middleware('can:financial-years.manage')->group(function () {

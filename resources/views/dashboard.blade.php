@@ -6,14 +6,18 @@
     <div class="space-y-6">
 
         @if (! $company)
-            <x-ui.alert variant="warning" title="Welcome to Sanjeevani. Let's set things up.">
-                Start by creating your company profile.
-                @can('companies.manage')
-                    <a href="{{ route('company.edit') }}" class="inline-block mt-3 text-sm font-semibold text-amber-800 underline">
+            @can('companies.manage')
+                <x-ui.alert variant="warning" title="Welcome to Sanjeevani. Let's set things up.">
+                    Start by creating your company profile.
+                    <a href="{{ route('companies.create') }}" class="inline-block mt-3 text-sm font-semibold text-amber-800 underline">
                         Set Up Company &rarr;
                     </a>
-                @endcan
-            </x-ui.alert>
+                </x-ui.alert>
+            @else
+                <x-ui.alert variant="warning" title="No company access yet.">
+                    You haven't been granted access to a company. Contact your administrator.
+                </x-ui.alert>
+            @endcan
         @elseif (! $activeFinancialYear)
             <x-ui.alert variant="warning" title="No active financial year.">
                 Create and activate a financial year to begin recording transactions.

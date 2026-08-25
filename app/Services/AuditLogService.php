@@ -12,6 +12,7 @@ class AuditLogService
     public function log(string $action, string $module, ?Model $record = null, ?array $oldValues = null, ?array $newValues = null): AuditLog
     {
         return AuditLog::create([
+            'company_id' => current_company()?->id,
             'user_id' => Auth::id(),
             'action' => $action,
             'module' => $module,

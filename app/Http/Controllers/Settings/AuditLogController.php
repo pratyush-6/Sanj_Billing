@@ -11,6 +11,7 @@ class AuditLogController extends Controller
     public function index(Request $request)
     {
         $logs = AuditLog::with('user')
+            ->where('company_id', current_company()?->id)
             ->when($request->filled('module'), fn ($query) => $query->where('module', $request->string('module')))
             ->when($request->filled('user_id'), fn ($query) => $query->where('user_id', $request->integer('user_id')))
             ->latest('created_at')
@@ -19,7 +20,7 @@ class AuditLogController extends Controller
 
         return view('settings.audit-logs.index', [
             'logs' => $logs,
-            'modules' => AuditLog::query()->distinct()->orderBy('module')->pluck('module'),
+            'modules' => AuditLog::query()->where('company_id', current_company()?->id)->distinct()->orderBy('module')->pluck('module'),
         ]);
     }
 }

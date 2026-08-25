@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Services\CompanyContextService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Role;
@@ -16,6 +17,7 @@ class UserRequest extends FormRequest
     public function rules(): array
     {
         $user = $this->route('user');
+        $accessibleCompanyIds = app(CompanyContextService::class)->accessibleCompanies()->pluck('id');
 
         return [
             'name' => ['required', 'string', 'max:255'],
@@ -24,6 +26,8 @@ class UserRequest extends FormRequest
             'role' => ['required', Rule::in(Role::pluck('name'))],
             'status' => ['required', Rule::in(['active', 'inactive'])],
             'password' => [$user ? 'nullable' : 'required', 'string', 'min:8', 'confirmed'],
+            'companies' => ['nullable', 'array'],
+            'companies.*' => [Rule::in($accessibleCompanyIds)],
         ];
     }
 }
