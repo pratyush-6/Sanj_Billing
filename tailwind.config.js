@@ -1,4 +1,5 @@
 import defaultTheme from 'tailwindcss/defaultTheme';
+import colors from 'tailwindcss/colors';
 import forms from '@tailwindcss/forms';
 
 /** @type {import('tailwindcss').Config} */
@@ -12,7 +13,13 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Plus Jakarta Sans', ...defaultTheme.fontFamily.sans],
+            },
+            colors: {
+                // Central brand palette. Swap this one alias to re-theme the
+                // whole app instead of touching individual view files.
+                brand: colors.teal,
+                ink: colors.slate,
             },
         },
     },

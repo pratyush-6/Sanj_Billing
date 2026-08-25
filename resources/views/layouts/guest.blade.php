@@ -9,21 +9,29 @@
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans text-gray-900 antialiased">
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
-            <div>
-                <a href="/">
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
-                </a>
+    <body class="font-sans text-ink-900 antialiased">
+        <div class="min-h-screen flex flex-col sm:flex-row">
+            <div class="hidden sm:flex sm:w-2/5 bg-brand-700 text-white flex-col justify-between p-10">
+                <x-application-logo class="[&_span]:text-white" />
+                <div>
+                    <p class="text-2xl font-bold leading-snug">Expenses, accounting & tax &mdash; in one place.</p>
+                    <p class="mt-3 text-brand-100 text-sm">Record expenses once. Reports, GST/TDS, and CA-ready data follow automatically.</p>
+                </div>
+                <p class="text-xs text-brand-200">&copy; {{ date('Y') }} Sanjeevani</p>
             </div>
 
-            <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
-                {{ $slot }}
+            <div class="flex flex-1 flex-col justify-center items-center px-6 py-12">
+                <div class="w-full sm:hidden mb-8">
+                    <x-application-logo />
+                </div>
+                <div class="w-full sm:max-w-sm">
+                    {{ $slot }}
+                </div>
             </div>
         </div>
     </body>

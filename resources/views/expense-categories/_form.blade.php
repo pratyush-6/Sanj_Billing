@@ -13,7 +13,7 @@
 
     <div>
         <x-input-label for="expense_nature" value="Expense Nature" />
-        <select id="expense_nature" name="expense_nature" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+        <select id="expense_nature" name="expense_nature" class="mt-1 block w-full border-ink-300 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
             <option value="">Select</option>
             @foreach ($natureOptions as $option)
                 <option value="{{ $option }}" @selected(old('expense_nature', $category?->expense_nature) === $option)>{{ $option }}</option>
@@ -24,7 +24,7 @@
 
     <div>
         <x-input-label for="status" value="Status *" />
-        <select id="status" name="status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+        <select id="status" name="status" class="mt-1 block w-full border-ink-300 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
             <option value="active" @selected(old('status', $category?->status ?? 'active') === 'active')>Active</option>
             <option value="inactive" @selected(old('status', $category?->status) === 'inactive')>Inactive</option>
         </select>
@@ -33,13 +33,13 @@
 
     <div class="sm:col-span-2">
         <x-input-label for="description" value="Description" />
-        <textarea id="description" name="description" rows="2" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">{{ old('description', $category?->description) }}</textarea>
+        <textarea id="description" name="description" rows="2" class="mt-1 block w-full border-ink-300 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">{{ old('description', $category?->description) }}</textarea>
         <x-input-error :messages="$errors->get('description')" class="mt-2" />
     </div>
 
     <div class="flex items-center gap-2">
         <input type="hidden" name="tax_applicable" value="0">
-        <input type="checkbox" id="tax_applicable" name="tax_applicable" value="1" class="rounded border-gray-300" @checked(old('tax_applicable', $category?->tax_applicable))>
+        <input type="checkbox" id="tax_applicable" name="tax_applicable" value="1" class="rounded border-ink-300 text-brand-600 focus:ring-brand-500" @checked(old('tax_applicable', $category?->tax_applicable))>
         <x-input-label for="tax_applicable" value="Tax applicable by default" class="!mb-0" />
     </div>
 </div>

@@ -1,17 +1,15 @@
 <x-app-layout>
-    <x-slot name="header"><h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('New Account') }}</h2></x-slot>
-    <div class="py-12">
-        <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                <form method="POST" action="{{ route('bank-accounts.store') }}" class="space-y-6">
-                    @csrf
-                    @include('masters.bank-accounts._form', ['bankAccount' => null])
-                    <div class="flex items-center gap-4">
-                        <x-primary-button>{{ __('Create') }}</x-primary-button>
-                        <a href="{{ route('bank-accounts.index') }}" class="text-sm text-gray-600 hover:underline">Cancel</a>
-                    </div>
-                </form>
-            </div>
-        </div>
+    <x-slot name="header"><x-ui.page-header title="New Account" /></x-slot>
+    <div class="max-w-xl">
+        <x-ui.card>
+            <form method="POST" action="{{ route('bank-accounts.store') }}" class="space-y-6">
+                @csrf
+                @include('masters.bank-accounts._form', ['bankAccount' => null])
+                <div class="flex items-center gap-4 border-t border-ink-100 pt-6">
+                    <x-primary-button>{{ __('Create') }}</x-primary-button>
+                    <a href="{{ route('bank-accounts.index') }}" class="text-sm text-ink-500 hover:text-ink-700">Cancel</a>
+                </div>
+            </form>
+        </x-ui.card>
     </div>
 </x-app-layout>

@@ -1,44 +1,49 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Payment Methods') }}</h2>
+        <x-ui.page-header title="Payment Methods" description="Ways expenses can be paid — Cash, UPI, NEFT, etc." />
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8 space-y-4">
-            @if (session('status'))
-                <div class="p-3 bg-green-50 text-green-800 rounded-md text-sm">{{ session('status') }}</div>
-            @endif
+    <div class="max-w-2xl space-y-4">
+        @if (session('status'))
+            <x-ui.alert variant="success">{{ session('status') }}</x-ui.alert>
+        @endif
 
-            <div class="flex justify-end">
-                <a href="{{ route('payment-methods.create') }}" class="px-4 py-2 bg-gray-800 text-white text-sm font-medium rounded-md hover:bg-gray-700">+ New Payment Method</a>
-            </div>
+        <div class="flex justify-end">
+            <a href="{{ route('payment-methods.create') }}">
+                <x-primary-button>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                    New Payment Method
+                </x-primary-button>
+            </a>
+        </div>
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+        <x-ui.card :padded="false">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-ink-100">
+                    <thead class="bg-ink-50/80">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 uppercase tracking-wide">Name</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 uppercase tracking-wide">Status</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 uppercase tracking-wide">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200">
+                    <tbody class="divide-y divide-ink-100">
                         @forelse ($paymentMethods as $method)
-                            <tr>
-                                <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $method->name }}</td>
-                                <td class="px-6 py-4 text-sm">
-                                    <span class="px-2 py-1 rounded-full text-xs {{ $method->status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600' }}">{{ ucfirst($method->status) }}</span>
+                            <tr class="hover:bg-ink-50/60">
+                                <td class="px-4 py-3.5 text-sm font-medium text-ink-900">{{ $method->name }}</td>
+                                <td class="px-4 py-3.5 text-sm">
+                                    <x-ui.badge :variant="$method->status === 'active' ? 'success' : 'neutral'">{{ ucfirst($method->status) }}</x-ui.badge>
                                 </td>
-                                <td class="px-6 py-4 text-right text-sm">
-                                    <a href="{{ route('payment-methods.edit', $method) }}" class="text-indigo-600 hover:underline">Edit</a>
+                                <td class="px-4 py-3.5 text-right text-sm">
+                                    <a href="{{ route('payment-methods.edit', $method) }}" class="text-brand-600 hover:text-brand-800 font-medium">Edit</a>
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="3" class="px-6 py-8 text-center text-sm text-gray-500">No payment methods yet.</td></tr>
+                            <tr><td colspan="3"><x-ui.empty-state title="No payment methods yet" /></td></tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
-        </div>
+        </x-ui.card>
     </div>
 </x-app-layout>

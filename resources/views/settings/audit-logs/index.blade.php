@@ -1,57 +1,58 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Audit Logs') }}
-        </h2>
+        <x-ui.page-header title="Audit Logs" description="Every recorded change, who made it, and when." />
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-6xl mx-auto sm:px-6 lg:px-8 space-y-4">
-
-            <form method="GET" class="bg-white shadow-sm sm:rounded-lg p-4 flex flex-wrap gap-4 items-end">
+    <div class="space-y-4">
+        <x-ui.card>
+            <form method="GET" class="flex flex-wrap gap-4 items-end">
                 <div>
-                    <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Module</label>
-                    <select name="module" class="border-gray-300 rounded-md shadow-sm text-sm">
+                    <label class="block text-xs font-medium text-ink-500 uppercase mb-1">Module</label>
+                    <select name="module" class="border-ink-300 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
                         <option value="">All</option>
                         @foreach ($modules as $module)
                             <option value="{{ $module }}" @selected(request('module') === $module)>{{ $module }}</option>
                         @endforeach
                     </select>
                 </div>
-                <button class="px-4 py-2 bg-gray-800 text-white text-sm font-medium rounded-md hover:bg-gray-700">Filter</button>
+                <x-secondary-button type="submit">Filter</x-secondary-button>
             </form>
+        </x-ui.card>
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+        <x-ui.card :padded="false">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-ink-100">
+                    <thead class="bg-ink-50/80">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date/Time</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Module</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">IP Address</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 uppercase tracking-wide">Date/Time</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 uppercase tracking-wide">User</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 uppercase tracking-wide">Action</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 uppercase tracking-wide">Module</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 uppercase tracking-wide">IP Address</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200">
+                    <tbody class="divide-y divide-ink-100">
                         @forelse ($logs as $log)
-                            <tr>
-                                <td class="px-6 py-4 text-sm text-gray-600">{{ $log->created_at->format('d-M-Y H:i:s') }}</td>
-                                <td class="px-6 py-4 text-sm text-gray-600">{{ $log->user?->name ?? 'System' }}</td>
-                                <td class="px-6 py-4 text-sm text-gray-900">{{ $log->action }}</td>
-                                <td class="px-6 py-4 text-sm text-gray-600">{{ $log->module }}</td>
-                                <td class="px-6 py-4 text-sm text-gray-500">{{ $log->ip_address }}</td>
+                            <tr class="hover:bg-ink-50/60">
+                                <td class="px-4 py-3.5 text-sm text-ink-600 whitespace-nowrap">{{ $log->created_at->format('d-M-Y H:i:s') }}</td>
+                                <td class="px-4 py-3.5 text-sm text-ink-600">{{ $log->user?->name ?? 'System' }}</td>
+                                <td class="px-4 py-3.5 text-sm font-medium text-ink-900">{{ $log->action }}</td>
+                                <td class="px-4 py-3.5 text-sm text-ink-600">{{ $log->module }}</td>
+                                <td class="px-4 py-3.5 text-sm text-ink-400">{{ $log->ip_address }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-8 text-center text-sm text-gray-500">No audit log entries yet.</td>
+                                <td colspan="5">
+                                    <x-ui.empty-state title="No audit log entries yet" />
+                                </td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
-                <div class="px-6 py-4">
+                <div class="px-4 py-4">
                     {{ $logs->links() }}
                 </div>
             </div>
-        </div>
+        </x-ui.card>
     </div>
 </x-app-layout>

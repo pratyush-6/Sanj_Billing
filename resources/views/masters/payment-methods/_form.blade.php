@@ -11,7 +11,7 @@
     </div>
     <div>
         <x-input-label for="status" value="Status *" />
-        <select id="status" name="status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+        <select id="status" name="status" class="mt-1 block w-full border-ink-300 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
             <option value="active" @selected(old('status', $paymentMethod?->status ?? 'active') === 'active')>Active</option>
             <option value="inactive" @selected(old('status', $paymentMethod?->status) === 'inactive')>Inactive</option>
         </select>

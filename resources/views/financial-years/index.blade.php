@@ -1,90 +1,92 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Financial Years') }}
-        </h2>
+        <x-ui.page-header title="Financial Years" description="Manage accounting periods for your company." />
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8 space-y-4">
+    <div class="space-y-4">
+        @if (session('status'))
+            <x-ui.alert variant="success">{{ session('status') }}</x-ui.alert>
+        @endif
 
-            @if (session('status'))
-                <div class="p-3 bg-green-50 text-green-800 rounded-md text-sm">{{ session('status') }}</div>
-            @endif
+        @if (! $company)
+            <x-ui.card>
+                <p class="text-sm text-ink-500">Please set up the <a href="{{ route('company.edit') }}" class="text-brand-600 hover:underline font-medium">company profile</a> first.</p>
+            </x-ui.card>
+        @else
+            <div class="flex justify-end">
+                <a href="{{ route('financial-years.create') }}">
+                    <x-primary-button>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                        New Financial Year
+                    </x-primary-button>
+                </a>
+            </div>
 
-            @if (! $company)
-                <div class="bg-white shadow-sm sm:rounded-lg p-6 text-gray-600">
-                    Please set up the <a href="{{ route('company.edit') }}" class="text-indigo-600 underline">company profile</a> first.
-                </div>
-            @else
-                <div class="flex justify-end">
-                    <a href="{{ route('financial-years.create') }}" class="px-4 py-2 bg-gray-800 text-white text-sm font-medium rounded-md hover:bg-gray-700">
-                        + New Financial Year
-                    </a>
-                </div>
-
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+            <x-ui.card :padded="false">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-ink-100">
+                        <thead class="bg-ink-50/80">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Period</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 uppercase tracking-wide">Name</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 uppercase tracking-wide">Period</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 uppercase tracking-wide">Status</th>
+                                <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 uppercase tracking-wide">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200">
+                        <tbody class="divide-y divide-ink-100">
                             @forelse ($financialYears as $fy)
-                                <tr>
-                                    <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $fy->name }}</td>
-                                    <td class="px-6 py-4 text-sm text-gray-600">{{ $fy->start_date->format('d-M-Y') }} &ndash; {{ $fy->end_date->format('d-M-Y') }}</td>
-                                    <td class="px-6 py-4 text-sm">
+                                <tr class="hover:bg-ink-50/60">
+                                    <td class="px-4 py-3.5 text-sm font-medium text-ink-900">{{ $fy->name }}</td>
+                                    <td class="px-4 py-3.5 text-sm text-ink-600">{{ $fy->start_date->format('d-M-Y') }} &ndash; {{ $fy->end_date->format('d-M-Y') }}</td>
+                                    <td class="px-4 py-3.5 text-sm space-x-1">
                                         @if ($fy->is_closed)
-                                            <span class="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-600">Closed</span>
+                                            <x-ui.badge variant="neutral">Closed</x-ui.badge>
                                         @elseif ($fy->is_active)
-                                            <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-700">Active</span>
+                                            <x-ui.badge variant="success">Active</x-ui.badge>
                                         @else
-                                            <span class="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-700">Inactive</span>
+                                            <x-ui.badge variant="warning">Inactive</x-ui.badge>
                                         @endif
                                         @if ($fy->is_locked)
-                                            <span class="px-2 py-1 rounded-full text-xs bg-red-100 text-red-700">Locked</span>
+                                            <x-ui.badge variant="danger">Locked</x-ui.badge>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 text-right text-sm space-x-2">
+                                    <td class="px-4 py-3.5 text-right text-sm space-x-3 whitespace-nowrap">
                                         @unless ($fy->is_closed)
                                             @unless ($fy->is_active)
                                                 <form method="POST" action="{{ route('financial-years.activate', $fy) }}" class="inline">
                                                     @csrf
-                                                    <button class="text-indigo-600 hover:underline">Activate</button>
+                                                    <button class="text-brand-600 hover:text-brand-800 font-medium">Activate</button>
                                                 </form>
                                             @endunless
                                             @if ($fy->is_locked)
                                                 <form method="POST" action="{{ route('financial-years.unlock', $fy) }}" class="inline">
                                                     @csrf
-                                                    <button class="text-indigo-600 hover:underline">Unlock</button>
+                                                    <button class="text-brand-600 hover:text-brand-800 font-medium">Unlock</button>
                                                 </form>
                                             @else
                                                 <form method="POST" action="{{ route('financial-years.lock', $fy) }}" class="inline">
                                                     @csrf
-                                                    <button class="text-indigo-600 hover:underline">Lock</button>
+                                                    <button class="text-brand-600 hover:text-brand-800 font-medium">Lock</button>
                                                 </form>
                                             @endif
                                             <form method="POST" action="{{ route('financial-years.close', $fy) }}" class="inline" onsubmit="return confirm('Close this financial year? This cannot be undone.');">
                                                 @csrf
-                                                <button class="text-red-600 hover:underline">Close</button>
+                                                <button class="text-rose-600 hover:text-rose-800 font-medium">Close</button>
                                             </form>
                                         @endunless
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="px-6 py-8 text-center text-sm text-gray-500">No financial years yet.</td>
+                                    <td colspan="4">
+                                        <x-ui.empty-state title="No financial years yet" description="Create one to start recording transactions." />
+                                    </td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
-            @endif
-        </div>
+            </x-ui.card>
+        @endif
     </div>
 </x-app-layout>

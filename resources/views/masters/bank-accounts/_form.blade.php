@@ -7,7 +7,7 @@
 
     <div>
         <x-input-label for="account_type" value="Account Type *" />
-        <select id="account_type" name="account_type" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+        <select id="account_type" name="account_type" class="mt-1 block w-full border-ink-300 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
             @foreach (['bank' => 'Bank', 'cash' => 'Cash', 'credit_card' => 'Credit Card', 'upi' => 'UPI'] as $value => $label)
                 <option value="{{ $value }}" @selected(old('account_type', $bankAccount?->account_type ?? 'bank') === $value)>{{ $label }}</option>
             @endforeach
@@ -39,14 +39,14 @@
         <x-input-label for="opening_balance" value="Opening Balance *" />
         <x-text-input id="opening_balance" name="opening_balance" type="number" step="0.01" class="mt-1 block w-full" :value="old('opening_balance', $bankAccount?->opening_balance ?? 0)" required @if($bankAccount) readonly @endif />
         @if ($bankAccount)
-            <p class="text-xs text-gray-500 mt-1">Opening balance can't be changed after creation.</p>
+            <p class="text-xs text-ink-400 mt-1">Opening balance can't be changed after creation.</p>
         @endif
         <x-input-error :messages="$errors->get('opening_balance')" class="mt-2" />
     </div>
 
     <div>
         <x-input-label for="status" value="Status *" />
-        <select id="status" name="status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+        <select id="status" name="status" class="mt-1 block w-full border-ink-300 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
             <option value="active" @selected(old('status', $bankAccount?->status ?? 'active') === 'active')>Active</option>
             <option value="inactive" @selected(old('status', $bankAccount?->status) === 'inactive')>Inactive</option>
         </select>
