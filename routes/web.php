@@ -3,9 +3,17 @@
 use App\Http\Controllers\Company\CompanyController;
 use App\Http\Controllers\Company\FinancialYearController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\Expense\ExpenseCategoryController;
+use App\Http\Controllers\Expense\ExpenseController;
+use App\Http\Controllers\Expense\ExpenseSubCategoryController;
+use App\Http\Controllers\Masters\BankAccountController;
+use App\Http\Controllers\Masters\PaymentMethodController;
+use App\Http\Controllers\Masters\UnitController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Settings\AuditLogController;
 use App\Http\Controllers\Settings\UserController;
+use App\Http\Controllers\Vendor\VendorController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -45,6 +53,37 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('can:audit-logs.view')->group(function () {
         Route::get('/settings/audit-logs', [AuditLogController::class, 'index'])->name('settings.audit-logs.index');
+    });
+
+    Route::middleware('can:expense-categories.manage')->group(function () {
+        Route::resource('expense-categories', ExpenseCategoryController::class)->except(['show', 'destroy']);
+        Route::resource('expense-sub-categories', ExpenseSubCategoryController::class)->except(['show', 'destroy']);
+    });
+
+    Route::middleware('can:vendors.manage')->group(function () {
+        Route::resource('vendors', VendorController::class)->except(['destroy']);
+    });
+
+    Route::middleware('can:masters.manage')->group(function () {
+        Route::resource('units', UnitController::class)->except(['show', 'destroy']);
+        Route::resource('payment-methods', PaymentMethodController::class)->except(['show', 'destroy']);
+    });
+
+    Route::middleware('can:bank-accounts.manage')->group(function () {
+        Route::resource('bank-accounts', BankAccountController::class)->except(['show', 'destroy']);
+    });
+
+    Route::middleware('can:expenses.view')->group(function () {
+        Route::get('/expenses', [ExpenseController::class, 'index'])->name('expenses.index');
+        Route::get('/documents/{document}/download', [DocumentController::class, 'download'])->name('documents.download');
+    });
+
+    Route::middleware('can:expenses.manage')->group(function () {
+        Route::get('/expenses/create', [ExpenseController::class, 'create'])->name('expenses.create');
+        Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
+        Route::get('/expenses/{expense}/edit', [ExpenseController::class, 'edit'])->name('expenses.edit');
+        Route::put('/expenses/{expense}', [ExpenseController::class, 'update'])->name('expenses.update');
+        Route::post('/expenses/{expense}/cancel', [ExpenseController::class, 'cancel'])->name('expenses.cancel');
     });
 });
 

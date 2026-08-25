@@ -16,13 +16,42 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
+                    @can('expenses.view')
+                        <x-dropdown align="left" width="48">
+                            <x-slot name="trigger">
+                                <button type="button" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none transition duration-150 ease-in-out">
+                                    {{ __('Expenses') }}
+                                    <svg class="ms-1 fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </x-slot>
+                            <x-slot name="content">
+                                <x-dropdown-link :href="route('expenses.index')">{{ __('All Expenses') }}</x-dropdown-link>
+                                @can('expenses.manage')
+                                    <x-dropdown-link :href="route('expenses.create')">{{ __('Add Expense') }}</x-dropdown-link>
+                                @endcan
+                                @can('expense-categories.manage')
+                                    <x-dropdown-link :href="route('expense-categories.index')">{{ __('Categories') }}</x-dropdown-link>
+                                    <x-dropdown-link :href="route('expense-sub-categories.index')">{{ __('Sub Categories') }}</x-dropdown-link>
+                                @endcan
+                            </x-slot>
+                        </x-dropdown>
+                    @endcan
+
+                    @can('vendors.manage')
+                        <x-nav-link :href="route('vendors.index')" :active="request()->routeIs('vendors.*')">
+                            {{ __('Vendors') }}
+                        </x-nav-link>
+                    @endcan
+
                     @can('financial-years.manage')
                         <x-nav-link :href="route('financial-years.index')" :active="request()->routeIs('financial-years.*')">
                             {{ __('Financial Years') }}
                         </x-nav-link>
                     @endcan
 
-                    @canany(['companies.manage', 'users.manage', 'audit-logs.view'])
+                    @canany(['companies.manage', 'users.manage', 'audit-logs.view', 'masters.manage', 'bank-accounts.manage'])
                         <x-dropdown align="left" width="48">
                             <x-slot name="trigger">
                                 <button type="button" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none transition duration-150 ease-in-out">
@@ -36,6 +65,13 @@
                             <x-slot name="content">
                                 @can('companies.manage')
                                     <x-dropdown-link :href="route('company.edit')">{{ __('Company Profile') }}</x-dropdown-link>
+                                @endcan
+                                @can('masters.manage')
+                                    <x-dropdown-link :href="route('units.index')">{{ __('Units') }}</x-dropdown-link>
+                                    <x-dropdown-link :href="route('payment-methods.index')">{{ __('Payment Methods') }}</x-dropdown-link>
+                                @endcan
+                                @can('bank-accounts.manage')
+                                    <x-dropdown-link :href="route('bank-accounts.index')">{{ __('Bank & Cash Accounts') }}</x-dropdown-link>
                                 @endcan
                                 @can('users.manage')
                                     <x-dropdown-link :href="route('settings.users.index')">{{ __('Users') }}</x-dropdown-link>
@@ -101,6 +137,24 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+            @can('expenses.view')
+                <x-responsive-nav-link :href="route('expenses.index')" :active="request()->routeIs('expenses.*')">
+                    {{ __('Expenses') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('expense-categories.manage')
+                <x-responsive-nav-link :href="route('expense-categories.index')" :active="request()->routeIs('expense-categories.*')">
+                    {{ __('Categories') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('expense-sub-categories.index')" :active="request()->routeIs('expense-sub-categories.*')">
+                    {{ __('Sub Categories') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('vendors.manage')
+                <x-responsive-nav-link :href="route('vendors.index')" :active="request()->routeIs('vendors.*')">
+                    {{ __('Vendors') }}
+                </x-responsive-nav-link>
+            @endcan
             @can('financial-years.manage')
                 <x-responsive-nav-link :href="route('financial-years.index')" :active="request()->routeIs('financial-years.*')">
                     {{ __('Financial Years') }}
@@ -109,6 +163,19 @@
             @can('companies.manage')
                 <x-responsive-nav-link :href="route('company.edit')" :active="request()->routeIs('company.*')">
                     {{ __('Company Profile') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('masters.manage')
+                <x-responsive-nav-link :href="route('units.index')" :active="request()->routeIs('units.*')">
+                    {{ __('Units') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('payment-methods.index')" :active="request()->routeIs('payment-methods.*')">
+                    {{ __('Payment Methods') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('bank-accounts.manage')
+                <x-responsive-nav-link :href="route('bank-accounts.index')" :active="request()->routeIs('bank-accounts.*')">
+                    {{ __('Bank & Cash Accounts') }}
                 </x-responsive-nav-link>
             @endcan
             @can('users.manage')

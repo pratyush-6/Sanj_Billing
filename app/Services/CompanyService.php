@@ -2,7 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\BankAccount;
 use App\Models\Company;
+use App\Models\PaymentMethod;
+use App\Models\Unit;
 use Illuminate\Support\Facades\DB;
 
 class CompanyService
@@ -22,8 +25,28 @@ class CompanyService
 
             $company = Company::create($data);
             $this->auditLog->log('Company Created', 'Company', $company, null, $company->toArray());
+            $this->seedDefaultMasters($company);
 
             return $company;
         });
+    }
+
+    private function seedDefaultMasters(Company $company): void
+    {
+        foreach (['Cash', 'Bank', 'UPI', 'Credit Card', 'Debit Card', 'Cheque', 'NEFT', 'RTGS', 'IMPS', 'Other'] as $name) {
+            PaymentMethod::create(['company_id' => $company->id, 'name' => $name]);
+        }
+
+        foreach (['Piece', 'Bottle', 'Kg', 'Gram', 'Liter', 'Meter', 'Hour', 'Day', 'Month', 'Box', 'Packet', 'Other'] as $name) {
+            Unit::create(['company_id' => $company->id, 'name' => $name]);
+        }
+
+        BankAccount::create([
+            'company_id' => $company->id,
+            'account_name' => 'Cash',
+            'account_type' => 'cash',
+            'opening_balance' => 0,
+            'current_balance' => 0,
+        ]);
     }
 }
