@@ -1,10 +1,10 @@
 <section>
     <header>
-        <h2 class="text-lg font-semibold text-ink-900">
+        <h2 class="text-lg font-semibold text-ink-900 dark:text-ink-50">
             {{ __('Profile Information') }}
         </h2>
 
-        <p class="mt-1 text-sm text-ink-500">
+        <p class="mt-1 text-sm text-ink-500 dark:text-ink-400">
             {{ __("Update your account's profile information and email address.") }}
         </p>
     </header>
@@ -39,7 +39,7 @@
                     </p>
 
                     @if (session('status') === 'verification-link-sent')
-                        <p class="mt-2 font-medium text-sm text-green-600">
+                        <p class="mt-2 font-medium text-sm text-green-600 dark:text-green-400">
                             {{ __('A new verification link has been sent to your email address.') }}
                         </p>
                     @endif
@@ -56,7 +56,7 @@
                     x-show="show"
                     x-transition
                     x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-emerald-600"
+                    class="text-sm text-emerald-600 dark:text-emerald-400"
                 >{{ __('Saved.') }}</p>
             @endif
         </div>

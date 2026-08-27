@@ -13,7 +13,7 @@
 
     <div>
         <x-input-label for="business_type" value="Business Type" />
-        <input list="business-types" id="business_type" name="business_type" class="mt-1 block w-full border-ink-300 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" value="{{ old('business_type', $company?->business_type) }}" />
+        <input list="business-types" id="business_type" name="business_type" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" value="{{ old('business_type', $company?->business_type) }}" />
         <datalist id="business-types">
             <option value="Proprietorship" />
             <option value="Partnership" />
@@ -94,7 +94,7 @@
 
     <div class="sm:col-span-2">
         <x-input-label for="business_description" value="Business Description" />
-        <textarea id="business_description" name="business_description" rows="3" class="mt-1 block w-full border-ink-300 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">{{ old('business_description', $company?->business_description) }}</textarea>
+        <textarea id="business_description" name="business_description" rows="3" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">{{ old('business_description', $company?->business_description) }}</textarea>
         <x-input-error :messages="$errors->get('business_description')" class="mt-2" />
     </div>
 </div>

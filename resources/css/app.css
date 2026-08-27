@@ -1,3 +1,17 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ * Ties native form control theming (date pickers, select dropdowns, scrollbars)
+ * to our own light/dark toggle rather than the OS preference alone — otherwise
+ * a user on a light OS who switches this app to dark mode would still see
+ * light-styled native date pickers clashing against the dark page.
+ */
+html {
+    color-scheme: light;
+}
+
+html.dark {
+    color-scheme: dark;
+}

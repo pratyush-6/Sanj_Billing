@@ -2,11 +2,11 @@
 
 @php
 $variants = [
-    'success' => ['wrap' => 'bg-emerald-50 border-emerald-200 text-emerald-800', 'icon' => 'text-emerald-500'],
-    'warning' => ['wrap' => 'bg-amber-50 border-amber-200 text-amber-800', 'icon' => 'text-amber-500'],
-    'danger' => ['wrap' => 'bg-rose-50 border-rose-200 text-rose-800', 'icon' => 'text-rose-500'],
-    'info' => ['wrap' => 'bg-sky-50 border-sky-200 text-sky-800', 'icon' => 'text-sky-500'],
-][$variant] ?? ['wrap' => 'bg-ink-50 border-ink-200 text-ink-800', 'icon' => 'text-ink-500'];
+    'success' => ['wrap' => 'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-500/10 dark:border-emerald-500/30 dark:text-emerald-300', 'icon' => 'text-emerald-500 dark:text-emerald-400'],
+    'warning' => ['wrap' => 'bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-500/10 dark:border-amber-500/30 dark:text-amber-300', 'icon' => 'text-amber-500 dark:text-amber-400'],
+    'danger' => ['wrap' => 'bg-rose-50 border-rose-200 text-rose-800 dark:bg-rose-500/10 dark:border-rose-500/30 dark:text-rose-300', 'icon' => 'text-rose-500 dark:text-rose-400'],
+    'info' => ['wrap' => 'bg-sky-50 border-sky-200 text-sky-800 dark:bg-sky-500/10 dark:border-sky-500/30 dark:text-sky-300', 'icon' => 'text-sky-500 dark:text-sky-400'],
+][$variant] ?? ['wrap' => 'bg-ink-50 border-ink-200 text-ink-800 dark:bg-ink-800/60 dark:border-ink-700 dark:text-ink-200', 'icon' => 'text-ink-500 dark:text-ink-400'];
 @endphp
 
 <div {{ $attributes->class(['flex gap-3 rounded-xl border p-4 text-sm', $variants['wrap']]) }}>

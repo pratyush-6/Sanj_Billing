@@ -3,14 +3,36 @@
 namespace App\Http\Requests;
 
 use App\Models\ExpenseCategory;
+use App\Services\ExpenseService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class ExpenseRequest extends FormRequest
 {
     public function authorize(): bool
     {
         return true;
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            try {
+                $amounts = app(ExpenseService::class)->calculateAmounts($this->all());
+            } catch (ValidationException) {
+                return;
+            }
+
+            $tds = (float) ($this->input('tds_amount') ?? 0);
+
+            if ($tds > $amounts['total_amount'] + 0.01) {
+                $validator->errors()->add(
+                    'tds_amount',
+                    'TDS amount cannot exceed the total payable amount ('.number_format($amounts['total_amount'], 2).').',
+                );
+            }
+        });
     }
 
     public function rules(): array

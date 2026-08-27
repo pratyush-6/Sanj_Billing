@@ -7,6 +7,14 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
+        <script>
+            (function () {
+                var theme = localStorage.getItem('theme') || 'system';
+                var isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                document.documentElement.classList.toggle('dark', isDark);
+            })();
+        </script>
+
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap" rel="stylesheet" />
@@ -14,9 +22,9 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans text-ink-900 antialiased">
+    <body class="font-sans text-ink-900 dark:text-ink-50 antialiased bg-white dark:bg-ink-950">
         <div class="min-h-screen flex flex-col sm:flex-row">
-            <div class="hidden sm:flex sm:w-2/5 bg-brand-700 text-white flex-col justify-between p-10">
+            <div class="hidden sm:flex sm:w-2/5 bg-brand-700 dark:bg-brand-800 text-white flex-col justify-between p-10">
                 <x-application-logo class="[&_span]:text-white" />
                 <div>
                     <p class="text-2xl font-bold leading-snug">Expenses, accounting & tax &mdash; in one place.</p>

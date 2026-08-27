@@ -24,6 +24,8 @@ class RolePermissionSeeder extends Seeder
             'masters.manage',
             'expenses.manage',
             'expenses.view',
+            'reports.view',
+            'accounting.view',
         ];
 
         $permissions = collect($names)->mapWithKeys(
@@ -47,6 +49,8 @@ class RolePermissionSeeder extends Seeder
             'masters.manage',
             'expenses.manage',
             'expenses.view',
+            'reports.view',
+            'accounting.view',
         ])->values());
 
         $accountant = Role::findOrCreate('Accountant', 'web');
@@ -54,12 +58,14 @@ class RolePermissionSeeder extends Seeder
             'vendors.manage',
             'expenses.manage',
             'expenses.view',
+            'reports.view',
+            'accounting.view',
         ])->values());
 
         $ca = Role::findOrCreate('CA', 'web');
-        $ca->syncPermissions($permissions->only(['expenses.view'])->values());
+        $ca->syncPermissions($permissions->only(['expenses.view', 'reports.view', 'accounting.view'])->values());
 
         $viewer = Role::findOrCreate('Viewer', 'web');
-        $viewer->syncPermissions($permissions->only(['expenses.view'])->values());
+        $viewer->syncPermissions($permissions->only(['expenses.view', 'reports.view'])->values());
     }
 }

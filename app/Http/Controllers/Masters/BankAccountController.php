@@ -6,6 +6,7 @@ use App\Http\Controllers\Concerns\EnsuresCompanyOwnership;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BankAccountRequest;
 use App\Models\BankAccount;
+use App\Services\AccountingService;
 use App\Services\MasterDataService;
 use Illuminate\Http\RedirectResponse;
 
@@ -13,13 +14,20 @@ class BankAccountController extends Controller
 {
     use EnsuresCompanyOwnership;
 
-    public function __construct(private MasterDataService $masterDataService) {}
+    public function __construct(
+        private MasterDataService $masterDataService,
+        private AccountingService $accountingService,
+    ) {}
 
     public function index()
     {
-        $bankAccounts = BankAccount::where('company_id', current_company()?->id)->orderBy('account_name')->get();
+        $bankAccounts = BankAccount::where('company_id', current_company()?->id)->with('account')->orderBy('account_name')->get();
+        $accountBalances = $this->accountingService->liveBalances($bankAccounts->pluck('account')->filter());
+        $balances = $bankAccounts->mapWithKeys(fn ($bankAccount) => [
+            $bankAccount->id => $bankAccount->account_id ? ($accountBalances[$bankAccount->account_id] ?? 0.0) : 0.0,
+        ]);
 
-        return view('masters.bank-accounts.index', ['bankAccounts' => $bankAccounts]);
+        return view('masters.bank-accounts.index', ['bankAccounts' => $bankAccounts, 'balances' => $balances]);
     }
 
     public function create()
@@ -30,11 +38,9 @@ class BankAccountController extends Controller
     public function store(BankAccountRequest $request): RedirectResponse
     {
         $company = current_company_or_fail();
-        $data = $request->validated();
-        $data['current_balance'] = $data['opening_balance'];
 
         $this->masterDataService->create(BankAccount::class, [
-            ...$data,
+            ...$request->validated(),
             'company_id' => $company->id,
         ], 'Bank Account');
 

@@ -58,7 +58,7 @@
 
                         <div>
                             <x-input-label for="expense_category_id" value="Category *" />
-                            <select id="expense_category_id" name="expense_category_id" class="mt-1 block w-full border-ink-300 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
+                            <select id="expense_category_id" name="expense_category_id" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
                                 <option value="">Select</option>
                                 @foreach ($categories as $category)
                                     <option value="{{ $category->id }}" @selected((string) old('expense_category_id', $expense?->expense_category_id) === (string) $category->id)>{{ $category->name }}</option>
@@ -69,7 +69,7 @@
 
                         <div>
                             <x-input-label for="expense_sub_category_id" value="Sub Category" />
-                            <select id="expense_sub_category_id" name="expense_sub_category_id" class="mt-1 block w-full border-ink-300 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
+                            <select id="expense_sub_category_id" name="expense_sub_category_id" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
                                 <option value="">None</option>
                                 @foreach ($categories as $category)
                                     @foreach ($category->subCategories as $sub)
@@ -82,7 +82,7 @@
 
                         <div>
                             <x-input-label for="vendor_id" value="Vendor" />
-                            <select id="vendor_id" name="vendor_id" class="mt-1 block w-full border-ink-300 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
+                            <select id="vendor_id" name="vendor_id" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
                                 <option value="">None</option>
                                 @foreach ($vendors as $vendor)
                                     <option value="{{ $vendor->id }}" @selected((string) old('vendor_id', $expense?->vendor_id) === (string) $vendor->id)>{{ $vendor->name }}</option>
@@ -108,7 +108,7 @@
                         </div>
                         <div>
                             <x-input-label for="unit_id" value="Unit" />
-                            <select id="unit_id" name="unit_id" class="mt-1 block w-full border-ink-300 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
+                            <select id="unit_id" name="unit_id" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
                                 <option value="">—</option>
                                 @foreach ($units as $unit)
                                     <option value="{{ $unit->id }}" @selected((string) old('unit_id', $expense?->unit_id) === (string) $unit->id)>{{ $unit->name }}</option>
@@ -123,7 +123,7 @@
                         <div>
                             <x-input-label for="taxable_amount" value="Taxable Amount" />
                             <x-text-input id="taxable_amount" name="taxable_amount" type="number" step="0.01" x-model="taxableAmount" class="mt-1 block w-full" />
-                            <p class="text-xs text-ink-400 mt-1" x-show="quantity && rate">Auto: qty &times; rate</p>
+                            <p class="text-xs text-ink-400 dark:text-ink-500 mt-1" x-show="quantity && rate">Auto: qty &times; rate</p>
                             <x-input-error :messages="$errors->get('taxable_amount')" class="mt-2" />
                         </div>
                         <div>
@@ -139,8 +139,8 @@
                             <x-text-input id="tds_amount" name="tds_amount" type="number" step="0.01" :value="old('tds_amount', $expense?->tds_amount)" class="mt-1 block w-full" />
                         </div>
                         <div class="flex flex-col justify-end col-span-2 sm:col-span-1">
-                            <p class="text-xs text-ink-400 uppercase tracking-wide">Total Amount</p>
-                            <p class="text-xl font-bold text-brand-700" x-text="'₹ ' + total"></p>
+                            <p class="text-xs text-ink-400 dark:text-ink-500 uppercase tracking-wide">Total Amount</p>
+                            <p class="text-xl font-bold text-brand-700 dark:text-brand-400" x-text="'₹ ' + total"></p>
                         </div>
                     </div>
                 </x-ui.section>
@@ -149,7 +149,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
                         <div>
                             <x-input-label for="nature_of_use" value="Nature of Use *" />
-                            <select id="nature_of_use" name="nature_of_use" x-model="natureOfUse" class="mt-1 block w-full border-ink-300 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
+                            <select id="nature_of_use" name="nature_of_use" x-model="natureOfUse" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
                                 @foreach ($natureOptions as $option)
                                     <option value="{{ $option }}">{{ $option }}</option>
                                 @endforeach
@@ -173,7 +173,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
                         <div>
                             <x-input-label for="payment_method_id" value="Payment Mode *" />
-                            <select id="payment_method_id" name="payment_method_id" class="mt-1 block w-full border-ink-300 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
+                            <select id="payment_method_id" name="payment_method_id" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
                                 <option value="">Select</option>
                                 @foreach ($paymentMethods as $method)
                                     <option value="{{ $method->id }}" @selected((string) old('payment_method_id', $expense?->payment_method_id) === (string) $method->id)>{{ $method->name }}</option>
@@ -183,7 +183,7 @@
                         </div>
                         <div>
                             <x-input-label for="bank_account_id" value="Bank / Cash Account *" />
-                            <select id="bank_account_id" name="bank_account_id" class="mt-1 block w-full border-ink-300 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
+                            <select id="bank_account_id" name="bank_account_id" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
                                 <option value="">Select</option>
                                 @foreach ($bankAccounts as $account)
                                     <option value="{{ $account->id }}" @selected((string) old('bank_account_id', $expense?->bank_account_id) === (string) $account->id)>{{ $account->account_name }}</option>
@@ -193,7 +193,7 @@
                         </div>
                         <div>
                             <x-input-label for="expense_nature" value="Expense Nature" />
-                            <select id="expense_nature" name="expense_nature" class="mt-1 block w-full border-ink-300 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
+                            <select id="expense_nature" name="expense_nature" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
                                 <option value="">Select</option>
                                 @foreach ($expenseNatureOptions as $option)
                                     <option value="{{ $option }}" @selected(old('expense_nature', $expense?->expense_nature) === $option)>{{ $option }}</option>
@@ -217,7 +217,7 @@
                         </div>
                         <div>
                             <x-input-label for="attachments" value="Attach Bill(s)" />
-                            <input id="attachments" name="attachments[]" type="file" multiple accept=".pdf,.jpg,.jpeg,.png" class="mt-1 block w-full text-sm text-ink-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-brand-50 file:text-brand-700 file:text-sm file:font-medium hover:file:bg-brand-100">
+                            <input id="attachments" name="attachments[]" type="file" multiple accept=".pdf,.jpg,.jpeg,.png" class="mt-1 block w-full text-sm text-ink-600 dark:text-ink-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-brand-50 file:text-brand-700 file:text-sm file:font-medium hover:file:bg-brand-100">
                             <x-input-error :messages="$errors->get('attachments')" class="mt-2" />
                         </div>
                     </div>
@@ -225,7 +225,7 @@
                     @if ($expense && $expense->documents->isNotEmpty())
                         <div class="mt-4 flex flex-wrap gap-2">
                             @foreach ($expense->documents as $document)
-                                <a href="{{ route('documents.download', $document) }}" class="inline-flex items-center gap-1.5 text-sm text-brand-700 bg-brand-50 rounded-lg px-3 py-1.5 hover:bg-brand-100">
+                                <a href="{{ route('documents.download', $document) }}" class="inline-flex items-center gap-1.5 text-sm text-brand-700 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 rounded-lg px-3 py-1.5 hover:bg-brand-100 dark:hover:bg-brand-500/20">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32" /></svg>
                                     {{ $document->name }}
                                 </a>
@@ -236,12 +236,12 @@
 
                 <div>
                     <x-input-label for="notes" value="Notes" />
-                    <textarea id="notes" name="notes" rows="2" class="mt-1 block w-full border-ink-300 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">{{ old('notes', $expense?->notes) }}</textarea>
+                    <textarea id="notes" name="notes" rows="2" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">{{ old('notes', $expense?->notes) }}</textarea>
                 </div>
 
-                <div class="flex items-center gap-4 border-t border-ink-100 pt-6">
+                <div class="flex items-center gap-4 border-t border-ink-100 dark:border-ink-800 pt-6">
                     <x-primary-button>{{ $expense ? __('Update Expense') : __('Save Expense') }}</x-primary-button>
-                    <a href="{{ route('expenses.index') }}" class="text-sm text-ink-500 hover:text-ink-700">Cancel</a>
+                    <a href="{{ route('expenses.index') }}" class="text-sm text-ink-500 dark:text-ink-400 hover:text-ink-700 dark:hover:text-ink-200">Cancel</a>
                 </div>
             </form>
         </x-ui.card>

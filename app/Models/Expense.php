@@ -104,4 +104,9 @@ class Expense extends Model
     {
         return $this->morphMany(Document::class, 'documentable');
     }
+
+    public function journalEntries(): MorphMany
+    {
+        return $this->morphMany(JournalEntry::class, 'source');
+    }
 }

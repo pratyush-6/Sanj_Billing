@@ -19,23 +19,23 @@
 
         <x-ui.card :padded="false">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-ink-100">
-                    <thead class="bg-ink-50/80">
+                <table class="min-w-full divide-y divide-ink-100 dark:divide-ink-800">
+                    <thead class="bg-ink-50/80 dark:bg-ink-800/80">
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 uppercase tracking-wide">Name</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 uppercase tracking-wide">Status</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 uppercase tracking-wide">Actions</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Name</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Status</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-ink-100">
+                    <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
                         @forelse ($paymentMethods as $method)
-                            <tr class="hover:bg-ink-50/60">
-                                <td class="px-4 py-3.5 text-sm font-medium text-ink-900">{{ $method->name }}</td>
+                            <tr class="hover:bg-ink-50/60 dark:hover:bg-ink-800/60">
+                                <td class="px-4 py-3.5 text-sm font-medium text-ink-900 dark:text-ink-50">{{ $method->name }}</td>
                                 <td class="px-4 py-3.5 text-sm">
                                     <x-ui.badge :variant="$method->status === 'active' ? 'success' : 'neutral'">{{ ucfirst($method->status) }}</x-ui.badge>
                                 </td>
                                 <td class="px-4 py-3.5 text-right text-sm">
-                                    <a href="{{ route('payment-methods.edit', $method) }}" class="text-brand-600 hover:text-brand-800 font-medium">Edit</a>
+                                    <a href="{{ route('payment-methods.edit', $method) }}" class="text-brand-600 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 font-medium">Edit</a>
                                 </td>
                             </tr>
                         @empty

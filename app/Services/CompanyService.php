@@ -46,7 +46,6 @@ class CompanyService
             'account_name' => 'Cash',
             'account_type' => 'cash',
             'opening_balance' => 0,
-            'current_balance' => 0,
         ]);
     }
 }

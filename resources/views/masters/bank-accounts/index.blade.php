@@ -19,36 +19,40 @@
 
         <x-ui.card :padded="false">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-ink-100">
-                    <thead class="bg-ink-50/80">
+                <table class="min-w-full divide-y divide-ink-100 dark:divide-ink-800">
+                    <thead class="bg-ink-50/80 dark:bg-ink-800/80">
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 uppercase tracking-wide">Account</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 uppercase tracking-wide">Type</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 uppercase tracking-wide">Opening Balance</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 uppercase tracking-wide">Status</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 uppercase tracking-wide">Actions</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Account</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Type</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Opening Balance</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Current Balance</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Status</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-ink-100">
+                    <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
                         @forelse ($bankAccounts as $account)
-                            <tr class="hover:bg-ink-50/60">
-                                <td class="px-4 py-3.5 text-sm font-medium text-ink-900">
+                            <tr class="hover:bg-ink-50/60 dark:hover:bg-ink-800/60">
+                                <td class="px-4 py-3.5 text-sm font-medium text-ink-900 dark:text-ink-50">
                                     {{ $account->account_name }}
                                     @if ($account->bank_name)
-                                        <span class="text-ink-400 font-normal">({{ $account->bank_name }})</span>
+                                        <span class="text-ink-400 dark:text-ink-500 font-normal">({{ $account->bank_name }})</span>
                                     @endif
                                 </td>
-                                <td class="px-4 py-3.5 text-sm text-ink-600">{{ ucfirst(str_replace('_', ' ', $account->account_type)) }}</td>
-                                <td class="px-4 py-3.5 text-sm text-right text-ink-900">{{ number_format($account->opening_balance, 2) }}</td>
+                                <td class="px-4 py-3.5 text-sm text-ink-600 dark:text-ink-300">{{ ucfirst(str_replace('_', ' ', $account->account_type)) }}</td>
+                                <td class="px-4 py-3.5 text-sm text-right text-ink-900 dark:text-ink-50">{{ number_format($account->opening_balance, 2) }}</td>
+                                <td class="px-4 py-3.5 text-sm text-right font-medium {{ ($balances[$account->id] ?? 0) < 0 ? 'text-rose-600' : 'text-ink-900' }}">
+                                    {{ number_format($balances[$account->id] ?? 0, 2) }}
+                                </td>
                                 <td class="px-4 py-3.5 text-sm">
                                     <x-ui.badge :variant="$account->status === 'active' ? 'success' : 'neutral'">{{ ucfirst($account->status) }}</x-ui.badge>
                                 </td>
                                 <td class="px-4 py-3.5 text-right text-sm">
-                                    <a href="{{ route('bank-accounts.edit', $account) }}" class="text-brand-600 hover:text-brand-800 font-medium">Edit</a>
+                                    <a href="{{ route('bank-accounts.edit', $account) }}" class="text-brand-600 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 font-medium">Edit</a>
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="5"><x-ui.empty-state title="No accounts yet" /></td></tr>
+                            <tr><td colspan="6"><x-ui.empty-state title="No accounts yet" /></td></tr>
                         @endforelse
                     </tbody>
                 </table>

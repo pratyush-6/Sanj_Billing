@@ -19,7 +19,7 @@
 
     <div>
         <x-input-label for="role" value="Role *" />
-        <select id="role" name="role" class="mt-1 block w-full border-ink-300 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
+        <select id="role" name="role" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
             <option value="">Select role</option>
             @foreach ($roles as $role)
                 <option value="{{ $role }}" @selected(old('role', $user?->roles->first()?->name) === $role)>{{ $role }}</option>
@@ -30,7 +30,7 @@
 
     <div>
         <x-input-label for="status" value="Status *" />
-        <select id="status" name="status" class="mt-1 block w-full border-ink-300 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
+        <select id="status" name="status" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
             <option value="active" @selected(old('status', $user?->status ?? 'active') === 'active')>Active</option>
             <option value="inactive" @selected(old('status', $user?->status) === 'inactive')>Inactive</option>
         </select>
@@ -49,19 +49,19 @@
     </div>
 </div>
 
-<div class="mt-6 pt-6 border-t border-ink-100">
+<div class="mt-6 pt-6 border-t border-ink-100 dark:border-ink-800">
     <x-input-label value="Company Access" />
-    <p class="text-xs text-ink-400 mb-3">Which companies can this user see and work in. Super Admins automatically have access to every company.</p>
+    <p class="text-xs text-ink-400 dark:text-ink-500 mb-3">Which companies can this user see and work in. Super Admins automatically have access to every company.</p>
     <div class="space-y-2">
         @forelse ($companies as $company)
             @php($selected = old('companies', $user?->companies->pluck('id')->all() ?? []))
-            <label class="flex items-center gap-2 text-sm text-ink-700">
-                <input type="checkbox" name="companies[]" value="{{ $company->id }}" class="rounded border-ink-300 text-brand-600 focus:ring-brand-500"
+            <label class="flex items-center gap-2 text-sm text-ink-700 dark:text-ink-200">
+                <input type="checkbox" name="companies[]" value="{{ $company->id }}" class="rounded bg-white dark:bg-ink-800 border-ink-300 dark:border-ink-600 text-brand-600 dark:text-brand-400 focus:ring-brand-500"
                     @checked(in_array($company->id, $selected))>
                 {{ $company->name }}
             </label>
         @empty
-            <p class="text-sm text-ink-400">No companies exist yet.</p>
+            <p class="text-sm text-ink-400 dark:text-ink-500">No companies exist yet.</p>
         @endforelse
     </div>
     <x-input-error :messages="$errors->get('companies')" class="mt-2" />

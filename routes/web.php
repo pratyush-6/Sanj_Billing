@@ -1,5 +1,11 @@
 <?php
 
+use App\Http\Controllers\Accounting\BalanceSheetController;
+use App\Http\Controllers\Accounting\ChartOfAccountsController;
+use App\Http\Controllers\Accounting\JournalController;
+use App\Http\Controllers\Accounting\LedgerController;
+use App\Http\Controllers\Accounting\ProfitLossController;
+use App\Http\Controllers\Accounting\TrialBalanceController;
 use App\Http\Controllers\Company\CompanyController;
 use App\Http\Controllers\Company\FinancialYearController;
 use App\Http\Controllers\DashboardController;
@@ -11,6 +17,7 @@ use App\Http\Controllers\Masters\BankAccountController;
 use App\Http\Controllers\Masters\PaymentMethodController;
 use App\Http\Controllers\Masters\UnitController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Report\ReportController;
 use App\Http\Controllers\Settings\AuditLogController;
 use App\Http\Controllers\Settings\UserController;
 use App\Http\Controllers\Vendor\VendorController;
@@ -85,6 +92,29 @@ Route::middleware('auth')->group(function () {
         Route::get('/expenses/{expense}/edit', [ExpenseController::class, 'edit'])->name('expenses.edit');
         Route::put('/expenses/{expense}', [ExpenseController::class, 'update'])->name('expenses.update');
         Route::post('/expenses/{expense}/cancel', [ExpenseController::class, 'cancel'])->name('expenses.cancel');
+    });
+
+    Route::middleware('can:accounting.view')->prefix('accounting')->name('accounting.')->group(function () {
+        Route::get('/chart-of-accounts', [ChartOfAccountsController::class, 'index'])->name('chart-of-accounts');
+        Route::get('/journal', [JournalController::class, 'index'])->name('journal.index');
+        Route::get('/journal/{journalEntry}', [JournalController::class, 'show'])->name('journal.show');
+        Route::get('/ledger', [LedgerController::class, 'index'])->name('ledger');
+        Route::get('/trial-balance', [TrialBalanceController::class, 'index'])->name('trial-balance');
+        Route::get('/profit-loss', [ProfitLossController::class, 'index'])->name('profit-loss');
+        Route::get('/balance-sheet', [BalanceSheetController::class, 'index'])->name('balance-sheet');
+    });
+
+    Route::middleware('can:reports.view')->prefix('reports')->name('reports.')->group(function () {
+        Route::get('/', [ReportController::class, 'index'])->name('index');
+        Route::get('/category-wise', [ReportController::class, 'categoryWise'])->name('category-wise');
+        Route::get('/vendor-wise', [ReportController::class, 'vendorWise'])->name('vendor-wise');
+        Route::get('/payment-wise', [ReportController::class, 'paymentWise'])->name('payment-wise');
+        Route::get('/monthly-comparison', [ReportController::class, 'monthlyComparison'])->name('monthly-comparison');
+        Route::get('/financial-year-summary', [ReportController::class, 'financialYearSummary'])->name('financial-year-summary');
+        Route::get('/daily', [ReportController::class, 'daily'])->name('daily');
+        Route::get('/monthly', [ReportController::class, 'monthly'])->name('monthly');
+        Route::get('/bank-cash-book', [ReportController::class, 'bankCashBook'])->name('bank-cash-book');
+        Route::get('/{report}/export/{format}', [ReportController::class, 'export'])->name('export');
     });
 });
 

@@ -9,9 +9,9 @@
                 @csrf
                 @include('expense-categories._form', ['category' => null, 'natureOptions' => $natureOptions])
 
-                <div class="flex items-center gap-4 border-t border-ink-100 pt-6">
+                <div class="flex items-center gap-4 border-t border-ink-100 dark:border-ink-800 pt-6">
                     <x-primary-button>{{ __('Create') }}</x-primary-button>
-                    <a href="{{ route('expense-categories.index') }}" class="text-sm text-ink-500 hover:text-ink-700">Cancel</a>
+                    <a href="{{ route('expense-categories.index') }}" class="text-sm text-ink-500 dark:text-ink-400 hover:text-ink-700 dark:hover:text-ink-200">Cancel</a>
                 </div>
             </form>
         </x-ui.card>

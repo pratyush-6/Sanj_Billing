@@ -17,6 +17,7 @@ class ExpenseService
     public function __construct(
         private AuditLogService $auditLog,
         private DocumentService $documentService,
+        private AccountingService $accountingService,
     ) {}
 
     public function calculateAmounts(array $data): array
@@ -116,6 +117,8 @@ class ExpenseService
                 }
             }
 
+            $this->accountingService->record($expense);
+
             $this->auditLog->log('Expense Created', 'Expense', $expense, null, $expense->toArray());
 
             return $expense;
@@ -144,6 +147,8 @@ class ExpenseService
                 }
             }
 
+            $this->accountingService->revise($expense);
+
             $this->auditLog->log('Expense Updated', 'Expense', $expense, $old, $expense->toArray());
 
             return $expense;
@@ -156,9 +161,12 @@ class ExpenseService
             throw new RuntimeException('This financial year is locked. This expense cannot be cancelled.');
         }
 
-        $expense->update(['status' => 'Cancelled']);
-        $this->auditLog->log('Expense Cancelled', 'Expense', $expense, null, ['status' => 'Cancelled']);
+        return DB::transaction(function () use ($expense) {
+            $expense->update(['status' => 'Cancelled']);
+            $this->accountingService->void($expense);
+            $this->auditLog->log('Expense Cancelled', 'Expense', $expense, null, ['status' => 'Cancelled']);
 
-        return $expense;
+            return $expense;
+        });
     }
 }

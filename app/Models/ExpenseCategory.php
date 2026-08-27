@@ -13,6 +13,7 @@ class ExpenseCategory extends Model
 
     protected $fillable = [
         'company_id',
+        'account_id',
         'name',
         'code',
         'description',
@@ -28,6 +29,11 @@ class ExpenseCategory extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function account(): BelongsTo
+    {
+        return $this->belongsTo(Account::class);
     }
 
     public function subCategories(): HasMany
