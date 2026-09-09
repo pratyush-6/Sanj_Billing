@@ -6,6 +6,7 @@ use App\Http\Controllers\Accounting\JournalController;
 use App\Http\Controllers\Accounting\LedgerController;
 use App\Http\Controllers\Accounting\ProfitLossController;
 use App\Http\Controllers\Accounting\TrialBalanceController;
+use App\Http\Controllers\Calendar\CalendarController;
 use App\Http\Controllers\Company\CompanyController;
 use App\Http\Controllers\Company\FinancialYearController;
 use App\Http\Controllers\DashboardController;
@@ -102,6 +103,18 @@ Route::middleware('auth')->group(function () {
         Route::get('/trial-balance', [TrialBalanceController::class, 'index'])->name('trial-balance');
         Route::get('/profit-loss', [ProfitLossController::class, 'index'])->name('profit-loss');
         Route::get('/balance-sheet', [BalanceSheetController::class, 'index'])->name('balance-sheet');
+    });
+
+    Route::middleware('can:daily-notes.view')->prefix('calendar')->name('calendar.')->group(function () {
+        Route::get('/', [CalendarController::class, 'index'])->name('index');
+        Route::get('/month', [CalendarController::class, 'month'])->name('month');
+        Route::get('/notes', [CalendarController::class, 'notesForDate'])->name('notes');
+
+        Route::middleware('can:daily-notes.manage')->group(function () {
+            Route::post('/notes', [CalendarController::class, 'store'])->name('notes.store');
+            Route::put('/notes/{dailyNote}', [CalendarController::class, 'update'])->name('notes.update');
+            Route::delete('/notes/{dailyNote}', [CalendarController::class, 'destroy'])->name('notes.destroy');
+        });
     });
 
     Route::middleware('can:reports.view')->prefix('reports')->name('reports.')->group(function () {
