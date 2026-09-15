@@ -9,6 +9,7 @@ use App\Models\BankAccount;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\PaymentMethod;
+use App\Models\PurchaseOrder;
 use App\Models\Unit;
 use App\Models\Vendor;
 use App\Services\ExpenseService;
@@ -165,6 +166,7 @@ class ExpenseController extends Controller
             'expense' => $expense,
             'categories' => ExpenseCategory::where('company_id', $company->id)->where('status', 'active')->with('subCategories')->orderBy('name')->get(),
             'vendors' => Vendor::where('company_id', $company->id)->where('status', 'active')->orderBy('name')->get(),
+            'purchaseOrders' => PurchaseOrder::where('company_id', $company->id)->whereNotIn('status', ['Draft', 'Cancelled'])->with('vendor')->orderByDesc('po_date')->get(),
             'units' => Unit::where('company_id', $company->id)->where('status', 'active')->orderBy('name')->get(),
             'paymentMethods' => PaymentMethod::where('company_id', $company->id)->where('status', 'active')->orderBy('name')->get(),
             'bankAccounts' => BankAccount::where('company_id', $company->id)->where('status', 'active')->orderBy('account_name')->get(),

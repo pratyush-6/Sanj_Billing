@@ -6,6 +6,7 @@ use App\Models\Account;
 use App\Models\BankAccount;
 use App\Models\Expense;
 use App\Services\AccountingService;
+use App\Services\InventoryReportService;
 use App\Services\ReportService;
 
 class DashboardController extends Controller
@@ -13,6 +14,7 @@ class DashboardController extends Controller
     public function __construct(
         private ReportService $reports,
         private AccountingService $accountingService,
+        private InventoryReportService $inventoryReports,
     ) {}
 
     public function index()
@@ -23,6 +25,7 @@ class DashboardController extends Controller
         $stats = null;
         $charts = null;
         $financials = null;
+        $lowStock = null;
 
         if ($company && $activeFinancialYear) {
             $baseQuery = Expense::where('company_id', $company->id)
@@ -70,12 +73,17 @@ class DashboardController extends Controller
             }
         }
 
+        if ($company && auth()->user()->can('inventory.view')) {
+            $lowStock = $this->inventoryReports->lowStock($company)->take(6);
+        }
+
         return view('dashboard', [
             'company' => $company,
             'activeFinancialYear' => $activeFinancialYear,
             'stats' => $stats,
             'charts' => $charts,
             'financials' => $financials,
+            'lowStock' => $lowStock,
         ]);
     }
 }

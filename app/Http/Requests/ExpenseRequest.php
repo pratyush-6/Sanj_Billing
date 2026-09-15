@@ -50,6 +50,7 @@ class ExpenseRequest extends FormRequest
                 ),
             ],
             'vendor_id' => ['nullable', Rule::exists('vendors', 'id')->where('company_id', $companyId)],
+            'purchase_order_id' => ['nullable', Rule::exists('purchase_orders', 'id')->where('company_id', $companyId)],
             'description' => ['nullable', 'string', 'max:500'],
 
             'quantity' => ['nullable', 'numeric', 'min:0', 'required_with:rate'],

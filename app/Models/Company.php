@@ -70,6 +70,31 @@ class Company extends Model
         return $this->hasMany(Expense::class);
     }
 
+    public function productCategories(): HasMany
+    {
+        return $this->hasMany(ProductCategory::class);
+    }
+
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    public function vendorQuotations(): HasMany
+    {
+        return $this->hasMany(VendorQuotation::class);
+    }
+
+    public function purchaseOrders(): HasMany
+    {
+        return $this->hasMany(PurchaseOrder::class);
+    }
+
+    public function goodsReceipts(): HasMany
+    {
+        return $this->hasMany(GoodsReceipt::class);
+    }
+
     public function activeFinancialYear(): ?FinancialYear
     {
         return $this->financialYears()->where('is_active', true)->first();

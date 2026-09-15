@@ -14,14 +14,23 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\Expense\ExpenseCategoryController;
 use App\Http\Controllers\Expense\ExpenseController;
 use App\Http\Controllers\Expense\ExpenseSubCategoryController;
+use App\Http\Controllers\Inventory\GoodsReceiptController;
+use App\Http\Controllers\Inventory\InventoryReportController;
+use App\Http\Controllers\Inventory\ProductCategoryController;
+use App\Http\Controllers\Inventory\ProductController;
+use App\Http\Controllers\Inventory\StockAdjustmentController;
 use App\Http\Controllers\Masters\BankAccountController;
 use App\Http\Controllers\Masters\PaymentMethodController;
 use App\Http\Controllers\Masters\UnitController;
+use App\Http\Controllers\Procurement\PurchaseOrderController;
+use App\Http\Controllers\Procurement\QuotationApprovalController;
+use App\Http\Controllers\Procurement\VendorQuotationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Report\ReportController;
 use App\Http\Controllers\Settings\AuditLogController;
 use App\Http\Controllers\Settings\UserController;
 use App\Http\Controllers\Vendor\VendorController;
+use App\Http\Controllers\Vendor\VendorProductController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -71,6 +80,101 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('can:vendors.manage')->group(function () {
         Route::resource('vendors', VendorController::class)->except(['destroy']);
+        Route::post('/vendors/{vendor}/products', [VendorProductController::class, 'store'])->name('vendors.products.store');
+        Route::put('/vendors/{vendor}/products/{vendorProduct}', [VendorProductController::class, 'update'])->name('vendors.products.update');
+        Route::delete('/vendors/{vendor}/products/{vendorProduct}', [VendorProductController::class, 'destroy'])->name('vendors.products.destroy');
+    });
+
+    Route::middleware('can:inventory.view')->group(function () {
+        Route::get('/product-categories', [ProductCategoryController::class, 'index'])->name('product-categories.index');
+        Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+    });
+
+    Route::middleware('can:product-categories.manage')->group(function () {
+        Route::resource('product-categories', ProductCategoryController::class)->except(['show', 'destroy', 'index']);
+    });
+
+    Route::middleware('can:products.manage')->group(function () {
+        Route::resource('products', ProductController::class)->except(['show', 'destroy', 'index']);
+    });
+
+    // Route order is deliberate: literal segments (create, compare) must be
+    // registered before the {quotation} wildcard, or Laravel's route matcher
+    // (same-method, first-match) swallows them as an id.
+    Route::middleware('can:inventory.view')->group(function () {
+        Route::get('/vendor-quotations', [VendorQuotationController::class, 'index'])->name('vendor-quotations.index');
+    });
+    Route::middleware('can:vendor-quotations.manage')->group(function () {
+        Route::get('/vendor-quotations/create', [VendorQuotationController::class, 'create'])->name('vendor-quotations.create');
+    });
+    Route::middleware('can:inventory.view')->group(function () {
+        Route::get('/vendor-quotations/compare', [VendorQuotationController::class, 'compare'])->name('vendor-quotations.compare');
+    });
+    Route::middleware('can:vendor-quotations.manage')->group(function () {
+        Route::post('/vendor-quotations', [VendorQuotationController::class, 'store'])->name('vendor-quotations.store');
+    });
+    Route::middleware('can:inventory.view')->group(function () {
+        Route::get('/vendor-quotations/{quotation}', [VendorQuotationController::class, 'show'])->name('vendor-quotations.show');
+    });
+    Route::middleware('can:vendor-quotations.manage')->group(function () {
+        Route::get('/vendor-quotations/{quotation}/edit', [VendorQuotationController::class, 'edit'])->name('vendor-quotations.edit');
+        Route::put('/vendor-quotations/{quotation}', [VendorQuotationController::class, 'update'])->name('vendor-quotations.update');
+        Route::post('/vendor-quotations/{quotation}/submit', [VendorQuotationController::class, 'submit'])->name('vendor-quotations.submit');
+    });
+    Route::middleware('can:vendor-quotations.approve')->group(function () {
+        Route::post('/vendor-quotations/{quotation}/approval', [QuotationApprovalController::class, 'store'])->name('vendor-quotations.approval.store');
+    });
+
+    Route::middleware('can:inventory.view')->group(function () {
+        Route::get('/purchase-orders', [PurchaseOrderController::class, 'index'])->name('purchase-orders.index');
+    });
+    Route::middleware('can:purchase-orders.manage')->group(function () {
+        Route::get('/purchase-orders/create', [PurchaseOrderController::class, 'create'])->name('purchase-orders.create');
+        Route::post('/purchase-orders', [PurchaseOrderController::class, 'store'])->name('purchase-orders.store');
+    });
+    Route::middleware('can:inventory.view')->group(function () {
+        Route::get('/purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'show'])->name('purchase-orders.show');
+    });
+    Route::middleware('can:purchase-orders.manage')->group(function () {
+        Route::get('/purchase-orders/{purchaseOrder}/edit', [PurchaseOrderController::class, 'edit'])->name('purchase-orders.edit');
+        Route::put('/purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'update'])->name('purchase-orders.update');
+        Route::post('/purchase-orders/{purchaseOrder}/send', [PurchaseOrderController::class, 'send'])->name('purchase-orders.send');
+        Route::post('/purchase-orders/{purchaseOrder}/cancel', [PurchaseOrderController::class, 'cancel'])->name('purchase-orders.cancel');
+    });
+
+    Route::middleware('can:inventory.view')->group(function () {
+        Route::get('/goods-receipts', [GoodsReceiptController::class, 'index'])->name('goods-receipts.index');
+    });
+    Route::middleware('can:goods-receipts.manage')->group(function () {
+        Route::get('/goods-receipts/create', [GoodsReceiptController::class, 'create'])->name('goods-receipts.create');
+        Route::post('/goods-receipts', [GoodsReceiptController::class, 'store'])->name('goods-receipts.store');
+    });
+    Route::middleware('can:inventory.view')->group(function () {
+        Route::get('/goods-receipts/{goodsReceipt}', [GoodsReceiptController::class, 'show'])->name('goods-receipts.show');
+    });
+    Route::middleware('can:goods-receipts.manage')->group(function () {
+        Route::get('/goods-receipts/{goodsReceipt}/edit', [GoodsReceiptController::class, 'edit'])->name('goods-receipts.edit');
+        Route::put('/goods-receipts/{goodsReceipt}', [GoodsReceiptController::class, 'update'])->name('goods-receipts.update');
+        Route::post('/goods-receipts/{goodsReceipt}/complete', [GoodsReceiptController::class, 'complete'])->name('goods-receipts.complete');
+    });
+
+    Route::middleware('can:inventory.view')->group(function () {
+        Route::get('/stock-adjustments', [StockAdjustmentController::class, 'index'])->name('stock-adjustments.index');
+    });
+    Route::middleware('can:stock-adjustments.manage')->group(function () {
+        Route::get('/stock-adjustments/create', [StockAdjustmentController::class, 'create'])->name('stock-adjustments.create');
+        Route::post('/stock-adjustments', [StockAdjustmentController::class, 'store'])->name('stock-adjustments.store');
+    });
+    Route::middleware('can:inventory.view')->group(function () {
+        Route::get('/stock-adjustments/{stockAdjustment}', [StockAdjustmentController::class, 'show'])->name('stock-adjustments.show');
+    });
+    Route::middleware('can:stock-adjustments.approve')->group(function () {
+        Route::post('/stock-adjustments/{stockAdjustment}/decision', [StockAdjustmentController::class, 'decide'])->name('stock-adjustments.decide');
+    });
+
+    Route::middleware('can:inventory.view')->prefix('inventory-reports')->name('inventory-reports.')->group(function () {
+        Route::get('/low-stock', [InventoryReportController::class, 'lowStock'])->name('low-stock');
+        Route::get('/movements', [InventoryReportController::class, 'movements'])->name('movements');
     });
 
     Route::middleware('can:masters.manage')->group(function () {

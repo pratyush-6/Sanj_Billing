@@ -19,6 +19,7 @@ class Expense extends Model
         'expense_category_id',
         'expense_sub_category_id',
         'vendor_id',
+        'purchase_order_id',
         'description',
         'quantity',
         'unit_id',
@@ -78,6 +79,11 @@ class Expense extends Model
     public function vendor(): BelongsTo
     {
         return $this->belongsTo(Vendor::class);
+    }
+
+    public function purchaseOrder(): BelongsTo
+    {
+        return $this->belongsTo(PurchaseOrder::class);
     }
 
     public function unit(): BelongsTo

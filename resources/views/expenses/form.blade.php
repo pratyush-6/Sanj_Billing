@@ -91,6 +91,17 @@
                             <x-input-error :messages="$errors->get('vendor_id')" class="mt-2" />
                         </div>
 
+                        <div>
+                            <x-input-label for="purchase_order_id" value="Purchase Order" />
+                            <select id="purchase_order_id" name="purchase_order_id" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
+                                <option value="">None</option>
+                                @foreach ($purchaseOrders as $po)
+                                    <option value="{{ $po->id }}" @selected((string) old('purchase_order_id', $expense?->purchase_order_id) === (string) $po->id)>{{ $po->po_number }} — {{ $po->vendor->name }}</option>
+                                @endforeach
+                            </select>
+                            <x-input-error :messages="$errors->get('purchase_order_id')" class="mt-2" />
+                        </div>
+
                         <div class="sm:col-span-2">
                             <x-input-label for="description" value="Description" />
                             <x-text-input id="description" name="description" type="text" class="mt-1 block w-full" :value="old('description', $expense?->description)" />

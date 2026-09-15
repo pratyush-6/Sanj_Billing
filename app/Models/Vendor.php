@@ -40,4 +40,14 @@ class Vendor extends Model
     {
         return $this->hasMany(Expense::class);
     }
+
+    public function vendorProducts(): HasMany
+    {
+        return $this->hasMany(VendorProduct::class);
+    }
+
+    public function quotations(): HasMany
+    {
+        return $this->hasMany(VendorQuotation::class);
+    }
 }

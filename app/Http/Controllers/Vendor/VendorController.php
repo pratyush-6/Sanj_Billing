@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Vendor;
 use App\Http\Controllers\Concerns\EnsuresCompanyOwnership;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\VendorRequest;
+use App\Models\Product;
 use App\Models\Vendor;
 use App\Services\MasterDataService;
 use Illuminate\Http\RedirectResponse;
@@ -66,7 +67,19 @@ class VendorController extends Controller
         $this->ensureBelongsToCurrentCompany($vendor);
 
         $expenses = $vendor->expenses()->latest('expense_date')->paginate(15);
+        $vendorProducts = $vendor->vendorProducts()->with('product')->get();
+        $availableProducts = Product::where('company_id', $vendor->company_id)
+            ->where('status', 'active')
+            ->whereNotIn('id', $vendorProducts->pluck('product_id'))
+            ->orderBy('name')
+            ->get();
 
-        return view('vendors.show', ['vendor' => $vendor, 'expenses' => $expenses]);
+        return view('vendors.show', [
+            'vendor' => $vendor,
+            'expenses' => $expenses,
+            'vendorProducts' => $vendorProducts,
+            'availableProducts' => $availableProducts,
+            'totalSpent' => (clone $vendor->expenses())->where('status', '!=', 'Cancelled')->sum('total_amount'),
+        ]);
     }
 }
