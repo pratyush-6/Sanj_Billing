@@ -76,7 +76,12 @@
 
     <div>
         <x-input-label for="state" value="State" />
-        <x-text-input id="state" name="state" type="text" class="mt-1 block w-full" :value="old('state', $company?->state)" />
+        <select id="state" name="state" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
+            <option value="">Select</option>
+            @foreach (config('india.states') as $state)
+                <option value="{{ $state }}" @selected(old('state', $company?->state) === $state)>{{ $state }}</option>
+            @endforeach
+        </select>
         <x-input-error :messages="$errors->get('state')" class="mt-2" />
     </div>
 

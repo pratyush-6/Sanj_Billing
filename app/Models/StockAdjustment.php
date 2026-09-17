@@ -19,6 +19,7 @@ class StockAdjustment extends Model
         'type',
         'reason',
         'quantity',
+        'unit_cost',
         'status',
         'notes',
         'created_by',
@@ -30,6 +31,7 @@ class StockAdjustment extends Model
     protected $casts = [
         'adjustment_date' => 'date',
         'quantity' => 'decimal:2',
+        'unit_cost' => 'decimal:4',
         'approved_at' => 'datetime',
     ];
 

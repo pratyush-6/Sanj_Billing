@@ -16,6 +16,8 @@ class Product extends Model
         'product_category_id',
         'unit_id',
         'sku',
+        'hsn_code',
+        'gst_rate_id',
         'name',
         'description',
         'min_stock_level',
@@ -41,6 +43,11 @@ class Product extends Model
     public function unit(): BelongsTo
     {
         return $this->belongsTo(Unit::class);
+    }
+
+    public function gstRate(): BelongsTo
+    {
+        return $this->belongsTo(GstRate::class);
     }
 
     public function vendorProducts(): HasMany

@@ -20,16 +20,25 @@ use App\Http\Controllers\Inventory\ProductCategoryController;
 use App\Http\Controllers\Inventory\ProductController;
 use App\Http\Controllers\Inventory\StockAdjustmentController;
 use App\Http\Controllers\Masters\BankAccountController;
+use App\Http\Controllers\Masters\GstRateController;
 use App\Http\Controllers\Masters\PaymentMethodController;
+use App\Http\Controllers\Masters\TdsSectionController;
 use App\Http\Controllers\Masters\UnitController;
+use App\Http\Controllers\Party\PartyController;
+use App\Http\Controllers\Party\PartyLedgerController;
+use App\Http\Controllers\Procurement\PurchaseBillController;
+use App\Http\Controllers\Procurement\PurchaseBillPaymentController;
 use App\Http\Controllers\Procurement\PurchaseOrderController;
 use App\Http\Controllers\Procurement\QuotationApprovalController;
 use App\Http\Controllers\Procurement\VendorQuotationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Report\ReportController;
+use App\Http\Controllers\Sales\DeliveryChallanController;
+use App\Http\Controllers\Sales\SaleInvoiceController;
+use App\Http\Controllers\Sales\SaleInvoicePaymentController;
+use App\Http\Controllers\Sales\SaleOrderController;
 use App\Http\Controllers\Settings\AuditLogController;
 use App\Http\Controllers\Settings\UserController;
-use App\Http\Controllers\Vendor\VendorController;
 use App\Http\Controllers\Vendor\VendorProductController;
 use Illuminate\Support\Facades\Route;
 
@@ -78,11 +87,13 @@ Route::middleware('auth')->group(function () {
         Route::resource('expense-sub-categories', ExpenseSubCategoryController::class)->except(['show', 'destroy']);
     });
 
-    Route::middleware('can:vendors.manage')->group(function () {
-        Route::resource('vendors', VendorController::class)->except(['destroy']);
-        Route::post('/vendors/{vendor}/products', [VendorProductController::class, 'store'])->name('vendors.products.store');
-        Route::put('/vendors/{vendor}/products/{vendorProduct}', [VendorProductController::class, 'update'])->name('vendors.products.update');
-        Route::delete('/vendors/{vendor}/products/{vendorProduct}', [VendorProductController::class, 'destroy'])->name('vendors.products.destroy');
+    Route::middleware('can:parties.manage')->group(function () {
+        Route::get('/party-ledger', [PartyLedgerController::class, 'index'])->name('party-ledger.index');
+        Route::resource('parties', PartyController::class)->except(['destroy']);
+        Route::post('/parties/{party}/products', [VendorProductController::class, 'store'])->name('parties.products.store');
+        Route::put('/parties/{party}/products/{vendorProduct}', [VendorProductController::class, 'update'])->name('parties.products.update');
+        Route::delete('/parties/{party}/products/{vendorProduct}', [VendorProductController::class, 'destroy'])->name('parties.products.destroy');
+        Route::get('/parties/{party}/ledger', [PartyLedgerController::class, 'show'])->name('parties.ledger');
     });
 
     Route::middleware('can:inventory.view')->group(function () {
@@ -159,6 +170,81 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::middleware('can:inventory.view')->group(function () {
+        Route::get('/purchase-bills', [PurchaseBillController::class, 'index'])->name('purchase-bills.index');
+    });
+    Route::middleware('can:purchase-bills.manage')->group(function () {
+        Route::get('/purchase-bills/create', [PurchaseBillController::class, 'create'])->name('purchase-bills.create');
+        Route::post('/purchase-bills', [PurchaseBillController::class, 'store'])->name('purchase-bills.store');
+    });
+    Route::middleware('can:inventory.view')->group(function () {
+        Route::get('/purchase-bills/{purchaseBill}', [PurchaseBillController::class, 'show'])->name('purchase-bills.show');
+        Route::get('/purchase-bills/{purchaseBill}/print', [PurchaseBillController::class, 'print'])->name('purchase-bills.print');
+    });
+    Route::middleware('can:purchase-bills.manage')->group(function () {
+        Route::get('/purchase-bills/{purchaseBill}/edit', [PurchaseBillController::class, 'edit'])->name('purchase-bills.edit');
+        Route::put('/purchase-bills/{purchaseBill}', [PurchaseBillController::class, 'update'])->name('purchase-bills.update');
+        Route::post('/purchase-bills/{purchaseBill}/post', [PurchaseBillController::class, 'post'])->name('purchase-bills.post');
+        Route::post('/purchase-bills/{purchaseBill}/cancel', [PurchaseBillController::class, 'cancel'])->name('purchase-bills.cancel');
+        Route::post('/purchase-bills/{purchaseBill}/payments', [PurchaseBillPaymentController::class, 'store'])->name('purchase-bills.payments.store');
+        Route::post('/purchase-bills/{purchaseBill}/payments/{payment}/cancel', [PurchaseBillPaymentController::class, 'cancel'])->name('purchase-bills.payments.cancel');
+    });
+
+    Route::middleware('can:inventory.view')->group(function () {
+        Route::get('/sale-orders', [SaleOrderController::class, 'index'])->name('sale-orders.index');
+    });
+    Route::middleware('can:sale-orders.manage')->group(function () {
+        Route::get('/sale-orders/create', [SaleOrderController::class, 'create'])->name('sale-orders.create');
+        Route::post('/sale-orders', [SaleOrderController::class, 'store'])->name('sale-orders.store');
+    });
+    Route::middleware('can:inventory.view')->group(function () {
+        Route::get('/sale-orders/{saleOrder}', [SaleOrderController::class, 'show'])->name('sale-orders.show');
+    });
+    Route::middleware('can:sale-orders.manage')->group(function () {
+        Route::get('/sale-orders/{saleOrder}/edit', [SaleOrderController::class, 'edit'])->name('sale-orders.edit');
+        Route::put('/sale-orders/{saleOrder}', [SaleOrderController::class, 'update'])->name('sale-orders.update');
+        Route::post('/sale-orders/{saleOrder}/confirm', [SaleOrderController::class, 'confirm'])->name('sale-orders.confirm');
+        Route::post('/sale-orders/{saleOrder}/cancel', [SaleOrderController::class, 'cancel'])->name('sale-orders.cancel');
+    });
+
+    Route::middleware('can:inventory.view')->group(function () {
+        Route::get('/delivery-challans', [DeliveryChallanController::class, 'index'])->name('delivery-challans.index');
+    });
+    Route::middleware('can:delivery-challans.manage')->group(function () {
+        Route::get('/delivery-challans/create', [DeliveryChallanController::class, 'create'])->name('delivery-challans.create');
+        Route::post('/delivery-challans', [DeliveryChallanController::class, 'store'])->name('delivery-challans.store');
+    });
+    Route::middleware('can:inventory.view')->group(function () {
+        Route::get('/delivery-challans/{deliveryChallan}', [DeliveryChallanController::class, 'show'])->name('delivery-challans.show');
+        Route::get('/delivery-challans/{deliveryChallan}/print', [DeliveryChallanController::class, 'print'])->name('delivery-challans.print');
+    });
+    Route::middleware('can:delivery-challans.manage')->group(function () {
+        Route::get('/delivery-challans/{deliveryChallan}/edit', [DeliveryChallanController::class, 'edit'])->name('delivery-challans.edit');
+        Route::put('/delivery-challans/{deliveryChallan}', [DeliveryChallanController::class, 'update'])->name('delivery-challans.update');
+        Route::post('/delivery-challans/{deliveryChallan}/complete', [DeliveryChallanController::class, 'complete'])->name('delivery-challans.complete');
+        Route::post('/delivery-challans/{deliveryChallan}/cancel', [DeliveryChallanController::class, 'cancel'])->name('delivery-challans.cancel');
+    });
+
+    Route::middleware('can:inventory.view')->group(function () {
+        Route::get('/sale-invoices', [SaleInvoiceController::class, 'index'])->name('sale-invoices.index');
+    });
+    Route::middleware('can:sale-invoices.manage')->group(function () {
+        Route::get('/sale-invoices/create', [SaleInvoiceController::class, 'create'])->name('sale-invoices.create');
+        Route::post('/sale-invoices', [SaleInvoiceController::class, 'store'])->name('sale-invoices.store');
+    });
+    Route::middleware('can:inventory.view')->group(function () {
+        Route::get('/sale-invoices/{saleInvoice}', [SaleInvoiceController::class, 'show'])->name('sale-invoices.show');
+        Route::get('/sale-invoices/{saleInvoice}/print', [SaleInvoiceController::class, 'print'])->name('sale-invoices.print');
+    });
+    Route::middleware('can:sale-invoices.manage')->group(function () {
+        Route::get('/sale-invoices/{saleInvoice}/edit', [SaleInvoiceController::class, 'edit'])->name('sale-invoices.edit');
+        Route::put('/sale-invoices/{saleInvoice}', [SaleInvoiceController::class, 'update'])->name('sale-invoices.update');
+        Route::post('/sale-invoices/{saleInvoice}/post', [SaleInvoiceController::class, 'post'])->name('sale-invoices.post');
+        Route::post('/sale-invoices/{saleInvoice}/cancel', [SaleInvoiceController::class, 'cancel'])->name('sale-invoices.cancel');
+        Route::post('/sale-invoices/{saleInvoice}/payments', [SaleInvoicePaymentController::class, 'store'])->name('sale-invoices.payments.store');
+        Route::post('/sale-invoices/{saleInvoice}/payments/{payment}/cancel', [SaleInvoicePaymentController::class, 'cancel'])->name('sale-invoices.payments.cancel');
+    });
+
+    Route::middleware('can:inventory.view')->group(function () {
         Route::get('/stock-adjustments', [StockAdjustmentController::class, 'index'])->name('stock-adjustments.index');
     });
     Route::middleware('can:stock-adjustments.manage')->group(function () {
@@ -180,6 +266,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware('can:masters.manage')->group(function () {
         Route::resource('units', UnitController::class)->except(['show', 'destroy']);
         Route::resource('payment-methods', PaymentMethodController::class)->except(['show', 'destroy']);
+        Route::resource('gst-rates', GstRateController::class)->except(['show', 'destroy']);
+        Route::resource('tds-sections', TdsSectionController::class)->except(['show', 'destroy']);
     });
 
     Route::middleware('can:bank-accounts.manage')->group(function () {

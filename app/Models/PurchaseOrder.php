@@ -46,7 +46,7 @@ class PurchaseOrder extends Model
 
     public function vendor(): BelongsTo
     {
-        return $this->belongsTo(Vendor::class);
+        return $this->belongsTo(Party::class, 'vendor_id');
     }
 
     public function creator(): BelongsTo

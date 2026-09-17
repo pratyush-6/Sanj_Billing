@@ -10,6 +10,9 @@ use App\Models\ExpenseCategory;
 use App\Models\FinancialYear;
 use App\Models\JournalEntry;
 use App\Models\JournalEntryItem;
+use App\Models\Payment;
+use App\Models\PurchaseBill;
+use App\Models\SaleInvoice;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -51,6 +54,43 @@ class AccountingService
         $this->createSystemAccount($company->id, 'Other Income', 'Income', 'other-income', $income->id);
 
         $this->createSystemAccount($company->id, 'Expenses', 'Expense', 'expenses-group');
+
+        $this->ensureInventoryAccounts($company);
+        $this->ensureTdsReceivableAccount($company);
+    }
+
+    /**
+     * Idempotent — safe to call for a company that already has a full chart of
+     * accounts (existing companies, via a backfill migration) as well as a
+     * brand-new one (from seedChartOfAccounts() above, in the same request).
+     */
+    public function ensureInventoryAccounts(Company $company): void
+    {
+        $assets = $this->controlAccount($company->id, 'assets-group');
+        $expensesGroup = $this->controlAccount($company->id, 'expenses-group');
+
+        if ($assets && ! $this->controlAccount($company->id, 'inventory')) {
+            $this->createSystemAccount($company->id, 'Inventory', 'Asset', 'inventory', $assets->id);
+        }
+
+        if ($expensesGroup && ! $this->controlAccount($company->id, 'cogs')) {
+            $this->createSystemAccount($company->id, 'Cost of Goods Sold', 'Expense', 'cogs', $expensesGroup->id);
+        }
+    }
+
+    /**
+     * TDS a customer deducts when paying a Sale Invoice is remitted to the
+     * government on the business's behalf — an asset (a tax credit the business
+     * can claim), the mirror image of the liability recorded via 'tds-payable'
+     * on the purchase side.
+     */
+    public function ensureTdsReceivableAccount(Company $company): void
+    {
+        $assets = $this->controlAccount($company->id, 'assets-group');
+
+        if ($assets && ! $this->controlAccount($company->id, 'tds-receivable')) {
+            $this->createSystemAccount($company->id, 'TDS Receivable', 'Asset', 'tds-receivable', $assets->id);
+        }
     }
 
     public function mapExpenseCategory(ExpenseCategory $category): void
@@ -217,6 +257,211 @@ class AccountingService
     public function void(Expense $expense): void
     {
         $this->reverseSourceEntries($expense);
+    }
+
+    /**
+     * Dr Inventory (GRN-anchored cost, per PurchaseBill's price-locking rule) +
+     * Dr Input GST, Cr Accounts Payable (net of TDS) + Cr TDS Payable — mirrors
+     * how record(Expense) already splits out tds_amount into its own credit line
+     * rather than folding it into the bank/payable outflow.
+     */
+    public function recordPurchaseBill(PurchaseBill $bill): ?JournalEntry
+    {
+        if ($bill->status !== 'Posted') {
+            return null;
+        }
+
+        $totalAmount = (float) $bill->total_amount;
+        if ($totalAmount == 0.0) {
+            return null;
+        }
+
+        $inventory = $this->controlAccount($bill->company_id, 'inventory');
+        $accountsPayable = $this->controlAccount($bill->company_id, 'accounts-payable');
+
+        if (! $inventory || ! $accountsPayable) {
+            return null;
+        }
+
+        $lines = [];
+
+        $taxableAmount = round((float) $bill->taxable_amount, 2);
+        if ($taxableAmount != 0) {
+            $lines[] = ['account_id' => $inventory->id, 'debit' => $taxableAmount, 'credit' => 0];
+        }
+
+        $gstAmount = round((float) $bill->cgst_amount + (float) $bill->sgst_amount + (float) $bill->igst_amount, 2);
+        if ($gstAmount != 0 && ($inputGst = $this->controlAccount($bill->company_id, 'input-gst'))) {
+            $lines[] = ['account_id' => $inputGst->id, 'debit' => $gstAmount, 'credit' => 0];
+        }
+
+        $tdsAmount = round((float) $bill->tds_amount, 2);
+        $payableAmount = round($totalAmount - $tdsAmount, 2);
+
+        if ($payableAmount < 0) {
+            // TDS withheld can never exceed the bill total -- refuse to post a
+            // broken entry rather than silently corrupting the books, same guard
+            // record(Expense) already applies to its own bank outflow.
+            return null;
+        }
+
+        if ($tdsAmount != 0 && ($tdsPayable = $this->controlAccount($bill->company_id, 'tds-payable'))) {
+            $lines[] = ['account_id' => $tdsPayable->id, 'debit' => 0, 'credit' => $tdsAmount];
+        }
+
+        if ($payableAmount != 0) {
+            $lines[] = ['account_id' => $accountsPayable->id, 'debit' => 0, 'credit' => $payableAmount];
+        }
+
+        return $this->postJournalEntry(
+            $bill->company,
+            $bill->financialYear,
+            $bill->bill_date,
+            "Purchase Bill {$bill->bill_number}",
+            $bill,
+            $lines,
+        );
+    }
+
+    public function voidPurchaseBill(PurchaseBill $bill): void
+    {
+        $bill->journalEntries()->where('status', 'Posted')->get()
+            ->each(fn (JournalEntry $entry) => $this->reverseJournalEntry($entry));
+    }
+
+    /**
+     * Dr Accounts Receivable (net of TDS — the customer withholds that portion
+     * and remits it to the government, so the business never collects it via a
+     * Payment) + Dr TDS Receivable, Cr Sales + Cr GST Payable; plus a second,
+     * independent pair — Dr COGS / Cr Inventory, sized off each line's cost
+     * snapshot — posted in the same JournalEntry since postJournalEntry() only
+     * checks the whole entry balances, not that sub-groups do individually.
+     */
+    public function recordSaleInvoice(SaleInvoice $invoice): ?JournalEntry
+    {
+        if ($invoice->status !== 'Posted') {
+            return null;
+        }
+
+        $totalAmount = (float) $invoice->total_amount;
+        if ($totalAmount == 0.0) {
+            return null;
+        }
+
+        $accountsReceivable = $this->controlAccount($invoice->company_id, 'accounts-receivable');
+        $sales = $this->controlAccount($invoice->company_id, 'sales');
+
+        if (! $accountsReceivable || ! $sales) {
+            return null;
+        }
+
+        $lines = [];
+
+        $tdsAmount = round((float) $invoice->tds_amount, 2);
+        $receivableAmount = round($totalAmount - $tdsAmount, 2);
+
+        if ($receivableAmount < 0) {
+            // TDS withheld can never exceed the invoice total -- refuse to post a
+            // broken entry rather than silently corrupting the books, same guard
+            // recordPurchaseBill() already applies to its own payable amount.
+            return null;
+        }
+
+        if ($receivableAmount != 0) {
+            $lines[] = ['account_id' => $accountsReceivable->id, 'debit' => $receivableAmount, 'credit' => 0];
+        }
+
+        if ($tdsAmount != 0 && ($tdsReceivable = $this->controlAccount($invoice->company_id, 'tds-receivable'))) {
+            $lines[] = ['account_id' => $tdsReceivable->id, 'debit' => $tdsAmount, 'credit' => 0];
+        }
+
+        $taxableAmount = round((float) $invoice->taxable_amount, 2);
+        if ($taxableAmount != 0) {
+            $lines[] = ['account_id' => $sales->id, 'debit' => 0, 'credit' => $taxableAmount];
+        }
+
+        $gstAmount = round((float) $invoice->cgst_amount + (float) $invoice->sgst_amount + (float) $invoice->igst_amount, 2);
+        if ($gstAmount != 0 && ($gstPayable = $this->controlAccount($invoice->company_id, 'gst-payable'))) {
+            $lines[] = ['account_id' => $gstPayable->id, 'debit' => 0, 'credit' => $gstAmount];
+        }
+
+        $totalCost = round((float) $invoice->items->sum('total_cost'), 2);
+        $inventory = $this->controlAccount($invoice->company_id, 'inventory');
+        $cogs = $this->controlAccount($invoice->company_id, 'cogs');
+
+        if ($totalCost != 0 && $inventory && $cogs) {
+            $lines[] = ['account_id' => $cogs->id, 'debit' => $totalCost, 'credit' => 0];
+            $lines[] = ['account_id' => $inventory->id, 'debit' => 0, 'credit' => $totalCost];
+        }
+
+        return $this->postJournalEntry(
+            $invoice->company,
+            $invoice->financialYear,
+            $invoice->invoice_date,
+            "Sale Invoice {$invoice->invoice_number}",
+            $invoice,
+            $lines,
+        );
+    }
+
+    public function voidSaleInvoice(SaleInvoice $invoice): void
+    {
+        $invoice->journalEntries()->where('status', 'Posted')->get()
+            ->each(fn (JournalEntry $entry) => $this->reverseJournalEntry($entry));
+    }
+
+    /**
+     * Dr Accounts Payable / Cr Bank for money the business pays out; the reverse
+     * for money it receives — the only two directions a Payment can go.
+     */
+    public function recordPayment(Payment $payment): ?JournalEntry
+    {
+        $amount = round((float) $payment->amount, 2);
+        if ($amount == 0.0) {
+            return null;
+        }
+
+        $bankAccount = $payment->bankAccount?->account;
+        if (! $bankAccount) {
+            return null;
+        }
+
+        if ($payment->direction === 'Out') {
+            $accountsPayable = $this->controlAccount($payment->company_id, 'accounts-payable');
+            if (! $accountsPayable) {
+                return null;
+            }
+
+            $lines = [
+                ['account_id' => $accountsPayable->id, 'debit' => $amount, 'credit' => 0],
+                ['account_id' => $bankAccount->id, 'debit' => 0, 'credit' => $amount],
+            ];
+        } else {
+            $accountsReceivable = $this->controlAccount($payment->company_id, 'accounts-receivable');
+            if (! $accountsReceivable) {
+                return null;
+            }
+
+            $lines = [
+                ['account_id' => $bankAccount->id, 'debit' => $amount, 'credit' => 0],
+                ['account_id' => $accountsReceivable->id, 'debit' => 0, 'credit' => $amount],
+            ];
+        }
+
+        return $this->postJournalEntry(
+            $payment->company,
+            $payment->financialYear,
+            $payment->payment_date,
+            "Payment {$payment->payment_number}",
+            $payment,
+            $lines,
+        );
+    }
+
+    public function voidPayment(Payment $payment): void
+    {
+        $payment->journalEntries()->where('status', 'Posted')->get()
+            ->each(fn (JournalEntry $entry) => $this->reverseJournalEntry($entry));
     }
 
     private function reverseSourceEntries(Expense $expense): void

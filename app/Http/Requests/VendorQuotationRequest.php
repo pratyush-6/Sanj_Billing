@@ -17,7 +17,7 @@ class VendorQuotationRequest extends FormRequest
         $companyId = current_company()?->id;
 
         return [
-            'vendor_id' => ['required', Rule::exists('vendors', 'id')->where('company_id', $companyId)],
+            'vendor_id' => ['required', Rule::exists('parties', 'id')->where('company_id', $companyId)],
             'quotation_date' => ['required', 'date'],
             'validity_date' => ['nullable', 'date', 'after_or_equal:quotation_date'],
             'notes' => ['nullable', 'string', 'max:2000'],

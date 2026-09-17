@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Procurement;
 use App\Http\Controllers\Concerns\EnsuresCompanyOwnership;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PurchaseOrderRequest;
+use App\Models\Party;
 use App\Models\Product;
 use App\Models\PurchaseOrder;
-use App\Models\Vendor;
 use App\Models\VendorQuotation;
 use App\Services\PurchaseOrderService;
 use Illuminate\Http\RedirectResponse;
@@ -36,7 +36,7 @@ class PurchaseOrderController extends Controller
 
         return view('purchase-orders.index', [
             'purchaseOrders' => $purchaseOrders,
-            'vendors' => Vendor::where('company_id', $companyId)->orderBy('name')->get(),
+            'vendors' => Party::where('company_id', $companyId)->where('is_vendor', true)->orderBy('name')->get(),
             'statuses' => config('inventory.purchase_order_statuses'),
         ]);
     }
@@ -139,7 +139,7 @@ class PurchaseOrderController extends Controller
         return view('purchase-orders.form', [
             'purchaseOrder' => $purchaseOrder?->load('items.product'),
             'quotation' => $quotation,
-            'vendors' => Vendor::where('company_id', $company->id)->where('status', 'active')->orderBy('name')->get(),
+            'vendors' => Party::where('company_id', $company->id)->where('is_vendor', true)->where('status', 'active')->orderBy('name')->get(),
             'products' => Product::where('company_id', $company->id)->where('status', 'active')->orderBy('name')->get(),
         ]);
     }

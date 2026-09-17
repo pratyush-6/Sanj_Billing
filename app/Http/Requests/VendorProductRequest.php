@@ -25,7 +25,7 @@ class VendorProductRequest extends FormRequest
             : [
                 'required',
                 Rule::exists('products', 'id')->where('company_id', $companyId),
-                Rule::unique('vendor_products', 'product_id')->where('vendor_id', $this->route('vendor')?->id),
+                Rule::unique('vendor_products', 'product_id')->where('vendor_id', $this->route('party')?->id),
             ];
 
         return [

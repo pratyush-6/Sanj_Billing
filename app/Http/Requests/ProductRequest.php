@@ -23,6 +23,8 @@ class ProductRequest extends FormRequest
                 Rule::unique('products', 'sku')->where('company_id', $companyId)->ignore($product),
             ],
             'name' => ['required', 'string', 'max:255'],
+            'hsn_code' => ['nullable', 'string', 'max:20'],
+            'gst_rate_id' => ['nullable', Rule::exists('gst_rates', 'id')->where('company_id', $companyId)],
             'product_category_id' => ['nullable', Rule::exists('product_categories', 'id')->where('company_id', $companyId)],
             'unit_id' => ['nullable', Rule::exists('units', 'id')->where('company_id', $companyId)],
             'description' => ['nullable', 'string', 'max:2000'],

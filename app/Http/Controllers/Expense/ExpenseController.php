@@ -8,10 +8,10 @@ use App\Http\Requests\ExpenseRequest;
 use App\Models\BankAccount;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
+use App\Models\Party;
 use App\Models\PaymentMethod;
 use App\Models\PurchaseOrder;
 use App\Models\Unit;
-use App\Models\Vendor;
 use App\Services\ExpenseService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -49,7 +49,7 @@ class ExpenseController extends Controller
         return view('expenses.index', [
             'expenses' => $expenses,
             'categories' => ExpenseCategory::where('company_id', $company?->id)->orderBy('name')->get(),
-            'vendors' => Vendor::where('company_id', $company?->id)->orderBy('name')->get(),
+            'vendors' => Party::where('company_id', $company?->id)->where('is_vendor', true)->orderBy('name')->get(),
             'paymentMethods' => PaymentMethod::where('company_id', $company?->id)->orderBy('name')->get(),
             'bankAccounts' => BankAccount::where('company_id', $company?->id)->orderBy('account_name')->get(),
             'financialYears' => $company?->financialYears()->orderByDesc('start_date')->get() ?? collect(),
@@ -165,7 +165,7 @@ class ExpenseController extends Controller
         return view('expenses.form', [
             'expense' => $expense,
             'categories' => ExpenseCategory::where('company_id', $company->id)->where('status', 'active')->with('subCategories')->orderBy('name')->get(),
-            'vendors' => Vendor::where('company_id', $company->id)->where('status', 'active')->orderBy('name')->get(),
+            'vendors' => Party::where('company_id', $company->id)->where('is_vendor', true)->where('status', 'active')->orderBy('name')->get(),
             'purchaseOrders' => PurchaseOrder::where('company_id', $company->id)->whereNotIn('status', ['Draft', 'Cancelled'])->with('vendor')->orderByDesc('po_date')->get(),
             'units' => Unit::where('company_id', $company->id)->where('status', 'active')->orderBy('name')->get(),
             'paymentMethods' => PaymentMethod::where('company_id', $company->id)->where('status', 'active')->orderBy('name')->get(),

@@ -19,7 +19,7 @@ class RolePermissionSeeder extends Seeder
             'settings.manage',
             'audit-logs.view',
             'expense-categories.manage',
-            'vendors.manage',
+            'parties.manage',
             'bank-accounts.manage',
             'masters.manage',
             'expenses.manage',
@@ -35,6 +35,10 @@ class RolePermissionSeeder extends Seeder
             'vendor-quotations.approve',
             'purchase-orders.manage',
             'goods-receipts.manage',
+            'purchase-bills.manage',
+            'sale-orders.manage',
+            'delivery-challans.manage',
+            'sale-invoices.manage',
             'stock-adjustments.manage',
             'stock-adjustments.approve',
         ];
@@ -55,7 +59,7 @@ class RolePermissionSeeder extends Seeder
             'settings.manage',
             'audit-logs.view',
             'expense-categories.manage',
-            'vendors.manage',
+            'parties.manage',
             'bank-accounts.manage',
             'masters.manage',
             'expenses.manage',
@@ -71,13 +75,17 @@ class RolePermissionSeeder extends Seeder
             'vendor-quotations.approve',
             'purchase-orders.manage',
             'goods-receipts.manage',
+            'purchase-bills.manage',
+            'sale-orders.manage',
+            'delivery-challans.manage',
+            'sale-invoices.manage',
             'stock-adjustments.manage',
             'stock-adjustments.approve',
         ])->values());
 
         $accountant = Role::findOrCreate('Accountant', 'web');
         $accountant->syncPermissions($permissions->only([
-            'vendors.manage',
+            'parties.manage',
             'expenses.manage',
             'expenses.view',
             'reports.view',
@@ -90,6 +98,10 @@ class RolePermissionSeeder extends Seeder
             'vendor-quotations.manage',
             'purchase-orders.manage',
             'goods-receipts.manage',
+            'purchase-bills.manage',
+            'sale-orders.manage',
+            'delivery-challans.manage',
+            'sale-invoices.manage',
             'stock-adjustments.manage',
         ])->values());
 

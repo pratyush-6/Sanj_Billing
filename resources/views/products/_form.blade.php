@@ -34,6 +34,23 @@
     </div>
 
     <div>
+        <x-input-label for="hsn_code" value="HSN/SAC Code" />
+        <x-text-input id="hsn_code" name="hsn_code" type="text" class="mt-1 block w-full" :value="old('hsn_code', $product?->hsn_code)" />
+        <x-input-error :messages="$errors->get('hsn_code')" class="mt-2" />
+    </div>
+
+    <div>
+        <x-input-label for="gst_rate_id" value="GST Rate" />
+        <select id="gst_rate_id" name="gst_rate_id" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
+            <option value="">None</option>
+            @foreach ($gstRates as $gstRate)
+                <option value="{{ $gstRate->id }}" @selected(old('gst_rate_id', $product?->gst_rate_id) == $gstRate->id)>{{ $gstRate->name }} ({{ $gstRate->rate }}%)</option>
+            @endforeach
+        </select>
+        <x-input-error :messages="$errors->get('gst_rate_id')" class="mt-2" />
+    </div>
+
+    <div>
         <x-input-label for="min_stock_level" value="Minimum Stock Level" />
         <x-text-input id="min_stock_level" name="min_stock_level" type="number" step="0.01" min="0" class="mt-1 block w-full" :value="old('min_stock_level', $product?->min_stock_level ?? 0)" />
         <x-input-error :messages="$errors->get('min_stock_level')" class="mt-2" />

@@ -19,6 +19,8 @@ class StockMovement extends Model
         'product_id',
         'direction',
         'quantity',
+        'unit_cost',
+        'total_cost',
         'movement_date',
         'reference_number',
         'source_type',
@@ -29,6 +31,8 @@ class StockMovement extends Model
 
     protected $casts = [
         'quantity' => 'decimal:2',
+        'unit_cost' => 'decimal:4',
+        'total_cost' => 'decimal:2',
         'movement_date' => 'date',
         'created_at' => 'datetime',
     ];

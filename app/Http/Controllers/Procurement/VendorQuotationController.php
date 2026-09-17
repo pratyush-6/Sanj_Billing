@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Procurement;
 use App\Http\Controllers\Concerns\EnsuresCompanyOwnership;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\VendorQuotationRequest;
+use App\Models\Party;
 use App\Models\Product;
-use App\Models\Vendor;
 use App\Models\VendorQuotation;
 use App\Services\VendorQuotationService;
 use Illuminate\Http\RedirectResponse;
@@ -35,7 +35,7 @@ class VendorQuotationController extends Controller
 
         return view('vendor-quotations.index', [
             'quotations' => $quotations,
-            'vendors' => Vendor::where('company_id', $companyId)->orderBy('name')->get(),
+            'vendors' => Party::where('company_id', $companyId)->where('is_vendor', true)->orderBy('name')->get(),
             'statuses' => config('inventory.quotation_statuses'),
         ]);
     }
@@ -134,7 +134,7 @@ class VendorQuotationController extends Controller
 
         return view('vendor-quotations.form', [
             'quotation' => $quotation?->load('items.product'),
-            'vendors' => Vendor::where('company_id', $company->id)->where('status', 'active')->orderBy('name')->get(),
+            'vendors' => Party::where('company_id', $company->id)->where('is_vendor', true)->where('status', 'active')->orderBy('name')->get(),
             'products' => Product::where('company_id', $company->id)->where('status', 'active')->orderBy('name')->get(),
         ]);
     }

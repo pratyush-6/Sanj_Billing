@@ -7,6 +7,7 @@ use App\Models\BankAccount;
 use App\Models\Expense;
 use App\Services\AccountingService;
 use App\Services\InventoryReportService;
+use App\Services\PartyLedgerService;
 use App\Services\ReportService;
 
 class DashboardController extends Controller
@@ -15,6 +16,7 @@ class DashboardController extends Controller
         private ReportService $reports,
         private AccountingService $accountingService,
         private InventoryReportService $inventoryReports,
+        private PartyLedgerService $partyLedgerService,
     ) {}
 
     public function index()
@@ -26,6 +28,7 @@ class DashboardController extends Controller
         $charts = null;
         $financials = null;
         $lowStock = null;
+        $outstandingDues = null;
 
         if ($company && $activeFinancialYear) {
             $baseQuery = Expense::where('company_id', $company->id)
@@ -77,6 +80,14 @@ class DashboardController extends Controller
             $lowStock = $this->inventoryReports->lowStock($company)->take(6);
         }
 
+        if ($company && auth()->user()->can('parties.manage')) {
+            $outstandingDues = $this->partyLedgerService->outstandingBalances($company)
+                ->filter(fn ($row) => $row['balance'] != 0)
+                ->sortByDesc(fn ($row) => abs($row['balance']))
+                ->take(6)
+                ->values();
+        }
+
         return view('dashboard', [
             'company' => $company,
             'activeFinancialYear' => $activeFinancialYear,
@@ -84,6 +95,7 @@ class DashboardController extends Controller
             'charts' => $charts,
             'financials' => $financials,
             'lowStock' => $lowStock,
+            'outstandingDues' => $outstandingDues,
         ]);
     }
 }

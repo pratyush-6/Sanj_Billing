@@ -9,7 +9,7 @@
         @endif
 
         <x-ui.card>
-            <form method="POST" action="{{ route('stock-adjustments.store') }}" class="space-y-6">
+            <form method="POST" action="{{ route('stock-adjustments.store') }}" class="space-y-6" x-data="{ type: '{{ old('type', $types[0] ?? 'Increase') }}' }">
                 @csrf
 
                 <div>
@@ -32,7 +32,7 @@
 
                     <div>
                         <x-input-label for="type" value="Type *" />
-                        <select id="type" name="type" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
+                        <select id="type" name="type" x-model="type" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
                             @foreach ($types as $type)
                                 <option value="{{ $type }}" @selected(old('type') === $type)>{{ $type }}</option>
                             @endforeach
@@ -44,6 +44,12 @@
                         <x-input-label for="quantity" value="Quantity *" />
                         <x-text-input id="quantity" name="quantity" type="number" step="0.01" min="0.01" class="mt-1 block w-full" :value="old('quantity')" required />
                         <x-input-error :messages="$errors->get('quantity')" class="mt-2" />
+                    </div>
+
+                    <div x-show="type === 'Increase'">
+                        <x-input-label for="unit_cost" value="Unit Cost" />
+                        <x-text-input id="unit_cost" name="unit_cost" type="number" step="0.0001" min="0" class="mt-1 block w-full" placeholder="Leave blank to use current average cost" :value="old('unit_cost')" />
+                        <x-input-error :messages="$errors->get('unit_cost')" class="mt-2" />
                     </div>
 
                     <div>

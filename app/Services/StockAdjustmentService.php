@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Company;
 use App\Models\FinancialYear;
+use App\Models\Product;
 use App\Models\StockAdjustment;
 use App\Models\User;
 use App\Services\Concerns\GeneratesSequentialNumbers;
@@ -23,6 +24,20 @@ class StockAdjustmentService
     public function create(array $data, Company $company, FinancialYear $financialYear, User $creator): StockAdjustment
     {
         return DB::transaction(function () use ($data, $company, $financialYear, $creator) {
+            if ($data['type'] === 'Increase') {
+                // A blank cost defaults to the current derived average, which is
+                // mathematically neutral (adding quantity at the existing average
+                // leaves the average unchanged) — a real "Opening Stock" entry
+                // overrides it with the actual historical cost.
+                if (! isset($data['unit_cost']) || $data['unit_cost'] === '' || $data['unit_cost'] === null) {
+                    $data['unit_cost'] = $this->stockLevelService->averageCostFor(Product::findOrFail($data['product_id']));
+                }
+            } else {
+                // Decrease's cost is derived live by StockMovementService::postOut()
+                // at approval time, same as any other stock-out — never user-entered.
+                $data['unit_cost'] = null;
+            }
+
             $adjustment = StockAdjustment::create([
                 ...$data,
                 'company_id' => $company->id,
@@ -66,10 +81,21 @@ class StockAdjustmentService
                 'approval_comments' => $comments,
             ]);
 
-            if ($decision === 'Approved') {
-                $method = $adjustment->type === 'Increase' ? 'postIn' : 'postOut';
-
-                $this->stockMovementService->{$method}(
+            if ($decision === 'Approved' && $adjustment->type === 'Increase') {
+                $this->stockMovementService->postIn(
+                    $adjustment->company,
+                    $adjustment->financialYear,
+                    $adjustment->product,
+                    (float) $adjustment->quantity,
+                    $adjustment->adjustment_date->toDateString(),
+                    $adjustment,
+                    $adjustment->adjustment_number,
+                    $adjustment->reason,
+                    $approver,
+                    (float) $adjustment->unit_cost,
+                );
+            } elseif ($decision === 'Approved') {
+                $this->stockMovementService->postOut(
                     $adjustment->company,
                     $adjustment->financialYear,
                     $adjustment->product,

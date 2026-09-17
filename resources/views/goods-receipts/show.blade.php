@@ -57,6 +57,23 @@
                     </div>
                 @endif
             @endcan
+
+            @can('purchase-bills.manage')
+                @if ($goodsReceipt->status === 'Completed' && ! $goodsReceipt->purchaseBill)
+                    <div class="flex flex-wrap items-center gap-3 mt-6 border-t border-ink-100 dark:border-ink-800 pt-4">
+                        <a href="{{ route('purchase-bills.create', ['goods_receipt_id' => $goodsReceipt->id]) }}">
+                            <x-secondary-button>Create Bill</x-secondary-button>
+                        </a>
+                    </div>
+                @endif
+            @endcan
+
+            @if ($goodsReceipt->purchaseBill)
+                <div class="border-t border-ink-100 dark:border-ink-800 mt-4 pt-4">
+                    <div class="text-xs text-ink-400 dark:text-ink-500 uppercase tracking-wide mb-1">Purchase Bill</div>
+                    <a href="{{ route('purchase-bills.show', $goodsReceipt->purchaseBill) }}" class="text-sm text-brand-600 dark:text-brand-400 hover:underline">{{ $goodsReceipt->purchaseBill->bill_number }} ({{ $goodsReceipt->purchaseBill->status }})</a>
+                </div>
+            @endif
         </x-ui.card>
 
         <x-ui.card :padded="false">

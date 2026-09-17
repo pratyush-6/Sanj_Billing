@@ -49,7 +49,7 @@ class ExpenseRequest extends FormRequest
                     ExpenseCategory::where('company_id', $companyId)->pluck('id')
                 ),
             ],
-            'vendor_id' => ['nullable', Rule::exists('vendors', 'id')->where('company_id', $companyId)],
+            'vendor_id' => ['nullable', Rule::exists('parties', 'id')->where('company_id', $companyId)],
             'purchase_order_id' => ['nullable', Rule::exists('purchase_orders', 'id')->where('company_id', $companyId)],
             'description' => ['nullable', 'string', 'max:500'],
 

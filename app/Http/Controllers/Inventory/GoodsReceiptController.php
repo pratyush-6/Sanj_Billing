@@ -86,7 +86,7 @@ class GoodsReceiptController extends Controller
     {
         $this->ensureBelongsToCurrentCompany($goodsReceipt);
 
-        $goodsReceipt->load(['purchaseOrder.vendor', 'creator', 'items.purchaseOrderItem.product']);
+        $goodsReceipt->load(['purchaseOrder.vendor', 'creator', 'items.purchaseOrderItem.product', 'purchaseBill']);
 
         return view('goods-receipts.show', ['goodsReceipt' => $goodsReceipt]);
     }

@@ -22,6 +22,7 @@ class StockAdjustmentRequest extends FormRequest
             'type' => ['required', Rule::in(config('inventory.adjustment_types'))],
             'reason' => ['required', Rule::in(config('inventory.adjustment_reasons'))],
             'quantity' => ['required', 'numeric', 'min:0.01'],
+            'unit_cost' => ['nullable', 'numeric', 'min:0'],
             'notes' => ['nullable', 'string', 'max:2000'],
         ];
     }

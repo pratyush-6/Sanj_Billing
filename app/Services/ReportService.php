@@ -33,9 +33,9 @@ class ReportService
     public function vendorWise(int $companyId, ?string $dateFrom = null, ?string $dateTo = null, ?int $financialYearId = null): Collection
     {
         return $this->baseQuery($companyId, $dateFrom, $dateTo, $financialYearId)
-            ->leftJoin('vendors', 'vendors.id', '=', 'expenses.vendor_id')
-            ->selectRaw("COALESCE(vendors.id, 0) as vendor_id, COALESCE(vendors.name, 'No Vendor') as vendor_name, SUM(expenses.total_amount) as total, COUNT(*) as count")
-            ->groupBy('vendors.id', 'vendors.name')
+            ->leftJoin('parties', 'parties.id', '=', 'expenses.vendor_id')
+            ->selectRaw("COALESCE(parties.id, 0) as vendor_id, COALESCE(parties.name, 'No Vendor') as vendor_name, SUM(expenses.total_amount) as total, COUNT(*) as count")
+            ->groupBy('parties.id', 'parties.name')
             ->orderByDesc('total')
             ->get()
             ->map(fn ($row) => (object) $row->getAttributes());

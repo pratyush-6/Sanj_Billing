@@ -145,6 +145,25 @@
                     </div>
                 </x-ui.card>
             @endif
+
+            @if ($outstandingDues && $outstandingDues->isNotEmpty())
+                <x-ui.card>
+                    <div class="flex items-center justify-between mb-3">
+                        <p class="text-sm font-semibold text-ink-900 dark:text-ink-50">Outstanding Dues</p>
+                        <a href="{{ route('party-ledger.index') }}" class="text-xs font-medium text-brand-600 dark:text-brand-400 hover:underline">View all &rarr;</a>
+                    </div>
+                    <div class="divide-y divide-ink-100 dark:divide-ink-800">
+                        @foreach ($outstandingDues as $row)
+                            <div class="flex items-center justify-between py-2 text-sm">
+                                <span class="text-ink-700 dark:text-ink-200">{{ $row['party']->name }}</span>
+                                <span class="{{ $row['balance'] > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }} font-medium">
+                                    {{ $row['balance'] > 0 ? 'You will get ' : 'You will give ' }}{{ number_format(abs($row['balance']), 2) }}
+                                </span>
+                            </div>
+                        @endforeach
+                    </div>
+                </x-ui.card>
+            @endif
         @endif
 
         <div>
@@ -161,14 +180,14 @@
                         </div>
                     </a>
                 @endcan
-                @can('vendors.manage')
-                    <a href="{{ route('vendors.index') }}" class="group flex items-start gap-3 rounded-xl border border-ink-200/70 dark:border-ink-700/70 bg-white dark:bg-ink-900 p-4 hover:border-brand-300 hover:shadow-sm transition">
+                @can('parties.manage')
+                    <a href="{{ route('parties.index') }}" class="group flex items-start gap-3 rounded-xl border border-ink-200/70 dark:border-ink-700/70 bg-white dark:bg-ink-900 p-4 hover:border-brand-300 hover:shadow-sm transition">
                         <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sky-50 dark:bg-sky-500/10 text-sky-600 dark:text-sky-400 group-hover:bg-sky-100">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0z" /></svg>
                         </div>
                         <div>
-                            <p class="font-semibold text-sm text-ink-800 dark:text-ink-100">Vendors</p>
-                            <p class="text-xs text-ink-400 dark:text-ink-500 mt-0.5">Manage suppliers</p>
+                            <p class="font-semibold text-sm text-ink-800 dark:text-ink-100">Parties</p>
+                            <p class="text-xs text-ink-400 dark:text-ink-500 mt-0.5">Manage vendors & customers</p>
                         </div>
                     </a>
                 @endcan

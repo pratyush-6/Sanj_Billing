@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Inventory;
 use App\Http\Controllers\Concerns\EnsuresCompanyOwnership;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;
+use App\Models\GstRate;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Unit;
@@ -86,6 +87,7 @@ class ProductController extends Controller
             'product' => $product,
             'categories' => ProductCategory::where('company_id', $companyId)->where('status', 'active')->orderBy('name')->get(),
             'units' => Unit::where('company_id', $companyId)->where('status', 'active')->orderBy('name')->get(),
+            'gstRates' => GstRate::where('company_id', $companyId)->where('status', 'active')->orderBy('rate')->get(),
         ]);
     }
 }

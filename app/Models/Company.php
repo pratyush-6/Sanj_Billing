@@ -45,9 +45,9 @@ class Company extends Model
         return $this->hasMany(ExpenseCategory::class);
     }
 
-    public function vendors(): HasMany
+    public function parties(): HasMany
     {
-        return $this->hasMany(Vendor::class);
+        return $this->hasMany(Party::class);
     }
 
     public function units(): HasMany

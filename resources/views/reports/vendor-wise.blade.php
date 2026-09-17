@@ -41,7 +41,7 @@
                                 <tr class="hover:bg-ink-50/60 dark:hover:bg-ink-800/60">
                                     <td class="px-4 py-3.5 text-sm font-medium text-ink-900 dark:text-ink-50">
                                         @if ($row->vendor_id)
-                                            <a href="{{ route('vendors.show', $row->vendor_id) }}" class="hover:text-brand-600 dark:hover:text-brand-400">{{ $row->vendor_name }}</a>
+                                            <a href="{{ route('parties.show', $row->vendor_id) }}" class="hover:text-brand-600 dark:hover:text-brand-400">{{ $row->vendor_name }}</a>
                                         @else
                                             {{ $row->vendor_name }}
                                         @endif

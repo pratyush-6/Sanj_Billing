@@ -94,6 +94,7 @@ class GoodsReceiptService
                     $goodsReceipt->grn_number,
                     null,
                     $actor,
+                    (float) $item->purchaseOrderItem->unit_price,
                 );
             }
 
