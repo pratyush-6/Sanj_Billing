@@ -28,7 +28,7 @@ class ProductController extends Controller
         $companyId = current_company()?->id;
 
         $products = Product::where('company_id', $companyId)
-            ->with(['category', 'unit'])
+            ->with(['category', 'unit', 'secondaryUnit'])
             ->when($request->filled('search'), fn ($query) => $query->where(function ($q) use ($request) {
                 $q->where('name', 'like', '%'.$request->string('search').'%')
                     ->orWhere('sku', 'like', '%'.$request->string('search').'%');

@@ -16,6 +16,7 @@ class PurchaseBill extends Model
         'company_id',
         'financial_year_id',
         'goods_receipt_id',
+        'purchase_order_id',
         'party_id',
         'bill_number',
         'bill_date',
@@ -53,9 +54,19 @@ class PurchaseBill extends Model
         return $this->belongsTo(FinancialYear::class);
     }
 
+    /**
+     * Historical only — Purchase Bills created before Goods Receipt was folded
+     * into Purchase Order still resolve through this; new bills leave it null
+     * and use purchaseOrder() instead.
+     */
     public function goodsReceipt(): BelongsTo
     {
         return $this->belongsTo(GoodsReceipt::class);
+    }
+
+    public function purchaseOrder(): BelongsTo
+    {
+        return $this->belongsTo(PurchaseOrder::class);
     }
 
     public function party(): BelongsTo

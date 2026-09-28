@@ -13,6 +13,7 @@ class PurchaseBillItem extends Model
     protected $fillable = [
         'purchase_bill_id',
         'goods_receipt_item_id',
+        'purchase_order_item_id',
         'hsn_code',
         'gst_rate',
         'quantity',
@@ -43,5 +44,20 @@ class PurchaseBillItem extends Model
     public function goodsReceiptItem(): BelongsTo
     {
         return $this->belongsTo(GoodsReceiptItem::class);
+    }
+
+    public function purchaseOrderItem(): BelongsTo
+    {
+        return $this->belongsTo(PurchaseOrderItem::class);
+    }
+
+    /**
+     * A new-style line goes straight to purchaseOrderItem; a historical line
+     * (created before Goods Receipt was folded into Purchase Order) only has
+     * goodsReceiptItem, one hop further to the same PurchaseOrderItem/product.
+     */
+    public function product(): ?Product
+    {
+        return $this->purchaseOrderItem?->product ?? $this->goodsReceiptItem?->purchaseOrderItem?->product;
     }
 }

@@ -86,7 +86,7 @@ class StockAdjustmentController extends Controller
         $company = current_company_or_fail();
 
         return view('stock-adjustments.form', [
-            'products' => Product::where('company_id', $company->id)->where('status', 'active')->orderBy('name')->get(),
+            'products' => Product::where('company_id', $company->id)->where('status', 'active')->with(['unit', 'secondaryUnit'])->orderBy('name')->get(),
             'types' => config('inventory.adjustment_types'),
             'reasons' => config('inventory.adjustment_reasons'),
         ]);

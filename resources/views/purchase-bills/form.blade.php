@@ -8,32 +8,32 @@
             <x-ui.alert variant="danger">{{ session('error') }}</x-ui.alert>
         @endif
 
-        @if (! $goodsReceipt)
+        @if (! $purchaseOrder)
             <x-ui.card>
                 <form method="GET" action="{{ route('purchase-bills.create') }}" class="flex flex-wrap items-end gap-3">
                     <div class="flex-1 min-w-[280px]">
-                        <x-input-label for="goods_receipt_id" value="Select a completed Goods Receipt to bill *" />
-                        <select id="goods_receipt_id" name="goods_receipt_id" onchange="this.form.submit()" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
-                            <option value="">Select a goods receipt</option>
-                            @foreach ($eligibleGoodsReceipts as $grn)
-                                <option value="{{ $grn->id }}">{{ $grn->grn_number }} — {{ $grn->purchaseOrder->vendor->name }}</option>
+                        <x-input-label for="purchase_order_id" value="Select a submitted Purchase Order to bill *" />
+                        <select id="purchase_order_id" name="purchase_order_id" onchange="this.form.submit()" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
+                            <option value="">Select a purchase order</option>
+                            @foreach ($eligiblePurchaseOrders as $po)
+                                <option value="{{ $po->id }}">{{ $po->po_number }} — {{ $po->vendor->name }}</option>
                             @endforeach
                         </select>
                     </div>
                 </form>
-                @if ($eligibleGoodsReceipts->isEmpty())
-                    <x-ui.empty-state title="No unbilled goods receipts" description="Complete a goods receipt against a purchase order before creating a bill." />
+                @if ($eligiblePurchaseOrders->isEmpty())
+                    <x-ui.empty-state title="No unbilled purchase orders" description="Submit a purchase order before creating a bill." />
                 @endif
             </x-ui.card>
         @else
             <x-ui.card>
                 <div class="flex items-center justify-between mb-4">
                     <div>
-                        <div class="text-xs text-ink-400 dark:text-ink-500 uppercase tracking-wide">Goods Receipt</div>
-                        <div class="text-sm font-medium text-ink-900 dark:text-ink-50 mt-1">{{ $goodsReceipt->grn_number }} — {{ $goodsReceipt->purchaseOrder->vendor->name }}</div>
+                        <div class="text-xs text-ink-400 dark:text-ink-500 uppercase tracking-wide">Purchase Order</div>
+                        <div class="text-sm font-medium text-ink-900 dark:text-ink-50 mt-1">{{ $purchaseOrder->po_number }} — {{ $purchaseOrder->vendor->name }}</div>
                     </div>
                     @if (! $bill)
-                        <a href="{{ route('purchase-bills.create') }}" class="text-sm text-ink-500 dark:text-ink-400 hover:text-ink-700 dark:hover:text-ink-200">Change goods receipt</a>
+                        <a href="{{ route('purchase-bills.create') }}" class="text-sm text-ink-500 dark:text-ink-400 hover:text-ink-700 dark:hover:text-ink-200">Change purchase order</a>
                     @endif
                 </div>
 
@@ -42,7 +42,7 @@
                     @if ($bill)
                         @method('PUT')
                     @endif
-                    <input type="hidden" name="goods_receipt_id" value="{{ $goodsReceipt->id }}">
+                    <input type="hidden" name="purchase_order_id" value="{{ $purchaseOrder->id }}">
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
                         <div>
@@ -67,7 +67,7 @@
                         </div>
                     </div>
 
-                    <x-ui.section title="Items (from Goods Receipt — quantity and price are locked)">
+                    <x-ui.section title="Items (from Purchase Order — quantity and price are locked)">
                         <div class="overflow-x-auto -mx-6">
                             <table class="min-w-full divide-y divide-ink-100 dark:divide-ink-800">
                                 <thead>
@@ -80,15 +80,15 @@
                                 </thead>
                                 <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
                                     @php $taxableTotal = 0; @endphp
-                                    @foreach ($goodsReceipt->items as $item)
+                                    @foreach ($purchaseOrder->items as $item)
                                         @php
-                                            $qty = (float) $item->quantity_received;
-                                            $price = (float) $item->purchaseOrderItem->unit_price;
+                                            $qty = (float) $item->quantity;
+                                            $price = (float) $item->unit_price;
                                             $lineTotal = round($qty * $price, 2);
                                             $taxableTotal += $lineTotal;
                                         @endphp
                                         <tr>
-                                            <td class="px-6 py-2 text-sm text-ink-900 dark:text-ink-50">{{ $item->purchaseOrderItem->product->name }} ({{ $item->purchaseOrderItem->product->sku }})</td>
+                                            <td class="px-6 py-2 text-sm text-ink-900 dark:text-ink-50">{{ $item->product->name }} ({{ $item->product->sku }})</td>
                                             <td class="px-3 py-2 text-sm text-right text-ink-600 dark:text-ink-300">{{ number_format($qty, 2) }}</td>
                                             <td class="px-3 py-2 text-sm text-right text-ink-600 dark:text-ink-300">{{ number_format($price, 2) }}</td>
                                             <td class="px-3 py-2 text-sm text-right text-ink-700 dark:text-ink-200 font-medium">{{ number_format($lineTotal, 2) }}</td>

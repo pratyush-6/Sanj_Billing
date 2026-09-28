@@ -13,7 +13,7 @@
                   action="{{ $order ? route('sale-orders.update', $order) : route('sale-orders.store') }}"
                   class="space-y-8"
                   x-data="{
-                      products: @js($products->map(fn ($product) => ['id' => $product->id, 'label' => $product->name.' ('.$product->sku.')'])),
+                      products: @js($products->map(fn ($product) => ['id' => $product->id, 'label' => $product->name.' ('.$product->sku.')', 'unit_code' => $product->unit?->name, 'secondary_unit_code' => $product->secondaryUnit?->name, 'conversion_factor' => $product->conversion_factor ? (float) $product->conversion_factor : null])),
                       items: @js($order
                           ? $order->items->map(fn ($item) => ['product_id' => $item->product_id, 'quantity' => (float) $item->quantity, 'unit_price' => (float) $item->unit_price, 'notes' => $item->notes])
                           : [['product_id' => '', 'quantity' => null, 'unit_price' => null, 'notes' => '']]),
@@ -24,6 +24,14 @@
                           if (this.items.length > 1) {
                               this.items.splice(index, 1);
                           }
+                      },
+                      unitCode(item) {
+                          return this.products.find(p => p.id == item.product_id)?.unit_code ?? null;
+                      },
+                      secondaryHint(item) {
+                          const product = this.products.find(p => p.id == item.product_id);
+                          if (!product || !product.secondary_unit_code || !product.conversion_factor) return null;
+                          return '= ' + ((parseFloat(item.quantity) || 0) * product.conversion_factor).toFixed(2) + ' ' + product.secondary_unit_code;
                       },
                       get total() {
                           return this.items.reduce((sum, item) => sum + ((parseFloat(item.quantity) || 0) * (parseFloat(item.unit_price) || 0)), 0).toFixed(2);
@@ -80,7 +88,11 @@
                                             </select>
                                         </td>
                                         <td class="px-3 py-2">
-                                            <input type="number" step="0.01" min="0.01" :name="`items[${index}][quantity]`" x-model.number="item.quantity" class="block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
+                                            <div class="flex items-center gap-1.5">
+                                                <input type="number" step="0.01" min="0.01" :name="`items[${index}][quantity]`" x-model.number="item.quantity" class="block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
+                                                <span class="text-xs text-ink-400 dark:text-ink-500 whitespace-nowrap" x-text="unitCode(item)"></span>
+                                            </div>
+                                            <p class="text-xs text-ink-400 dark:text-ink-500 mt-1" x-show="secondaryHint(item)" x-text="secondaryHint(item)"></p>
                                         </td>
                                         <td class="px-3 py-2">
                                             <input type="number" step="0.01" min="0" :name="`items[${index}][unit_price]`" x-model.number="item.unit_price" class="block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>

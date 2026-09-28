@@ -71,10 +71,7 @@
                                 <td class="px-4 py-3.5 text-sm text-right text-ink-600 dark:text-ink-300">{{ number_format($purchaseOrder->items->sum('amount'), 2) }}</td>
                                 <td class="px-4 py-3.5 text-sm">
                                     <x-ui.badge :variant="match($purchaseOrder->status) {
-                                        'Sent' => 'info',
-                                        'Partially Received' => 'warning',
-                                        'Received' => 'success',
-                                        'Closed' => 'brand',
+                                        'Submitted' => 'success',
                                         'Cancelled' => 'danger',
                                         default => 'neutral',
                                     }">{{ $purchaseOrder->status }}</x-ui.badge>

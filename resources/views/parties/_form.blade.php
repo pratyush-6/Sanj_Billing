@@ -14,18 +14,22 @@
             </div>
 
             <div class="sm:col-span-2">
+                @php
+                    $currentRole = old('role', $party ? ($party->is_customer ? 'customer' : 'vendor') : 'vendor');
+                @endphp
                 <x-input-label value="This party is a *" />
                 <div class="mt-1 flex items-center gap-6">
                     <label class="inline-flex items-center gap-2 text-sm text-ink-700 dark:text-ink-200">
-                        <input type="checkbox" name="is_vendor" value="1" @checked(old('is_vendor', $party?->is_vendor ?? true)) class="rounded bg-white dark:bg-ink-800 border-ink-300 dark:border-ink-600 text-brand-600 dark:text-brand-400 focus:ring-brand-500">
+                        <input type="radio" name="role" value="vendor" @checked($currentRole === 'vendor') class="bg-white dark:bg-ink-800 border-ink-300 dark:border-ink-600 text-brand-600 dark:text-brand-400 focus:ring-brand-500" required>
                         Vendor (you buy from them)
                     </label>
                     <label class="inline-flex items-center gap-2 text-sm text-ink-700 dark:text-ink-200">
-                        <input type="checkbox" name="is_customer" value="1" @checked(old('is_customer', $party?->is_customer ?? false)) class="rounded bg-white dark:bg-ink-800 border-ink-300 dark:border-ink-600 text-brand-600 dark:text-brand-400 focus:ring-brand-500">
+                        <input type="radio" name="role" value="customer" @checked($currentRole === 'customer') class="bg-white dark:bg-ink-800 border-ink-300 dark:border-ink-600 text-brand-600 dark:text-brand-400 focus:ring-brand-500" required>
                         Customer (you sell to them)
                     </label>
                 </div>
-                <x-input-error :messages="$errors->get('is_vendor')" class="mt-2" />
+                <p class="text-xs text-ink-400 dark:text-ink-500 mt-1">A party is either a vendor or a customer, not both.</p>
+                <x-input-error :messages="$errors->get('role')" class="mt-2" />
             </div>
 
             <div>

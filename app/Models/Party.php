@@ -55,11 +55,6 @@ class Party extends Model
         return $this->hasMany(VendorProduct::class, 'vendor_id');
     }
 
-    public function quotations(): HasMany
-    {
-        return $this->hasMany(VendorQuotation::class, 'vendor_id');
-    }
-
     public function purchaseOrders(): HasMany
     {
         return $this->hasMany(PurchaseOrder::class, 'vendor_id');

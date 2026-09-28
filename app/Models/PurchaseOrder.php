@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class PurchaseOrder extends Model
 {
@@ -14,7 +15,6 @@ class PurchaseOrder extends Model
     protected $fillable = [
         'company_id',
         'financial_year_id',
-        'quotation_id',
         'vendor_id',
         'po_number',
         'po_date',
@@ -39,11 +39,6 @@ class PurchaseOrder extends Model
         return $this->belongsTo(FinancialYear::class);
     }
 
-    public function quotation(): BelongsTo
-    {
-        return $this->belongsTo(VendorQuotation::class, 'quotation_id');
-    }
-
     public function vendor(): BelongsTo
     {
         return $this->belongsTo(Party::class, 'vendor_id');
@@ -62,6 +57,11 @@ class PurchaseOrder extends Model
     public function goodsReceipts(): HasMany
     {
         return $this->hasMany(GoodsReceipt::class);
+    }
+
+    public function purchaseBill(): HasOne
+    {
+        return $this->hasOne(PurchaseBill::class);
     }
 
     public function expenses(): HasMany

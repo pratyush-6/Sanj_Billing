@@ -78,7 +78,7 @@
         <tbody>
             @foreach ($bill->items as $item)
                 <tr>
-                    <td>{{ $item->goodsReceiptItem->purchaseOrderItem->product->name }}</td>
+                    <td>{{ $item->product()->name }}</td>
                     <td>{{ $item->hsn_code ?? '—' }}</td>
                     <td class="numeric">{{ number_format($item->quantity, 2) }}</td>
                     <td class="numeric">{{ number_format($item->unit_price, 2) }}</td>

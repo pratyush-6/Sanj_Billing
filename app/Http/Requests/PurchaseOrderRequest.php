@@ -17,10 +17,6 @@ class PurchaseOrderRequest extends FormRequest
         $companyId = current_company()?->id;
 
         return [
-            'quotation_id' => [
-                'nullable',
-                Rule::exists('vendor_quotations', 'id')->where('company_id', $companyId)->where('status', 'Approved'),
-            ],
             'vendor_id' => ['required', Rule::exists('parties', 'id')->where('company_id', $companyId)],
             'po_date' => ['required', 'date'],
             'expected_delivery_date' => ['nullable', 'date', 'after_or_equal:po_date'],

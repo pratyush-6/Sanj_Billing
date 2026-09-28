@@ -6,9 +6,9 @@ use App\Http\Controllers\Concerns\EnsuresCompanyOwnership;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PurchaseBillRequest;
 use App\Models\BankAccount;
-use App\Models\GoodsReceipt;
 use App\Models\PaymentMethod;
 use App\Models\PurchaseBill;
+use App\Models\PurchaseOrder;
 use App\Models\TdsSection;
 use App\Services\PurchaseBillService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -28,7 +28,7 @@ class PurchaseBillController extends Controller
         $companyId = current_company()?->id;
 
         $bills = PurchaseBill::where('company_id', $companyId)
-            ->with(['party', 'goodsReceipt.purchaseOrder', 'payments'])
+            ->with(['party', 'purchaseOrder', 'payments'])
             ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')))
             ->latest('bill_date')
             ->latest('id')
@@ -44,28 +44,28 @@ class PurchaseBillController extends Controller
     public function create(Request $request)
     {
         $company = current_company_or_fail();
-        $goodsReceipt = null;
+        $purchaseOrder = null;
 
-        if ($request->filled('goods_receipt_id')) {
-            $goodsReceipt = GoodsReceipt::where('company_id', $company->id)
-                ->where('status', 'Completed')
-                ->findOrFail($request->integer('goods_receipt_id'));
+        if ($request->filled('purchase_order_id')) {
+            $purchaseOrder = PurchaseOrder::where('company_id', $company->id)
+                ->where('status', 'Submitted')
+                ->findOrFail($request->integer('purchase_order_id'));
 
-            if ($goodsReceipt->purchaseBill()->exists()) {
-                return redirect()->route('goods-receipts.show', $goodsReceipt)->with('error', 'This goods receipt has already been billed.');
+            if ($purchaseOrder->purchaseBill()->exists()) {
+                return redirect()->route('purchase-orders.show', $purchaseOrder)->with('error', 'This purchase order has already been billed.');
             }
 
-            $goodsReceipt->load(['items.purchaseOrderItem.product', 'purchaseOrder.vendor']);
+            $purchaseOrder->load(['items.product', 'vendor']);
         }
 
         return view('purchase-bills.form', [
             'bill' => null,
-            'goodsReceipt' => $goodsReceipt,
-            'eligibleGoodsReceipts' => $goodsReceipt ? collect() : GoodsReceipt::where('company_id', $company->id)
-                ->where('status', 'Completed')
+            'purchaseOrder' => $purchaseOrder,
+            'eligiblePurchaseOrders' => $purchaseOrder ? collect() : PurchaseOrder::where('company_id', $company->id)
+                ->where('status', 'Submitted')
                 ->whereDoesntHave('purchaseBill')
-                ->with('purchaseOrder.vendor')
-                ->orderByDesc('receipt_date')
+                ->with('vendor')
+                ->orderByDesc('po_date')
                 ->get(),
             'tdsSections' => TdsSection::where('company_id', $company->id)->where('status', 'active')->orderBy('section')->get(),
         ]);
@@ -80,13 +80,13 @@ class PurchaseBillController extends Controller
             return redirect()->route('purchase-bills.create')->with('error', 'No active financial year. Please set one up first.');
         }
 
-        $goodsReceiptId = $request->integer('goods_receipt_id');
-        $goodsReceipt = GoodsReceipt::where('company_id', $company->id)->findOrFail($goodsReceiptId);
+        $purchaseOrderId = $request->integer('purchase_order_id');
+        $purchaseOrder = PurchaseOrder::where('company_id', $company->id)->findOrFail($purchaseOrderId);
 
         try {
-            $bill = $this->purchaseBillService->createFromGoodsReceipt($goodsReceipt, $request->validated(), $company, $financialYear, Auth::user());
+            $bill = $this->purchaseBillService->createFromPurchaseOrder($purchaseOrder, $request->validated(), $company, $financialYear, Auth::user());
         } catch (RuntimeException $exception) {
-            return redirect()->route('purchase-bills.create', ['goods_receipt_id' => $goodsReceiptId])->withInput()->with('error', $exception->getMessage());
+            return redirect()->route('purchase-bills.create', ['purchase_order_id' => $purchaseOrderId])->withInput()->with('error', $exception->getMessage());
         }
 
         return redirect()->route('purchase-bills.show', $bill)->with('status', "Purchase Bill {$bill->bill_number} saved as draft.");
@@ -97,7 +97,7 @@ class PurchaseBillController extends Controller
         $this->ensureBelongsToCurrentCompany($purchaseBill);
 
         $purchaseBill->load([
-            'party', 'goodsReceipt.purchaseOrder', 'items.goodsReceiptItem.purchaseOrderItem.product',
+            'party', 'goodsReceipt.purchaseOrder', 'purchaseOrder', 'items.goodsReceiptItem.purchaseOrderItem.product', 'items.purchaseOrderItem.product',
             'tdsSection', 'creator', 'payments' => fn ($query) => $query->orderByDesc('payment_date'),
         ]);
 
@@ -117,12 +117,12 @@ class PurchaseBillController extends Controller
         }
 
         $company = current_company_or_fail();
-        $purchaseBill->load(['goodsReceipt.purchaseOrder.vendor', 'items.goodsReceiptItem.purchaseOrderItem.product']);
+        $purchaseBill->load(['purchaseOrder.vendor', 'items.purchaseOrderItem.product']);
 
         return view('purchase-bills.form', [
             'bill' => $purchaseBill,
-            'goodsReceipt' => $purchaseBill->goodsReceipt,
-            'eligibleGoodsReceipts' => collect(),
+            'purchaseOrder' => $purchaseBill->purchaseOrder,
+            'eligiblePurchaseOrders' => collect(),
             'tdsSections' => TdsSection::where('company_id', $company->id)->where('status', 'active')->orderBy('section')->get(),
         ]);
     }
@@ -170,7 +170,7 @@ class PurchaseBillController extends Controller
     {
         $this->ensureBelongsToCurrentCompany($purchaseBill);
 
-        $purchaseBill->load(['party', 'company', 'items.goodsReceiptItem.purchaseOrderItem.product', 'tdsSection']);
+        $purchaseBill->load(['party', 'company', 'items.goodsReceiptItem.purchaseOrderItem.product', 'items.purchaseOrderItem.product', 'tdsSection']);
 
         return Pdf::loadView('purchase-bills.print', ['bill' => $purchaseBill])->stream("{$purchaseBill->bill_number}.pdf");
     }

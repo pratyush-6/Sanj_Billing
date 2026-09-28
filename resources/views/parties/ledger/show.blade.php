@@ -30,7 +30,8 @@
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Date</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Type</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Reference</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Amount</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Debit</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Credit</th>
                             <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Balance</th>
                         </tr>
                     </thead>
@@ -46,11 +47,12 @@
                                         {{ $row['reference'] }}
                                     @endif
                                 </td>
-                                <td class="px-4 py-3.5 text-sm text-right {{ $row['amount'] >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' }}">{{ number_format($row['amount'], 2) }}</td>
+                                <td class="px-4 py-3.5 text-sm text-right text-emerald-600 dark:text-emerald-400">{{ $row['debit'] > 0 ? number_format($row['debit'], 2) : '—' }}</td>
+                                <td class="px-4 py-3.5 text-sm text-right text-rose-600 dark:text-rose-400">{{ $row['credit'] > 0 ? number_format($row['credit'], 2) : '—' }}</td>
                                 <td class="px-4 py-3.5 text-sm text-right font-medium text-ink-900 dark:text-ink-50">{{ number_format($row['running_balance'], 2) }}</td>
                             </tr>
                         @empty
-                            <tr><td colspan="5"><x-ui.empty-state title="No posted transactions yet" /></td></tr>
+                            <tr><td colspan="6"><x-ui.empty-state title="No posted transactions yet" /></td></tr>
                         @endforelse
                     </tbody>
                 </table>

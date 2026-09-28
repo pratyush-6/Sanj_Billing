@@ -74,6 +74,10 @@ class PartyLedgerService
      * Every Sale Invoice / Purchase Bill / Payment for this party, chronological,
      * with a running balance derived on the fly — never stored, same philosophy
      * as AccountingService::ledger(), just sourced from these three tables.
+     * Debit increases what the party owes the business (a Sale Invoice, or a
+     * Payment the business made to a vendor); Credit decreases it (a Purchase
+     * Bill, or a Payment received from a customer) — the same signed convention
+     * outstandingBalances() uses, just split into two columns instead of one.
      */
     public function statementFor(Party $party): Collection
     {
@@ -85,7 +89,8 @@ class PartyLedgerService
                 'type' => 'Sale Invoice',
                 'reference' => $invoice->invoice_number,
                 'route' => route('sale-invoices.show', $invoice),
-                'amount' => round((float) $invoice->total_amount - (float) $invoice->tds_amount, 2),
+                'debit' => round((float) $invoice->total_amount - (float) $invoice->tds_amount, 2),
+                'credit' => 0.0,
             ]);
         }
 
@@ -95,24 +100,33 @@ class PartyLedgerService
                 'type' => 'Purchase Bill',
                 'reference' => $bill->bill_number,
                 'route' => route('purchase-bills.show', $bill),
-                'amount' => -round((float) $bill->total_amount - (float) $bill->tds_amount, 2),
+                'debit' => 0.0,
+                'credit' => round((float) $bill->total_amount - (float) $bill->tds_amount, 2),
             ]);
         }
 
         foreach (Payment::where('party_id', $party->id)->where('status', 'Posted')->get() as $payment) {
+            $isIn = $payment->direction === 'In';
+            $sourceRoute = match ($payment->source_type) {
+                SaleInvoice::class => route('sale-invoices.show', $payment->source_id),
+                PurchaseBill::class => route('purchase-bills.show', $payment->source_id),
+                default => null,
+            };
+
             $rows->push([
                 'date' => $payment->payment_date,
-                'type' => $payment->direction === 'In' ? 'Payment Received' : 'Payment Paid',
+                'type' => $isIn ? 'Payment Received' : 'Payment Paid',
                 'reference' => $payment->payment_number,
-                'route' => null,
-                'amount' => $payment->direction === 'In' ? -round((float) $payment->amount, 2) : round((float) $payment->amount, 2),
+                'route' => $sourceRoute,
+                'debit' => $isIn ? 0.0 : round((float) $payment->amount, 2),
+                'credit' => $isIn ? round((float) $payment->amount, 2) : 0.0,
             ]);
         }
 
         $running = 0.0;
 
         return $rows->sortBy('date')->values()->map(function ($row) use (&$running) {
-            $running = round($running + $row['amount'], 2);
+            $running = round($running + $row['debit'] - $row['credit'], 2);
             $row['running_balance'] = $running;
 
             return $row;
@@ -146,7 +160,7 @@ class PartyLedgerService
         }
 
         $billItems = PurchaseBillItem::whereHas('purchaseBill', fn ($query) => $query->where('party_id', $party->id)->where('status', 'Posted'))
-            ->with('purchaseBill', 'goodsReceiptItem.purchaseOrderItem.product')
+            ->with('purchaseBill', 'goodsReceiptItem.purchaseOrderItem.product', 'purchaseOrderItem.product')
             ->get();
 
         foreach ($billItems as $item) {
@@ -155,7 +169,7 @@ class PartyLedgerService
                 'type' => 'Purchase',
                 'reference' => $item->purchaseBill->bill_number,
                 'route' => route('purchase-bills.show', $item->purchaseBill),
-                'product' => $item->goodsReceiptItem->purchaseOrderItem->product,
+                'product' => $item->product(),
                 'direction' => 'In',
                 'quantity' => (float) $item->quantity,
                 'unit_price' => (float) $item->unit_price,

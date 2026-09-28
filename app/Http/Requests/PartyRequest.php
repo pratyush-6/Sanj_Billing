@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Validator;
 
 class PartyRequest extends FormRequest
 {
@@ -13,21 +12,34 @@ class PartyRequest extends FormRequest
         return true;
     }
 
-    public function withValidator(Validator $validator): void
+    /**
+     * A party is either a Vendor or a Customer, never both — the form only
+     * ever submits a single `role`; this derives the two stored booleans from
+     * it so the rest of the create/update pipeline (and every existing query
+     * filtering by is_vendor/is_customer) doesn't need to change. Done here
+     * rather than via merge()+passedValidation(), since validated() only
+     * returns rule-declared keys and wouldn't otherwise pick up the merge.
+     */
+    public function validated($key = null, $default = null)
     {
-        $validator->after(function ($validator) {
-            if (! $this->boolean('is_vendor') && ! $this->boolean('is_customer')) {
-                $validator->errors()->add('is_vendor', 'Select at least one: Vendor or Customer.');
-            }
-        });
+        $validated = parent::validated();
+
+        $validated['is_vendor'] = $validated['role'] === 'vendor';
+        $validated['is_customer'] = $validated['role'] === 'customer';
+        unset($validated['role']);
+
+        if ($key !== null) {
+            return data_get($validated, $key, $default);
+        }
+
+        return $validated;
     }
 
     public function rules(): array
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'is_vendor' => ['nullable', 'boolean'],
-            'is_customer' => ['nullable', 'boolean'],
+            'role' => ['required', Rule::in(['vendor', 'customer'])],
             'company_name' => ['nullable', 'string', 'max:255'],
             'contact_person' => ['nullable', 'string', 'max:255'],
             'mobile' => ['nullable', 'string', 'max:20'],

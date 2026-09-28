@@ -29,8 +29,6 @@ use App\Http\Controllers\Party\PartyLedgerController;
 use App\Http\Controllers\Procurement\PurchaseBillController;
 use App\Http\Controllers\Procurement\PurchaseBillPaymentController;
 use App\Http\Controllers\Procurement\PurchaseOrderController;
-use App\Http\Controllers\Procurement\QuotationApprovalController;
-use App\Http\Controllers\Procurement\VendorQuotationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Report\ReportController;
 use App\Http\Controllers\Sales\DeliveryChallanController;
@@ -38,6 +36,7 @@ use App\Http\Controllers\Sales\SaleInvoiceController;
 use App\Http\Controllers\Sales\SaleInvoicePaymentController;
 use App\Http\Controllers\Sales\SaleOrderController;
 use App\Http\Controllers\Settings\AuditLogController;
+use App\Http\Controllers\Settings\RoleController;
 use App\Http\Controllers\Settings\UserController;
 use App\Http\Controllers\Vendor\VendorProductController;
 use Illuminate\Support\Facades\Route;
@@ -82,6 +81,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/settings/audit-logs', [AuditLogController::class, 'index'])->name('settings.audit-logs.index');
     });
 
+    Route::middleware('can:roles.manage')->group(function () {
+        Route::get('/settings/roles', [RoleController::class, 'index'])->name('settings.roles.index');
+        Route::get('/settings/roles/{role}/edit', [RoleController::class, 'edit'])->name('settings.roles.edit');
+        Route::put('/settings/roles/{role}', [RoleController::class, 'update'])->name('settings.roles.update');
+    });
+
     Route::middleware('can:expense-categories.manage')->group(function () {
         Route::resource('expense-categories', ExpenseCategoryController::class)->except(['show', 'destroy']);
         Route::resource('expense-sub-categories', ExpenseSubCategoryController::class)->except(['show', 'destroy']);
@@ -109,33 +114,6 @@ Route::middleware('auth')->group(function () {
         Route::resource('products', ProductController::class)->except(['show', 'destroy', 'index']);
     });
 
-    // Route order is deliberate: literal segments (create, compare) must be
-    // registered before the {quotation} wildcard, or Laravel's route matcher
-    // (same-method, first-match) swallows them as an id.
-    Route::middleware('can:inventory.view')->group(function () {
-        Route::get('/vendor-quotations', [VendorQuotationController::class, 'index'])->name('vendor-quotations.index');
-    });
-    Route::middleware('can:vendor-quotations.manage')->group(function () {
-        Route::get('/vendor-quotations/create', [VendorQuotationController::class, 'create'])->name('vendor-quotations.create');
-    });
-    Route::middleware('can:inventory.view')->group(function () {
-        Route::get('/vendor-quotations/compare', [VendorQuotationController::class, 'compare'])->name('vendor-quotations.compare');
-    });
-    Route::middleware('can:vendor-quotations.manage')->group(function () {
-        Route::post('/vendor-quotations', [VendorQuotationController::class, 'store'])->name('vendor-quotations.store');
-    });
-    Route::middleware('can:inventory.view')->group(function () {
-        Route::get('/vendor-quotations/{quotation}', [VendorQuotationController::class, 'show'])->name('vendor-quotations.show');
-    });
-    Route::middleware('can:vendor-quotations.manage')->group(function () {
-        Route::get('/vendor-quotations/{quotation}/edit', [VendorQuotationController::class, 'edit'])->name('vendor-quotations.edit');
-        Route::put('/vendor-quotations/{quotation}', [VendorQuotationController::class, 'update'])->name('vendor-quotations.update');
-        Route::post('/vendor-quotations/{quotation}/submit', [VendorQuotationController::class, 'submit'])->name('vendor-quotations.submit');
-    });
-    Route::middleware('can:vendor-quotations.approve')->group(function () {
-        Route::post('/vendor-quotations/{quotation}/approval', [QuotationApprovalController::class, 'store'])->name('vendor-quotations.approval.store');
-    });
-
     Route::middleware('can:inventory.view')->group(function () {
         Route::get('/purchase-orders', [PurchaseOrderController::class, 'index'])->name('purchase-orders.index');
     });
@@ -149,24 +127,15 @@ Route::middleware('auth')->group(function () {
     Route::middleware('can:purchase-orders.manage')->group(function () {
         Route::get('/purchase-orders/{purchaseOrder}/edit', [PurchaseOrderController::class, 'edit'])->name('purchase-orders.edit');
         Route::put('/purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'update'])->name('purchase-orders.update');
-        Route::post('/purchase-orders/{purchaseOrder}/send', [PurchaseOrderController::class, 'send'])->name('purchase-orders.send');
+        Route::post('/purchase-orders/{purchaseOrder}/submit', [PurchaseOrderController::class, 'submit'])->name('purchase-orders.submit');
         Route::post('/purchase-orders/{purchaseOrder}/cancel', [PurchaseOrderController::class, 'cancel'])->name('purchase-orders.cancel');
     });
 
-    Route::middleware('can:inventory.view')->group(function () {
-        Route::get('/goods-receipts', [GoodsReceiptController::class, 'index'])->name('goods-receipts.index');
-    });
-    Route::middleware('can:goods-receipts.manage')->group(function () {
-        Route::get('/goods-receipts/create', [GoodsReceiptController::class, 'create'])->name('goods-receipts.create');
-        Route::post('/goods-receipts', [GoodsReceiptController::class, 'store'])->name('goods-receipts.store');
-    });
+    // Goods Receipt is retired as an active workflow (a Purchase Order now posts
+    // stock and enables billing directly on submit) — only `show` survives, so
+    // historical receipts created before this change keep resolving correctly.
     Route::middleware('can:inventory.view')->group(function () {
         Route::get('/goods-receipts/{goodsReceipt}', [GoodsReceiptController::class, 'show'])->name('goods-receipts.show');
-    });
-    Route::middleware('can:goods-receipts.manage')->group(function () {
-        Route::get('/goods-receipts/{goodsReceipt}/edit', [GoodsReceiptController::class, 'edit'])->name('goods-receipts.edit');
-        Route::put('/goods-receipts/{goodsReceipt}', [GoodsReceiptController::class, 'update'])->name('goods-receipts.update');
-        Route::post('/goods-receipts/{goodsReceipt}/complete', [GoodsReceiptController::class, 'complete'])->name('goods-receipts.complete');
     });
 
     Route::middleware('can:inventory.view')->group(function () {
@@ -240,6 +209,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/sale-invoices/{saleInvoice}', [SaleInvoiceController::class, 'update'])->name('sale-invoices.update');
         Route::post('/sale-invoices/{saleInvoice}/post', [SaleInvoiceController::class, 'post'])->name('sale-invoices.post');
         Route::post('/sale-invoices/{saleInvoice}/cancel', [SaleInvoiceController::class, 'cancel'])->name('sale-invoices.cancel');
+        Route::post('/sale-invoices/{saleInvoice}/copy', [SaleInvoiceController::class, 'copy'])->name('sale-invoices.copy');
         Route::post('/sale-invoices/{saleInvoice}/payments', [SaleInvoicePaymentController::class, 'store'])->name('sale-invoices.payments.store');
         Route::post('/sale-invoices/{saleInvoice}/payments/{payment}/cancel', [SaleInvoicePaymentController::class, 'cancel'])->name('sale-invoices.payments.cancel');
     });

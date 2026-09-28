@@ -56,7 +56,7 @@
             @endif
 
             @can('stock-adjustments.approve')
-                @if ($adjustment->status === 'Pending' && $adjustment->created_by !== auth()->id())
+                @if ($adjustment->status === 'Pending')
                     <div class="flex flex-wrap items-center gap-3 mt-6 border-t border-ink-100 dark:border-ink-800 pt-4">
                         <form method="POST" action="{{ route('stock-adjustments.decide', $adjustment) }}">
                             @csrf
@@ -69,8 +69,6 @@
                             <x-danger-button type="submit">Reject</x-danger-button>
                         </form>
                     </div>
-                @elseif ($adjustment->status === 'Pending')
-                    <p class="text-xs text-ink-400 dark:text-ink-500 mt-6 border-t border-ink-100 dark:border-ink-800 pt-4">You submitted this adjustment, so you cannot approve or reject it yourself.</p>
                 @endif
             @endcan
         </x-ui.card>

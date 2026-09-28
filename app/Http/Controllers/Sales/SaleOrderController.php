@@ -125,7 +125,7 @@ class SaleOrderController extends Controller
         return view('sale-orders.form', [
             'order' => $order?->load('items.product'),
             'parties' => Party::where('company_id', $company->id)->where('is_customer', true)->where('status', 'active')->orderBy('name')->get(),
-            'products' => Product::where('company_id', $company->id)->where('status', 'active')->orderBy('name')->get(),
+            'products' => Product::where('company_id', $company->id)->where('status', 'active')->with(['unit', 'secondaryUnit'])->orderBy('name')->get(),
         ]);
     }
 }

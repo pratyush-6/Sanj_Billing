@@ -26,9 +26,13 @@
                         <div class="text-sm font-medium text-ink-900 dark:text-ink-50 mt-1">{{ $bill->party->name }}</div>
                     </div>
                     <div>
-                        <div class="text-xs text-ink-400 dark:text-ink-500 uppercase tracking-wide">Goods Receipt</div>
+                        <div class="text-xs text-ink-400 dark:text-ink-500 uppercase tracking-wide">Purchase Order</div>
                         <div class="text-sm font-medium mt-1">
-                            <a href="{{ route('goods-receipts.show', $bill->goodsReceipt) }}" class="text-brand-600 dark:text-brand-400 hover:underline">{{ $bill->goodsReceipt->grn_number }}</a>
+                            @if ($bill->purchase_order_id)
+                                <a href="{{ route('purchase-orders.show', $bill->purchaseOrder) }}" class="text-brand-600 dark:text-brand-400 hover:underline">{{ $bill->purchaseOrder->po_number }}</a>
+                            @else
+                                <a href="{{ route('goods-receipts.show', $bill->goodsReceipt) }}" class="text-brand-600 dark:text-brand-400 hover:underline">{{ $bill->goodsReceipt->grn_number }}</a>
+                            @endif
                         </div>
                     </div>
                     <div>
@@ -90,7 +94,7 @@
                     <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
                         @foreach ($bill->items as $item)
                             <tr>
-                                <td class="px-4 py-3.5 text-sm text-ink-900 dark:text-ink-50">{{ $item->goodsReceiptItem->purchaseOrderItem->product->name }}</td>
+                                <td class="px-4 py-3.5 text-sm text-ink-900 dark:text-ink-50">{{ $item->product()->name }}</td>
                                 <td class="px-4 py-3.5 text-sm text-ink-600 dark:text-ink-300">{{ $item->hsn_code ?? '—' }}</td>
                                 <td class="px-4 py-3.5 text-sm text-right text-ink-600 dark:text-ink-300">{{ number_format($item->quantity, 2) }}</td>
                                 <td class="px-4 py-3.5 text-sm text-right text-ink-600 dark:text-ink-300">{{ number_format($item->unit_price, 2) }}</td>

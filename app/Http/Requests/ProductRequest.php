@@ -27,6 +27,8 @@ class ProductRequest extends FormRequest
             'gst_rate_id' => ['nullable', Rule::exists('gst_rates', 'id')->where('company_id', $companyId)],
             'product_category_id' => ['nullable', Rule::exists('product_categories', 'id')->where('company_id', $companyId)],
             'unit_id' => ['nullable', Rule::exists('units', 'id')->where('company_id', $companyId)],
+            'secondary_unit_id' => ['nullable', 'different:unit_id', Rule::exists('units', 'id')->where('company_id', $companyId)],
+            'conversion_factor' => ['nullable', 'numeric', 'min:0.0001', 'required_with:secondary_unit_id'],
             'description' => ['nullable', 'string', 'max:2000'],
             'min_stock_level' => ['nullable', 'numeric', 'min:0'],
             'max_stock_level' => ['nullable', 'numeric', 'min:0', 'gte:min_stock_level'],

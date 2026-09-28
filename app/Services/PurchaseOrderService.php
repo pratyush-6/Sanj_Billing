@@ -6,7 +6,6 @@ use App\Models\Company;
 use App\Models\FinancialYear;
 use App\Models\PurchaseOrder;
 use App\Models\User;
-use App\Models\VendorQuotation;
 use App\Services\Concerns\GeneratesSequentialNumbers;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -15,20 +14,16 @@ class PurchaseOrderService
 {
     use GeneratesSequentialNumbers;
 
-    public function __construct(private AuditLogService $auditLog) {}
+    public function __construct(
+        private AuditLogService $auditLog,
+        private StockMovementService $stockMovementService,
+    ) {}
 
     public function create(array $data, Company $company, FinancialYear $financialYear, User $creator): PurchaseOrder
     {
         return DB::transaction(function () use ($data, $company, $financialYear, $creator) {
             $items = $data['items'];
             unset($data['items']);
-
-            $quotation = null;
-            if (! empty($data['quotation_id'])) {
-                $quotation = VendorQuotation::where('company_id', $company->id)
-                    ->where('status', 'Approved')
-                    ->findOrFail($data['quotation_id']);
-            }
 
             $purchaseOrder = PurchaseOrder::create([
                 ...$data,
@@ -40,10 +35,6 @@ class PurchaseOrderService
             ]);
 
             $this->syncItems($purchaseOrder, $items);
-
-            if ($quotation) {
-                $quotation->update(['status' => 'Converted']);
-            }
 
             $this->auditLog->log('Purchase Order Created', 'Purchase Order', $purchaseOrder, null, $purchaseOrder->toArray());
 
@@ -60,7 +51,7 @@ class PurchaseOrderService
         return DB::transaction(function () use ($purchaseOrder, $data) {
             $old = $purchaseOrder->toArray();
             $items = $data['items'];
-            unset($data['items'], $data['quotation_id']);
+            unset($data['items']);
 
             $purchaseOrder->update($data);
             $this->syncItems($purchaseOrder, $items);
@@ -71,26 +62,57 @@ class PurchaseOrderService
         });
     }
 
-    public function send(PurchaseOrder $purchaseOrder): PurchaseOrder
+    /**
+     * The single point of no return: submitting a PO is both "sent to the
+     * vendor" and "goods received" in this simplified workflow — it posts a
+     * stock-In movement per line at the PO's own price (the same call shape
+     * GoodsReceiptService::complete() used to make, just sourced to the PO
+     * itself) and immediately makes the PO eligible for billing. A mistake
+     * discovered afterwards is a Stock Adjustment, not a cancellation — the
+     * same rule every other "stock has already moved" document in this app
+     * follows (a Completed Delivery Challan, a Posted Sale Invoice's direct
+     * line).
+     */
+    public function submit(PurchaseOrder $purchaseOrder, User $actor): PurchaseOrder
     {
         if ($purchaseOrder->status !== 'Draft') {
-            throw new RuntimeException('Only draft purchase orders can be sent.');
+            throw new RuntimeException('Only draft purchase orders can be submitted.');
         }
 
         if ($purchaseOrder->items()->count() === 0) {
-            throw new RuntimeException('Add at least one line item before sending.');
+            throw new RuntimeException('Add at least one line item before submitting.');
         }
 
-        $purchaseOrder->update(['status' => 'Sent']);
-        $this->auditLog->log('Purchase Order Sent', 'Purchase Order', $purchaseOrder, null, ['status' => 'Sent']);
+        return DB::transaction(function () use ($purchaseOrder, $actor) {
+            $purchaseOrder->load(['items.product', 'company', 'financialYear']);
 
-        return $purchaseOrder;
+            foreach ($purchaseOrder->items as $item) {
+                $this->stockMovementService->postIn(
+                    $purchaseOrder->company,
+                    $purchaseOrder->financialYear,
+                    $item->product,
+                    (float) $item->quantity,
+                    $purchaseOrder->po_date->toDateString(),
+                    $purchaseOrder,
+                    $purchaseOrder->po_number,
+                    null,
+                    $actor,
+                    (float) $item->unit_price,
+                );
+            }
+
+            $purchaseOrder->update(['status' => 'Submitted']);
+
+            $this->auditLog->log('Purchase Order Submitted', 'Purchase Order', $purchaseOrder, null, ['status' => 'Submitted']);
+
+            return $purchaseOrder;
+        });
     }
 
     public function cancel(PurchaseOrder $purchaseOrder): PurchaseOrder
     {
-        if (! in_array($purchaseOrder->status, ['Draft', 'Sent'], true)) {
-            throw new RuntimeException('Only draft or sent purchase orders can be cancelled.');
+        if ($purchaseOrder->status !== 'Draft') {
+            throw new RuntimeException('Only a draft purchase order can be cancelled.');
         }
 
         $purchaseOrder->update(['status' => 'Cancelled']);

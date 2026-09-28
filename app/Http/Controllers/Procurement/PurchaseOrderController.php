@@ -8,7 +8,6 @@ use App\Http\Requests\PurchaseOrderRequest;
 use App\Models\Party;
 use App\Models\Product;
 use App\Models\PurchaseOrder;
-use App\Models\VendorQuotation;
 use App\Services\PurchaseOrderService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -43,20 +42,7 @@ class PurchaseOrderController extends Controller
 
     public function create(Request $request)
     {
-        $company = current_company_or_fail();
-        $quotation = null;
-
-        if ($request->filled('from_quotation')) {
-            $quotation = VendorQuotation::where('company_id', $company->id)->findOrFail($request->integer('from_quotation'));
-
-            if ($quotation->status !== 'Approved') {
-                return redirect()->route('vendor-quotations.show', $quotation)->with('error', 'Only approved quotations can be converted to a purchase order.');
-            }
-
-            $quotation->load('items.product');
-        }
-
-        return $this->formData(null, $quotation);
+        return $this->formData();
     }
 
     public function store(PurchaseOrderRequest $request): RedirectResponse
@@ -77,7 +63,7 @@ class PurchaseOrderController extends Controller
     {
         $this->ensureBelongsToCurrentCompany($purchaseOrder);
 
-        $purchaseOrder->load(['vendor', 'creator', 'items.product', 'quotation', 'goodsReceipts', 'expenses']);
+        $purchaseOrder->load(['vendor', 'creator', 'items.product', 'purchaseBill', 'expenses']);
 
         return view('purchase-orders.show', ['purchaseOrder' => $purchaseOrder]);
     }
@@ -106,17 +92,17 @@ class PurchaseOrderController extends Controller
         return redirect()->route('purchase-orders.show', $purchaseOrder)->with('status', 'Purchase order updated.');
     }
 
-    public function send(PurchaseOrder $purchaseOrder): RedirectResponse
+    public function submit(PurchaseOrder $purchaseOrder): RedirectResponse
     {
         $this->ensureBelongsToCurrentCompany($purchaseOrder);
 
         try {
-            $this->purchaseOrderService->send($purchaseOrder);
+            $this->purchaseOrderService->submit($purchaseOrder, Auth::user());
         } catch (RuntimeException $exception) {
             return redirect()->route('purchase-orders.show', $purchaseOrder)->with('error', $exception->getMessage());
         }
 
-        return redirect()->route('purchase-orders.show', $purchaseOrder)->with('status', 'Purchase order sent to vendor.');
+        return redirect()->route('purchase-orders.show', $purchaseOrder)->with('status', 'Purchase order submitted — stock updated.');
     }
 
     public function cancel(PurchaseOrder $purchaseOrder): RedirectResponse
@@ -132,15 +118,14 @@ class PurchaseOrderController extends Controller
         return redirect()->route('purchase-orders.show', $purchaseOrder)->with('status', 'Purchase order cancelled.');
     }
 
-    private function formData(?PurchaseOrder $purchaseOrder = null, ?VendorQuotation $quotation = null)
+    private function formData(?PurchaseOrder $purchaseOrder = null)
     {
         $company = current_company_or_fail();
 
         return view('purchase-orders.form', [
             'purchaseOrder' => $purchaseOrder?->load('items.product'),
-            'quotation' => $quotation,
             'vendors' => Party::where('company_id', $company->id)->where('is_vendor', true)->where('status', 'active')->orderBy('name')->get(),
-            'products' => Product::where('company_id', $company->id)->where('status', 'active')->orderBy('name')->get(),
+            'products' => Product::where('company_id', $company->id)->where('status', 'active')->with(['unit', 'secondaryUnit'])->orderBy('name')->get(),
         ]);
     }
 }

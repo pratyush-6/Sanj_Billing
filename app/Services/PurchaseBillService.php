@@ -4,9 +4,9 @@ namespace App\Services;
 
 use App\Models\Company;
 use App\Models\FinancialYear;
-use App\Models\GoodsReceipt;
 use App\Models\Party;
 use App\Models\PurchaseBill;
+use App\Models\PurchaseOrder;
 use App\Models\TdsSection;
 use App\Models\User;
 use App\Services\Concerns\GeneratesSequentialNumbers;
@@ -23,21 +23,21 @@ class PurchaseBillService
         private GstCalculationService $gstCalculator,
     ) {}
 
-    public function createFromGoodsReceipt(GoodsReceipt $goodsReceipt, array $data, Company $company, FinancialYear $financialYear, User $creator): PurchaseBill
+    public function createFromPurchaseOrder(PurchaseOrder $purchaseOrder, array $data, Company $company, FinancialYear $financialYear, User $creator): PurchaseBill
     {
-        if ($goodsReceipt->status !== 'Completed') {
-            throw new RuntimeException('Only a completed goods receipt can be billed.');
+        if ($purchaseOrder->status !== 'Submitted') {
+            throw new RuntimeException('Only a submitted purchase order can be billed.');
         }
 
-        if ($goodsReceipt->purchaseBill()->exists()) {
-            throw new RuntimeException('This goods receipt has already been billed.');
+        if ($purchaseOrder->purchaseBill()->exists()) {
+            throw new RuntimeException('This purchase order has already been billed.');
         }
 
-        return DB::transaction(function () use ($goodsReceipt, $data, $company, $financialYear, $creator) {
-            $goodsReceipt->load(['items.purchaseOrderItem.product.gstRate', 'purchaseOrder.vendor']);
-            $party = $goodsReceipt->purchaseOrder->vendor;
+        return DB::transaction(function () use ($purchaseOrder, $data, $company, $financialYear, $creator) {
+            $purchaseOrder->load(['items.product.gstRate', 'vendor']);
+            $party = $purchaseOrder->vendor;
 
-            $lines = $this->buildLines($goodsReceipt, $company, $party);
+            $lines = $this->buildLines($purchaseOrder, $company, $party);
             $totals = $this->sumTotals($lines);
 
             $tdsAmount = 0.0;
@@ -49,7 +49,7 @@ class PurchaseBillService
             $bill = PurchaseBill::create([
                 'company_id' => $company->id,
                 'financial_year_id' => $financialYear->id,
-                'goods_receipt_id' => $goodsReceipt->id,
+                'purchase_order_id' => $purchaseOrder->id,
                 'party_id' => $party->id,
                 'bill_number' => $this->generateSequentialNumber(PurchaseBill::class, 'BILL', $company, $financialYear),
                 'bill_date' => $data['bill_date'],
@@ -146,19 +146,19 @@ class PurchaseBillService
         });
     }
 
-    private function buildLines(GoodsReceipt $goodsReceipt, Company $company, Party $party): array
+    private function buildLines(PurchaseOrder $purchaseOrder, Company $company, Party $party): array
     {
-        return $goodsReceipt->items->map(function ($item) use ($company, $party) {
-            $product = $item->purchaseOrderItem->product;
-            $quantity = round((float) $item->quantity_received, 2);
-            $unitPrice = round((float) $item->purchaseOrderItem->unit_price, 2);
+        return $purchaseOrder->items->map(function ($item) use ($company, $party) {
+            $product = $item->product;
+            $quantity = round((float) $item->quantity, 2);
+            $unitPrice = round((float) $item->unit_price, 2);
             $taxableAmount = round($quantity * $unitPrice, 2);
             $gstRate = (float) ($product->gstRate?->rate ?? 0);
 
             $gstSplit = $this->gstCalculator->splitGst($taxableAmount, $gstRate, $company->state, $party->state);
 
             return [
-                'goods_receipt_item_id' => $item->id,
+                'purchase_order_item_id' => $item->id,
                 'hsn_code' => $product->hsn_code,
                 'gst_rate' => $gstRate,
                 'quantity' => $quantity,

@@ -12,17 +12,23 @@
             <x-ui.alert variant="info">Invoicing delivery challan {{ $challan->challan_number }} ({{ $challan->party->name }}). Only the undelivered-but-unbilled balance of each line is shown.</x-ui.alert>
         @endif
 
+        @if ($prefill ?? null)
+            <x-ui.alert variant="info">Pre-filled from cancelled invoice {{ $prefill['source_invoice_number'] }} — adjust the quantity and save to create the corrected invoice.</x-ui.alert>
+        @endif
+
         <x-ui.card>
             <form method="POST"
                   action="{{ $invoice ? route('sale-invoices.update', $invoice) : route('sale-invoices.store') }}"
                   class="space-y-8"
                   @if (! $invoice)
                   x-data="{
-                      products: @js($products->map(fn ($product) => ['id' => $product->id, 'label' => $product->name.' ('.$product->sku.')'])),
+                      products: @js($products->map(fn ($product) => ['id' => $product->id, 'label' => $product->name.' ('.$product->sku.')', 'unit_code' => $product->unit?->name, 'secondary_unit_code' => $product->secondaryUnit?->name, 'conversion_factor' => $product->conversion_factor ? (float) $product->conversion_factor : null])),
                       lockedItems: {{ $challan ? 'true' : 'false' }},
                       items: @js($challan
                           ? $challanLines->map(fn ($line) => ['delivery_challan_item_id' => $line['delivery_challan_item_id'], 'product_id' => $line['product_id'], 'product_label' => $line['product_label'], 'quantity' => $line['remaining'], 'max' => $line['remaining'], 'unit_price' => null])
-                          : [['product_id' => '', 'quantity' => null, 'unit_price' => null]]),
+                          : (($prefill['items'] ?? null)
+                              ? $prefill['items']
+                              : [['product_id' => '', 'quantity' => null, 'unit_price' => null]])),
                       addItem() {
                           this.items.push({ product_id: '', quantity: null, unit_price: null });
                       },
@@ -30,6 +36,14 @@
                           if (this.items.length > 1) {
                               this.items.splice(index, 1);
                           }
+                      },
+                      unitCode(item) {
+                          return this.products.find(p => p.id == item.product_id)?.unit_code ?? null;
+                      },
+                      secondaryHint(item) {
+                          const product = this.products.find(p => p.id == item.product_id);
+                          if (!product || !product.secondary_unit_code || !product.conversion_factor) return null;
+                          return '= ' + ((parseFloat(item.quantity) || 0) * product.conversion_factor).toFixed(2) + ' ' + product.secondary_unit_code;
                       },
                       get total() {
                           return this.items.reduce((sum, item) => sum + ((parseFloat(item.quantity) || 0) * (parseFloat(item.unit_price) || 0)), 0).toFixed(2);
@@ -56,7 +70,7 @@
                                 <select id="party_id" name="party_id" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
                                     <option value="">Select</option>
                                     @foreach ($parties as $party)
-                                        <option value="{{ $party->id }}" @selected((string) old('party_id') === (string) $party->id)>{{ $party->name }}</option>
+                                        <option value="{{ $party->id }}" @selected((string) old('party_id', $prefill['party_id'] ?? null) === (string) $party->id)>{{ $party->name }}</option>
                                     @endforeach
                                 </select>
                                 <x-input-error :messages="$errors->get('party_id')" class="mt-2" />
@@ -148,8 +162,12 @@
                                                 </template>
                                             </td>
                                             <td class="px-3 py-2">
-                                                <input type="number" step="0.01" min="0.01" :max="item.max ?? null" :name="`items[${index}][quantity]`" x-model.number="item.quantity" class="block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
+                                                <div class="flex items-center gap-1.5">
+                                                    <input type="number" step="0.01" min="0.01" :max="item.max ?? null" :name="`items[${index}][quantity]`" x-model.number="item.quantity" class="block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
+                                                    <span class="text-xs text-ink-400 dark:text-ink-500 whitespace-nowrap" x-text="unitCode(item)"></span>
+                                                </div>
                                                 <p class="text-xs text-ink-400 dark:text-ink-500 mt-1" x-show="item.max" x-text="'Max: ' + item.max"></p>
+                                                <p class="text-xs text-ink-400 dark:text-ink-500 mt-1" x-show="secondaryHint(item)" x-text="secondaryHint(item)"></p>
                                             </td>
                                             <td class="px-3 py-2">
                                                 <input type="number" step="0.01" min="0" :name="`items[${index}][unit_price]`" x-model.number="item.unit_price" class="block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>

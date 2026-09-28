@@ -80,11 +80,6 @@ class Company extends Model
         return $this->hasMany(Product::class);
     }
 
-    public function vendorQuotations(): HasMany
-    {
-        return $this->hasMany(VendorQuotation::class);
-    }
-
     public function purchaseOrders(): HasMany
     {
         return $this->hasMany(PurchaseOrder::class);

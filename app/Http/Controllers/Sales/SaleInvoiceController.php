@@ -49,6 +49,26 @@ class SaleInvoiceController extends Controller
         $company = current_company_or_fail();
         $challan = null;
         $challanLines = collect();
+        $prefill = null;
+
+        if ($request->filled('prefill_from')) {
+            $source = SaleInvoice::where('company_id', $company->id)
+                ->where('status', 'Cancelled')
+                ->with('items.product')
+                ->find($request->integer('prefill_from'));
+
+            if ($source) {
+                $prefill = [
+                    'party_id' => $source->party_id,
+                    'source_invoice_number' => $source->invoice_number,
+                    'items' => $source->items->map(fn ($item) => [
+                        'product_id' => $item->product_id,
+                        'quantity' => (float) $item->quantity,
+                        'unit_price' => (float) $item->unit_price,
+                    ])->all(),
+                ];
+            }
+        }
 
         if ($request->filled('from_challan')) {
             $challan = DeliveryChallan::where('company_id', $company->id)
@@ -79,7 +99,7 @@ class SaleInvoiceController extends Controller
             }
         }
 
-        return $this->formData(null, $challan, $challanLines);
+        return $this->formData(null, $challan, $challanLines, $prefill);
     }
 
     public function store(SaleInvoiceRequest $request): RedirectResponse
@@ -177,7 +197,30 @@ class SaleInvoiceController extends Controller
         return Pdf::loadView('sale-invoices.print', ['invoice' => $saleInvoice])->stream("{$saleInvoice->invoice_number}.pdf");
     }
 
-    private function formData(?SaleInvoice $invoice = null, ?DeliveryChallan $challan = null, $challanLines = null)
+    /**
+     * "Editing" a quantity is cancel-and-recreate, not an in-place mutation —
+     * cancels the invoice (reversing its stock/accounting via the existing
+     * cancel() path) and hands back a fresh create form pre-filled from it,
+     * so the user only has to adjust the quantity and resubmit. A from-challan
+     * invoice's correction becomes a direct sale on the new invoice — its
+     * challan-eligibility isn't re-derived on a copy.
+     */
+    public function copy(SaleInvoice $saleInvoice): RedirectResponse
+    {
+        $this->ensureBelongsToCurrentCompany($saleInvoice);
+
+        try {
+            $this->saleInvoiceService->cancel($saleInvoice);
+        } catch (RuntimeException $exception) {
+            return redirect()->route('sale-invoices.show', $saleInvoice)->with('error', $exception->getMessage());
+        }
+
+        $saleInvoice->load('items.product');
+
+        return redirect()->route('sale-invoices.create', ['prefill_from' => $saleInvoice->id]);
+    }
+
+    private function formData(?SaleInvoice $invoice = null, ?DeliveryChallan $challan = null, $challanLines = null, ?array $prefill = null)
     {
         $company = current_company_or_fail();
 
@@ -185,8 +228,9 @@ class SaleInvoiceController extends Controller
             'invoice' => $invoice,
             'challan' => $challan,
             'challanLines' => $challanLines ?? collect(),
+            'prefill' => $prefill,
             'parties' => Party::where('company_id', $company->id)->where('is_customer', true)->where('status', 'active')->orderBy('name')->get(),
-            'products' => Product::where('company_id', $company->id)->where('status', 'active')->orderBy('name')->get(),
+            'products' => Product::where('company_id', $company->id)->where('status', 'active')->with(['unit', 'secondaryUnit'])->orderBy('name')->get(),
             'tdsSections' => TdsSection::where('company_id', $company->id)->where('status', 'active')->orderBy('section')->get(),
         ]);
     }

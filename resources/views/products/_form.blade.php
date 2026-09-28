@@ -23,14 +23,34 @@
     </div>
 
     <div>
-        <x-input-label for="unit_id" value="Unit" />
+        <x-input-label for="unit_id" value="Primary Unit" />
         <select id="unit_id" name="unit_id" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
             <option value="">None</option>
             @foreach ($units as $unit)
                 <option value="{{ $unit->id }}" @selected(old('unit_id', $product?->unit_id) == $unit->id)>{{ $unit->name }}</option>
             @endforeach
         </select>
+        <p class="text-xs text-ink-400 dark:text-ink-500 mt-1">The unit this product is purchased, stocked and sold in.</p>
         <x-input-error :messages="$errors->get('unit_id')" class="mt-2" />
+    </div>
+
+    <div>
+        <x-input-label for="secondary_unit_id" value="Secondary Unit" />
+        <select id="secondary_unit_id" name="secondary_unit_id" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
+            <option value="">None</option>
+            @foreach ($units as $unit)
+                <option value="{{ $unit->id }}" @selected(old('secondary_unit_id', $product?->secondary_unit_id) == $unit->id)>{{ $unit->name }}</option>
+            @endforeach
+        </select>
+        <p class="text-xs text-ink-400 dark:text-ink-500 mt-1">Optional — an additional unit for reference (e.g. Kg for a product stocked in Bags).</p>
+        <x-input-error :messages="$errors->get('secondary_unit_id')" class="mt-2" />
+    </div>
+
+    <div>
+        <x-input-label for="conversion_factor" value="Conversion Factor" />
+        <x-text-input id="conversion_factor" name="conversion_factor" type="number" step="0.0001" min="0.0001" class="mt-1 block w-full" :value="old('conversion_factor', $product?->conversion_factor)" placeholder="e.g. 25 (1 Bag = 25 Kg)" />
+        <p class="text-xs text-ink-400 dark:text-ink-500 mt-1">1 primary unit = this many secondary units.</p>
+        <x-input-error :messages="$errors->get('conversion_factor')" class="mt-2" />
     </div>
 
     <div>

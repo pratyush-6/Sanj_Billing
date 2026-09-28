@@ -59,10 +59,6 @@ class StockAdjustmentService
             throw new RuntimeException('Only pending stock adjustments can be approved or rejected.');
         }
 
-        if ($adjustment->created_by === $approver->id) {
-            throw new RuntimeException('You cannot approve or reject a stock adjustment you created yourself.');
-        }
-
         $adjustment->load('product', 'company', 'financialYear');
 
         if ($decision === 'Approved' && $adjustment->type === 'Decrease') {

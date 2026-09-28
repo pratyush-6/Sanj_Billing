@@ -2,7 +2,7 @@
     <x-slot name="header">
         <x-ui.page-header :title="'Goods Receipt '.$goodsReceipt->grn_number">
             <x-slot name="actions">
-                <a href="{{ route('goods-receipts.index') }}" class="text-sm text-ink-500 dark:text-ink-400 hover:text-ink-700 dark:hover:text-ink-200">&larr; Back to Goods Receipts</a>
+                <a href="{{ route('purchase-orders.show', $goodsReceipt->purchaseOrder) }}" class="text-sm text-ink-500 dark:text-ink-400 hover:text-ink-700 dark:hover:text-ink-200">&larr; Back to Purchase Order</a>
             </x-slot>
         </x-ui.page-header>
     </x-slot>
@@ -44,29 +44,7 @@
                 <p class="text-sm text-ink-600 dark:text-ink-300 mt-4 border-t border-ink-100 dark:border-ink-800 pt-4">{{ $goodsReceipt->notes }}</p>
             @endif
 
-            @can('goods-receipts.manage')
-                @if ($goodsReceipt->status === 'Draft')
-                    <div class="flex flex-wrap items-center gap-3 mt-6 border-t border-ink-100 dark:border-ink-800 pt-4">
-                        <a href="{{ route('goods-receipts.edit', $goodsReceipt) }}">
-                            <x-secondary-button>Edit</x-secondary-button>
-                        </a>
-                        <form method="POST" action="{{ route('goods-receipts.complete', $goodsReceipt) }}" onsubmit="return confirm('Complete this receipt? Stock will be updated and this cannot be edited afterwards.');">
-                            @csrf
-                            <x-primary-button type="submit">Complete Receipt</x-primary-button>
-                        </form>
-                    </div>
-                @endif
-            @endcan
-
-            @can('purchase-bills.manage')
-                @if ($goodsReceipt->status === 'Completed' && ! $goodsReceipt->purchaseBill)
-                    <div class="flex flex-wrap items-center gap-3 mt-6 border-t border-ink-100 dark:border-ink-800 pt-4">
-                        <a href="{{ route('purchase-bills.create', ['goods_receipt_id' => $goodsReceipt->id]) }}">
-                            <x-secondary-button>Create Bill</x-secondary-button>
-                        </a>
-                    </div>
-                @endif
-            @endcan
+            <x-ui.alert variant="info">This is a historical Goods Receipt, kept read-only. New purchases go straight from a Purchase Order to a Purchase Bill.</x-ui.alert>
 
             @if ($goodsReceipt->purchaseBill)
                 <div class="border-t border-ink-100 dark:border-ink-800 mt-4 pt-4">

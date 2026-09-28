@@ -34,10 +34,7 @@ if ($inventoryItems) {
 
 $procurementItems = [];
 if (auth()->user()->can('inventory.view')) {
-    $procurementItems[] = ['route' => 'vendor-quotations.index', 'label' => 'Vendor Quotations', 'pattern' => 'vendor-quotations.index'];
-    $procurementItems[] = ['route' => 'vendor-quotations.compare', 'label' => 'Compare Quotations', 'pattern' => 'vendor-quotations.compare'];
     $procurementItems[] = ['route' => 'purchase-orders.index', 'label' => 'Purchase Orders', 'pattern' => 'purchase-orders.index'];
-    $procurementItems[] = ['route' => 'goods-receipts.index', 'label' => 'Goods Receipts', 'pattern' => 'goods-receipts.index'];
     $procurementItems[] = ['route' => 'purchase-bills.index', 'label' => 'Purchase Bills', 'pattern' => 'purchase-bills.*'];
 }
 if ($procurementItems) {
@@ -106,6 +103,9 @@ $adminItems = [];
 if (auth()->user()->can('users.manage')) {
     $adminItems[] = ['route' => 'settings.users.index', 'label' => 'Users', 'pattern' => 'settings.users.*'];
 }
+if (auth()->user()->can('roles.manage')) {
+    $adminItems[] = ['route' => 'settings.roles.index', 'label' => 'Roles & Permissions', 'pattern' => 'settings.roles.*'];
+}
 if (auth()->user()->can('audit-logs.view')) {
     $adminItems[] = ['route' => 'settings.audit-logs.index', 'label' => 'Audit Logs', 'pattern' => 'settings.audit-logs.*'];
 }
@@ -167,7 +167,9 @@ $icons = [
         </div>
     @endif
 
-    <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+    <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1"
+         x-data
+         x-init="$nextTick(() => $el.querySelector('a.bg-brand-50')?.scrollIntoView({ block: 'nearest' }))">
         <a href="{{ route('dashboard') }}"
            @class([
                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition',

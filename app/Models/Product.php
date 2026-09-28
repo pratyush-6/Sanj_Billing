@@ -15,6 +15,8 @@ class Product extends Model
         'company_id',
         'product_category_id',
         'unit_id',
+        'secondary_unit_id',
+        'conversion_factor',
         'sku',
         'hsn_code',
         'gst_rate_id',
@@ -28,6 +30,7 @@ class Product extends Model
     protected $casts = [
         'min_stock_level' => 'decimal:2',
         'max_stock_level' => 'decimal:2',
+        'conversion_factor' => 'decimal:4',
     ];
 
     public function company(): BelongsTo
@@ -43,6 +46,25 @@ class Product extends Model
     public function unit(): BelongsTo
     {
         return $this->belongsTo(Unit::class);
+    }
+
+    public function secondaryUnit(): BelongsTo
+    {
+        return $this->belongsTo(Unit::class, 'secondary_unit_id');
+    }
+
+    /**
+     * Quantity is always stored/entered in the primary unit everywhere in the
+     * app (purchase/sale/stock/ledger) — this is a display-only conversion
+     * hint, not a second unit of storage.
+     */
+    public function secondaryQuantityFor(float $primaryQty): ?float
+    {
+        if (! $this->secondary_unit_id || ! $this->conversion_factor) {
+            return null;
+        }
+
+        return round($primaryQty * (float) $this->conversion_factor, 4);
     }
 
     public function gstRate(): BelongsTo

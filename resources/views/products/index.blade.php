@@ -53,7 +53,12 @@
                                 <td class="px-4 py-3.5 text-sm font-medium text-ink-900 dark:text-ink-50 whitespace-nowrap">{{ $product->sku }}</td>
                                 <td class="px-4 py-3.5 text-sm text-ink-700 dark:text-ink-200">{{ $product->name }}</td>
                                 <td class="px-4 py-3.5 text-sm text-ink-600 dark:text-ink-300">{{ $product->category?->name ?? '—' }}</td>
-                                <td class="px-4 py-3.5 text-sm text-ink-600 dark:text-ink-300">{{ $product->unit?->name ?? '—' }}</td>
+                                <td class="px-4 py-3.5 text-sm text-ink-600 dark:text-ink-300">
+                                    {{ $product->unit?->name ?? '—' }}
+                                    @if ($product->secondaryUnit)
+                                        <span class="text-ink-400 dark:text-ink-500">&rarr; {{ $product->conversion_factor }} {{ $product->secondaryUnit->name }}</span>
+                                    @endif
+                                </td>
                                 <td class="px-4 py-3.5 text-sm text-right font-medium {{ $stock <= (float) $product->min_stock_level ? 'text-rose-600 dark:text-rose-400' : 'text-ink-700 dark:text-ink-200' }}">{{ number_format($stock, 2) }}</td>
                                 <td class="px-4 py-3.5 text-sm text-right text-ink-600 dark:text-ink-300">{{ number_format($product->min_stock_level, 2) }}</td>
                                 <td class="px-4 py-3.5 text-sm">

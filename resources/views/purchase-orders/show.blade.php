@@ -15,13 +15,6 @@
             <x-ui.alert variant="danger">{{ session('error') }}</x-ui.alert>
         @endif
 
-        @if ($purchaseOrder->quotation)
-            <x-ui.alert variant="info">
-                Converted from quotation
-                <a href="{{ route('vendor-quotations.show', $purchaseOrder->quotation) }}" class="underline font-medium">{{ $purchaseOrder->quotation->quotation_number }}</a>.
-            </x-ui.alert>
-        @endif
-
         <x-ui.card>
             <div class="flex flex-wrap items-start justify-between gap-4">
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 flex-1">
@@ -43,10 +36,7 @@
                     </div>
                 </div>
                 <x-ui.badge :variant="match($purchaseOrder->status) {
-                    'Sent' => 'info',
-                    'Partially Received' => 'warning',
-                    'Received' => 'success',
-                    'Closed' => 'brand',
+                    'Submitted' => 'success',
                     'Cancelled' => 'danger',
                     default => 'neutral',
                 }" class="text-sm">{{ $purchaseOrder->status }}</x-ui.badge>
@@ -62,35 +52,27 @@
                         <a href="{{ route('purchase-orders.edit', $purchaseOrder) }}">
                             <x-secondary-button>Edit</x-secondary-button>
                         </a>
-                        <form method="POST" action="{{ route('purchase-orders.send', $purchaseOrder) }}" onsubmit="return confirm('Mark this purchase order as sent to the vendor? It cannot be edited after that.');">
+                        <form method="POST" action="{{ route('purchase-orders.submit', $purchaseOrder) }}" onsubmit="return confirm('Submit this purchase order? Stock will be updated immediately and it cannot be edited after that.');">
                             @csrf
-                            <x-primary-button type="submit">Send to Vendor</x-primary-button>
+                            <x-primary-button type="submit">Submit Purchase Order</x-primary-button>
                         </form>
-                    @endif
-                    @if (in_array($purchaseOrder->status, ['Draft', 'Sent']))
                         <form method="POST" action="{{ route('purchase-orders.cancel', $purchaseOrder) }}" onsubmit="return confirm('Cancel this purchase order?');">
                             @csrf
                             <x-danger-button type="submit">Cancel</x-danger-button>
                         </form>
                     @endif
-                    @can('goods-receipts.manage')
-                        @if (in_array($purchaseOrder->status, ['Sent', 'Partially Received']))
-                            <a href="{{ route('goods-receipts.create', ['purchase_order_id' => $purchaseOrder->id]) }}">
-                                <x-secondary-button>Receive Goods</x-secondary-button>
-                            </a>
-                        @endif
-                    @endcan
+                    @if ($purchaseOrder->status === 'Submitted' && ! $purchaseOrder->purchaseBill)
+                        <a href="{{ route('purchase-bills.create', ['purchase_order_id' => $purchaseOrder->id]) }}">
+                            <x-secondary-button>Create Purchase Bill</x-secondary-button>
+                        </a>
+                    @endif
                 </div>
             @endcan
 
-            @if ($purchaseOrder->goodsReceipts->isNotEmpty())
+            @if ($purchaseOrder->purchaseBill)
                 <div class="border-t border-ink-100 dark:border-ink-800 mt-4 pt-4">
-                    <div class="text-xs text-ink-400 dark:text-ink-500 uppercase tracking-wide mb-1">Goods Receipts</div>
-                    <div class="flex flex-wrap gap-2">
-                        @foreach ($purchaseOrder->goodsReceipts as $grn)
-                            <a href="{{ route('goods-receipts.show', $grn) }}" class="text-sm text-brand-600 dark:text-brand-400 hover:underline">{{ $grn->grn_number }} ({{ $grn->status }})</a>
-                        @endforeach
-                    </div>
+                    <div class="text-xs text-ink-400 dark:text-ink-500 uppercase tracking-wide mb-1">Purchase Bill</div>
+                    <a href="{{ route('purchase-bills.show', $purchaseOrder->purchaseBill) }}" class="text-sm text-brand-600 dark:text-brand-400 hover:underline">{{ $purchaseOrder->purchaseBill->bill_number }} ({{ $purchaseOrder->purchaseBill->status }})</a>
                 </div>
             @endif
 

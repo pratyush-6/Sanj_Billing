@@ -69,6 +69,10 @@
                         </form>
                     @endif
                     @if ($invoice->status !== 'Cancelled')
+                        <form method="POST" action="{{ route('sale-invoices.copy', $invoice) }}" onsubmit="return confirm('This cancels the current invoice and opens a new one pre-filled from it, so you can correct the quantity. Continue?');">
+                            @csrf
+                            <x-secondary-button type="submit">Edit Quantity</x-secondary-button>
+                        </form>
                         <form method="POST" action="{{ route('sale-invoices.cancel', $invoice) }}" onsubmit="return confirm('Cancel this sale invoice?');">
                             @csrf
                             <x-danger-button type="submit">Cancel</x-danger-button>

@@ -3,13 +3,9 @@
 return [
     'statuses' => ['active', 'inactive'],
 
-    'quotation_statuses' => ['Draft', 'Submitted', 'Approved', 'Rejected', 'Expired', 'Converted'],
-
     'approval_decisions' => ['Approved', 'Rejected'],
 
-    'purchase_order_statuses' => ['Draft', 'Sent', 'Partially Received', 'Received', 'Closed', 'Cancelled'],
-
-    'goods_receipt_statuses' => ['Draft', 'Completed'],
+    'purchase_order_statuses' => ['Draft', 'Submitted', 'Cancelled'],
 
     'stock_movement_directions' => ['In', 'Out'],
 
