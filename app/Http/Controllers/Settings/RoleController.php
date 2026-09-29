@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\RoleRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
@@ -15,6 +16,18 @@ class RoleController extends Controller
         $roles = Role::withCount('permissions')->orderBy('name')->get();
 
         return view('settings.roles.index', ['roles' => $roles]);
+    }
+
+    public function create()
+    {
+        return view('settings.roles.create');
+    }
+
+    public function store(RoleRequest $request): RedirectResponse
+    {
+        $role = Role::create(['name' => $request->validated('name'), 'guard_name' => 'web']);
+
+        return redirect()->route('settings.roles.edit', $role)->with('status', "Role \"{$role->name}\" created. Set its permissions below.");
     }
 
     public function edit(Role $role)

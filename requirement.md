@@ -1,4 +1,4 @@
-# Sanjeevani Business Management System
+# KSRGlobal Business Management System
 ## Current System Specification (as-built)
 
 > This document was originally written as a forward-looking implementation plan for an expense/accounting tool. It has since been rewritten to describe the system **as it actually exists in code today**, and is kept as the source of truth for scope and architecture. Sections describing features that are not yet built are explicitly marked **(Not Built — Future)**.
@@ -9,11 +9,11 @@
 
 ## Project Name
 
-Sanjeevani Business Management System (originally scoped as "Sanjeevani Expense, Accounting & Tax Management System"; the scope has grown into a full multi-company Vyapar-style business platform).
+KSRGlobal Business Management System (originally scoped as "Sanjeevani Expense, Accounting & Tax Management System"; the scope has grown into a full multi-company Vyapar-style business platform).
 
 ## Purpose
 
-The system gives Sanjeevani (and any additional companies onboarded into the same install) a centralized platform to:
+The system gives KSRGlobal (and any additional companies onboarded into the same install) a centralized platform to:
 
 - Record all business expenses, categorized and vendor-linked.
 - Maintain a unified Party master for vendors, customers, or both.

@@ -7,7 +7,7 @@
 
         @if (! $company)
             @can('companies.manage')
-                <x-ui.alert variant="warning" title="Welcome to Sanjeevani. Let's set things up.">
+                <x-ui.alert variant="warning" title="Welcome to KSRGlobal. Let's set things up.">
                     Start by creating your company profile.
                     <a href="{{ route('companies.create') }}" class="inline-block mt-3 text-sm font-semibold text-amber-800 dark:text-amber-300 underline">
                         Set Up Company &rarr;

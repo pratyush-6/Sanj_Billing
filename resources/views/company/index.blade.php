@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <x-ui.page-header title="Companies" description="Businesses set up in Sanjeevani." />
+        <x-ui.page-header title="Companies" description="Businesses set up in KSRGlobal." />
     </x-slot>
 
     <div class="max-w-4xl space-y-4">

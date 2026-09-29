@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <x-ui.page-header title="Users" description="Manage who can access Sanjeevani and what they can do." />
+        <x-ui.page-header title="Users" description="Manage who can access KSRGlobal and what they can do." />
     </x-slot>
 
     <div class="space-y-4">

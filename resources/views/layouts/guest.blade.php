@@ -30,7 +30,7 @@
                     <p class="text-2xl font-bold leading-snug">Expenses, accounting & tax &mdash; in one place.</p>
                     <p class="mt-3 text-brand-100 text-sm">Record expenses once. Reports, GST/TDS, and CA-ready data follow automatically.</p>
                 </div>
-                <p class="text-xs text-brand-200">&copy; {{ date('Y') }} Sanjeevani</p>
+                <p class="text-xs text-brand-200">&copy; {{ date('Y') }} KSRGlobal</p>
             </div>
 
             <div class="flex flex-1 flex-col justify-center items-center px-6 py-12">

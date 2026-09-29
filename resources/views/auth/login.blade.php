@@ -1,7 +1,7 @@
 <x-guest-layout>
     <div class="mb-8">
         <h1 class="text-2xl font-bold text-ink-900 dark:text-ink-50">Welcome back</h1>
-        <p class="mt-1 text-sm text-ink-500 dark:text-ink-400">Sign in to your Sanjeevani account.</p>
+        <p class="mt-1 text-sm text-ink-500 dark:text-ink-400">Sign in to your KSRGlobal account.</p>
     </div>
 
     <!-- Session Status -->

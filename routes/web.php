@@ -83,6 +83,8 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('can:roles.manage')->group(function () {
         Route::get('/settings/roles', [RoleController::class, 'index'])->name('settings.roles.index');
+        Route::get('/settings/roles/create', [RoleController::class, 'create'])->name('settings.roles.create');
+        Route::post('/settings/roles', [RoleController::class, 'store'])->name('settings.roles.store');
         Route::get('/settings/roles/{role}/edit', [RoleController::class, 'edit'])->name('settings.roles.edit');
         Route::put('/settings/roles/{role}', [RoleController::class, 'update'])->name('settings.roles.update');
     });

@@ -1,6 +1,12 @@
 <x-app-layout>
     <x-slot name="header">
-        <x-ui.page-header title="Roles &amp; Permissions" description="Control which modules and actions each role can access." />
+        <x-ui.page-header title="Roles &amp; Permissions" description="Control which modules and actions each role can access.">
+            <x-slot name="actions">
+                <a href="{{ route('settings.roles.create') }}">
+                    <x-primary-button type="button">Add Role</x-primary-button>
+                </a>
+            </x-slot>
+        </x-ui.page-header>
     </x-slot>
 
     <div class="space-y-4">

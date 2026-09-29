@@ -72,6 +72,11 @@ class Product extends Model
         return $this->belongsTo(GstRate::class);
     }
 
+    public function displayLabel(): string
+    {
+        return $this->sku ? "{$this->name} ({$this->sku})" : $this->name;
+    }
+
     public function vendorProducts(): HasMany
     {
         return $this->hasMany(VendorProduct::class);
