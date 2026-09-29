@@ -66,7 +66,7 @@
             <div class="divide-y divide-ink-100 dark:divide-ink-800">
                 @forelse ($itemHistory as $productId => $rows)
                     <div class="px-4 py-3">
-                        <div class="text-sm font-medium text-ink-900 dark:text-ink-50 mb-2">{{ $rows->first()['product']->name }} <span class="text-ink-400 dark:text-ink-500 font-normal">({{ $rows->first()['product']->sku }})</span></div>
+                        <div class="text-sm font-medium text-ink-900 dark:text-ink-50 mb-2">{{ $rows->first()['product']->displayLabel() }}</div>
                         <div class="overflow-x-auto">
                             <table class="min-w-full text-sm">
                                 <thead>

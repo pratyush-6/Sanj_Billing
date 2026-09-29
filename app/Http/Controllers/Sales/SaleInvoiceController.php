@@ -89,7 +89,7 @@ class SaleInvoiceController extends Controller
                 return [
                     'delivery_challan_item_id' => $item->id,
                     'product_id' => $item->product_id,
-                    'product_label' => $item->product->name.' ('.$item->product->sku.')',
+                    'product_label' => $item->product->displayLabel(),
                     'remaining' => $remaining,
                 ];
             })->filter(fn ($line) => $line['remaining'] > 0)->values();

@@ -22,7 +22,7 @@
                   class="space-y-8"
                   @if (! $invoice)
                   x-data="{
-                      products: @js($products->map(fn ($product) => ['id' => $product->id, 'label' => $product->name.' ('.$product->sku.')', 'unit_code' => $product->unit?->name, 'secondary_unit_code' => $product->secondaryUnit?->name, 'conversion_factor' => $product->conversion_factor ? (float) $product->conversion_factor : null])),
+                      products: @js($products->map(fn ($product) => ['id' => $product->id, 'label' => $product->displayLabel(), 'unit_code' => $product->unit?->name, 'secondary_unit_code' => $product->secondaryUnit?->name, 'conversion_factor' => $product->conversion_factor ? (float) $product->conversion_factor : null])),
                       lockedItems: {{ $challan ? 'true' : 'false' }},
                       items: @js($challan
                           ? $challanLines->map(fn ($line) => ['delivery_challan_item_id' => $line['delivery_challan_item_id'], 'product_id' => $line['product_id'], 'product_label' => $line['product_label'], 'quantity' => $line['remaining'], 'max' => $line['remaining'], 'unit_price' => null])
@@ -117,7 +117,7 @@
                                 <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
                                     @foreach ($invoice->items as $item)
                                         <tr>
-                                            <td class="px-6 py-2 text-sm text-ink-900 dark:text-ink-50">{{ $item->product->name }} ({{ $item->product->sku }})</td>
+                                            <td class="px-6 py-2 text-sm text-ink-900 dark:text-ink-50">{{ $item->product->displayLabel() }}</td>
                                             <td class="px-3 py-2 text-sm text-right text-ink-600 dark:text-ink-300">{{ number_format($item->quantity, 2) }}</td>
                                             <td class="px-3 py-2 text-sm text-right text-ink-600 dark:text-ink-300">{{ number_format($item->unit_price, 2) }}</td>
                                             <td class="px-3 py-2 text-sm text-right text-ink-700 dark:text-ink-200 font-medium">{{ number_format($item->amount, 2) }}</td>

@@ -55,7 +55,7 @@
                         <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
                             @forelse ($vendorProducts as $vendorProduct)
                                 <tr class="hover:bg-ink-50/60 dark:hover:bg-ink-800/60">
-                                    <td class="px-4 py-3.5 text-sm font-medium text-ink-900 dark:text-ink-50">{{ $vendorProduct->product->name }} <span class="text-ink-400 dark:text-ink-500 font-normal">({{ $vendorProduct->product->sku }})</span></td>
+                                    <td class="px-4 py-3.5 text-sm font-medium text-ink-900 dark:text-ink-50">{{ $vendorProduct->product->displayLabel() }}</td>
                                     <td class="px-4 py-3.5 text-sm">
                                         <input form="vp-form-{{ $vendorProduct->id }}" type="text" name="vendor_sku" value="{{ $vendorProduct->vendor_sku }}" class="w-28 bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                                     </td>
@@ -98,7 +98,7 @@
                                 <select name="product_id" class="bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500" required>
                                     <option value="">Select product</option>
                                     @foreach ($availableProducts as $product)
-                                        <option value="{{ $product->id }}">{{ $product->name }} ({{ $product->sku }})</option>
+                                        <option value="{{ $product->id }}">{{ $product->displayLabel() }}</option>
                                     @endforeach
                                 </select>
                             </div>

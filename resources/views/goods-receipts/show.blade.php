@@ -70,7 +70,7 @@
                     <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
                         @foreach ($goodsReceipt->items as $item)
                             <tr>
-                                <td class="px-4 py-3.5 text-sm text-ink-900 dark:text-ink-50">{{ $item->purchaseOrderItem->product->name }} ({{ $item->purchaseOrderItem->product->sku }})</td>
+                                <td class="px-4 py-3.5 text-sm text-ink-900 dark:text-ink-50">{{ $item->purchaseOrderItem->product->displayLabel() }}</td>
                                 <td class="px-4 py-3.5 text-sm text-right text-ink-700 dark:text-ink-200 font-medium">{{ number_format($item->quantity_received, 2) }}</td>
                                 <td class="px-4 py-3.5 text-sm text-ink-600 dark:text-ink-300">{{ $item->notes ?? '—' }}</td>
                             </tr>

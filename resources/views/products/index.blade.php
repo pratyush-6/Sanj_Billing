@@ -50,7 +50,7 @@
                         @forelse ($products as $product)
                             @php $stock = $stockLevels[$product->id] ?? 0.0; @endphp
                             <tr class="hover:bg-ink-50/60 dark:hover:bg-ink-800/60">
-                                <td class="px-4 py-3.5 text-sm font-medium text-ink-900 dark:text-ink-50 whitespace-nowrap">{{ $product->sku }}</td>
+                                <td class="px-4 py-3.5 text-sm font-medium text-ink-900 dark:text-ink-50 whitespace-nowrap">{{ $product->sku ?? '—' }}</td>
                                 <td class="px-4 py-3.5 text-sm text-ink-700 dark:text-ink-200">{{ $product->name }}</td>
                                 <td class="px-4 py-3.5 text-sm text-ink-600 dark:text-ink-300">{{ $product->category?->name ?? '—' }}</td>
                                 <td class="px-4 py-3.5 text-sm text-ink-600 dark:text-ink-300">

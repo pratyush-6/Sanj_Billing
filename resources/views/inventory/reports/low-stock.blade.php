@@ -19,7 +19,7 @@
                     <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
                         @forelse ($rows as $row)
                             <tr class="hover:bg-ink-50/60 dark:hover:bg-ink-800/60">
-                                <td class="px-4 py-3.5 text-sm font-medium text-ink-900 dark:text-ink-50 whitespace-nowrap">{{ $row->product->sku }}</td>
+                                <td class="px-4 py-3.5 text-sm font-medium text-ink-900 dark:text-ink-50 whitespace-nowrap">{{ $row->product->sku ?? '—' }}</td>
                                 <td class="px-4 py-3.5 text-sm text-ink-700 dark:text-ink-200">{{ $row->product->name }}</td>
                                 <td class="px-4 py-3.5 text-sm text-right font-medium text-rose-600 dark:text-rose-400">{{ number_format($row->current_stock, 2) }}</td>
                                 <td class="px-4 py-3.5 text-sm text-right text-ink-600 dark:text-ink-300">{{ number_format($row->product->min_stock_level, 2) }}</td>

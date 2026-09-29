@@ -13,7 +13,7 @@
                   action="{{ $purchaseOrder ? route('purchase-orders.update', $purchaseOrder) : route('purchase-orders.store') }}"
                   class="space-y-8"
                   x-data="{
-                      products: @js($products->map(fn ($product) => ['id' => $product->id, 'label' => $product->name.' ('.$product->sku.')', 'unit_code' => $product->unit?->name, 'secondary_unit_code' => $product->secondaryUnit?->name, 'conversion_factor' => $product->conversion_factor ? (float) $product->conversion_factor : null])),
+                      products: @js($products->map(fn ($product) => ['id' => $product->id, 'label' => $product->displayLabel(), 'unit_code' => $product->unit?->name, 'secondary_unit_code' => $product->secondaryUnit?->name, 'conversion_factor' => $product->conversion_factor ? (float) $product->conversion_factor : null])),
                       items: @js($purchaseOrder
                           ? $purchaseOrder->items->map(fn ($item) => ['product_id' => $item->product_id, 'quantity' => (float) $item->quantity, 'unit_price' => (float) $item->unit_price, 'notes' => $item->notes])
                           : [['product_id' => '', 'quantity' => null, 'unit_price' => null, 'notes' => '']]),

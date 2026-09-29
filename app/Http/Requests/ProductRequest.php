@@ -19,7 +19,7 @@ class ProductRequest extends FormRequest
 
         return [
             'sku' => [
-                'required', 'string', 'max:100',
+                'nullable', 'string', 'max:100',
                 Rule::unique('products', 'sku')->where('company_id', $companyId)->ignore($product),
             ],
             'name' => ['required', 'string', 'max:255'],

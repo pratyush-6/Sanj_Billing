@@ -63,7 +63,7 @@
             @foreach ($challan->items as $item)
                 <tr>
                     <td>{{ $item->product->name }}</td>
-                    <td>{{ $item->product->sku }}</td>
+                    <td>{{ $item->product->sku ?? '—' }}</td>
                     <td class="numeric">{{ number_format($item->quantity, 2) }}</td>
                     <td>{{ $item->notes ?? '—' }}</td>
                 </tr>

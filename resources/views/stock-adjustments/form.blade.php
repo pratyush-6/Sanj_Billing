@@ -30,7 +30,7 @@
                     <select id="product_id" name="product_id" x-model="productId" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
                         <option value="">Select</option>
                         @foreach ($products as $product)
-                            <option value="{{ $product->id }}" @selected((string) old('product_id') === (string) $product->id)>{{ $product->name }} ({{ $product->sku }})</option>
+                            <option value="{{ $product->id }}" @selected((string) old('product_id') === (string) $product->id)>{{ $product->displayLabel() }}</option>
                         @endforeach
                     </select>
                     <x-input-error :messages="$errors->get('product_id')" class="mt-2" />

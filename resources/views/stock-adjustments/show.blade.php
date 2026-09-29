@@ -20,7 +20,7 @@
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-6 flex-1">
                     <div>
                         <div class="text-xs text-ink-400 dark:text-ink-500 uppercase tracking-wide">Product</div>
-                        <div class="text-sm font-medium text-ink-900 dark:text-ink-50 mt-1">{{ $adjustment->product->name }} ({{ $adjustment->product->sku }})</div>
+                        <div class="text-sm font-medium text-ink-900 dark:text-ink-50 mt-1">{{ $adjustment->product->displayLabel() }}</div>
                     </div>
                     <div>
                         <div class="text-xs text-ink-400 dark:text-ink-500 uppercase tracking-wide">Type</div>

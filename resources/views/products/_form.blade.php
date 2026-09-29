@@ -1,7 +1,7 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
     <div>
-        <x-input-label for="sku" value="SKU *" />
-        <x-text-input id="sku" name="sku" type="text" class="mt-1 block w-full" :value="old('sku', $product?->sku)"  />
+        <x-input-label for="sku" value="SKU" />
+        <x-text-input id="sku" name="sku" type="text" class="mt-1 block w-full" :value="old('sku', $product?->sku)" />
         <x-input-error :messages="$errors->get('sku')" class="mt-2" />
     </div>
 

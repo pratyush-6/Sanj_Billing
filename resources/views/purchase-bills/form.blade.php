@@ -88,7 +88,7 @@
                                             $taxableTotal += $lineTotal;
                                         @endphp
                                         <tr>
-                                            <td class="px-6 py-2 text-sm text-ink-900 dark:text-ink-50">{{ $item->product->name }} ({{ $item->product->sku }})</td>
+                                            <td class="px-6 py-2 text-sm text-ink-900 dark:text-ink-50">{{ $item->product->displayLabel() }}</td>
                                             <td class="px-3 py-2 text-sm text-right text-ink-600 dark:text-ink-300">{{ number_format($qty, 2) }}</td>
                                             <td class="px-3 py-2 text-sm text-right text-ink-600 dark:text-ink-300">{{ number_format($price, 2) }}</td>
                                             <td class="px-3 py-2 text-sm text-right text-ink-700 dark:text-ink-200 font-medium">{{ number_format($lineTotal, 2) }}</td>
