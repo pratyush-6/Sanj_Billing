@@ -27,7 +27,7 @@ class PurchaseBillController extends Controller
     {
         $companyId = current_company()?->id;
 
-        $bills = PurchaseBill::where('company_id', $companyId)
+        $bills = scope_to_branch(PurchaseBill::where('company_id', $companyId))
             ->with(['party', 'purchaseOrder', 'payments'])
             ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')))
             ->latest('bill_date')

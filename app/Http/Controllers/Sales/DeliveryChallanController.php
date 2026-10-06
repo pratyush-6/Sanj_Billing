@@ -26,7 +26,7 @@ class DeliveryChallanController extends Controller
     {
         $companyId = current_company()?->id;
 
-        $challans = DeliveryChallan::where('company_id', $companyId)
+        $challans = scope_to_branch(DeliveryChallan::where('company_id', $companyId))
             ->with(['party', 'saleOrder'])
             ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')))
             ->latest('challan_date')
@@ -65,7 +65,7 @@ class DeliveryChallanController extends Controller
             return redirect()->route('delivery-challans.create')->with('error', 'No active financial year. Please set one up first.');
         }
 
-        $challan = $this->deliveryChallanService->create($request->validated(), $company, $financialYear, Auth::user());
+        $challan = $this->deliveryChallanService->create($request->validated(), $company, current_branch_or_fail(), $financialYear, Auth::user());
 
         return redirect()->route('delivery-challans.show', $challan)->with('status', "Delivery Challan {$challan->challan_number} saved as draft.");
     }

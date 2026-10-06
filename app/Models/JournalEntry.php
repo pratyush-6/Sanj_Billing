@@ -14,6 +14,7 @@ class JournalEntry extends Model
 
     protected $fillable = [
         'company_id',
+        'branch_id',
         'financial_year_id',
         'entry_date',
         'entry_number',
@@ -28,6 +29,11 @@ class JournalEntry extends Model
     protected $casts = [
         'entry_date' => 'date',
     ];
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
 
     public function company(): BelongsTo
     {

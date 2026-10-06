@@ -40,6 +40,11 @@ class Company extends Model
         return $this->belongsToMany(User::class);
     }
 
+    public function branches(): HasMany
+    {
+        return $this->hasMany(Branch::class);
+    }
+
     public function expenseCategories(): HasMany
     {
         return $this->hasMany(ExpenseCategory::class);

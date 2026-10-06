@@ -15,6 +15,7 @@ class StockMovement extends Model
 
     protected $fillable = [
         'company_id',
+        'branch_id',
         'financial_year_id',
         'product_id',
         'direction',
@@ -36,6 +37,11 @@ class StockMovement extends Model
         'movement_date' => 'date',
         'created_at' => 'datetime',
     ];
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
 
     public function company(): BelongsTo
     {

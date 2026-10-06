@@ -7,6 +7,7 @@ use App\Http\Controllers\Accounting\LedgerController;
 use App\Http\Controllers\Accounting\ProfitLossController;
 use App\Http\Controllers\Accounting\TrialBalanceController;
 use App\Http\Controllers\Calendar\CalendarController;
+use App\Http\Controllers\Company\BranchController;
 use App\Http\Controllers\Company\CompanyController;
 use App\Http\Controllers\Company\FinancialYearController;
 use App\Http\Controllers\DashboardController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\Inventory\InventoryReportController;
 use App\Http\Controllers\Inventory\ProductCategoryController;
 use App\Http\Controllers\Inventory\ProductController;
 use App\Http\Controllers\Inventory\StockAdjustmentController;
+use App\Http\Controllers\Inventory\StockTransferController;
 use App\Http\Controllers\Masters\BankAccountController;
 use App\Http\Controllers\Masters\GstRateController;
 use App\Http\Controllers\Masters\PaymentMethodController;
@@ -55,6 +57,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::post('/companies/{company}/switch', [CompanyController::class, 'switch'])->name('companies.switch');
+    Route::post('/branches/all/switch', [BranchController::class, 'switchAll'])->name('branches.switch-all');
+    Route::post('/branches/{branch}/switch', [BranchController::class, 'switch'])->name('branches.switch');
+
+    Route::middleware('can:branches.manage')->group(function () {
+        Route::resource('branches', BranchController::class)->except(['show', 'destroy']);
+    });
 
     Route::middleware('can:companies.manage')->group(function () {
         Route::resource('companies', CompanyController::class)->except(['show', 'destroy']);
@@ -119,7 +127,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('can:inventory.view')->group(function () {
         Route::get('/purchase-orders', [PurchaseOrderController::class, 'index'])->name('purchase-orders.index');
     });
-    Route::middleware('can:purchase-orders.manage')->group(function () {
+    Route::middleware(['can:purchase-orders.manage', 'branch.selected'])->group(function () {
         Route::get('/purchase-orders/create', [PurchaseOrderController::class, 'create'])->name('purchase-orders.create');
         Route::post('/purchase-orders', [PurchaseOrderController::class, 'store'])->name('purchase-orders.store');
     });
@@ -143,7 +151,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('can:inventory.view')->group(function () {
         Route::get('/purchase-bills', [PurchaseBillController::class, 'index'])->name('purchase-bills.index');
     });
-    Route::middleware('can:purchase-bills.manage')->group(function () {
+    Route::middleware(['can:purchase-bills.manage', 'branch.selected'])->group(function () {
         Route::get('/purchase-bills/create', [PurchaseBillController::class, 'create'])->name('purchase-bills.create');
         Route::post('/purchase-bills', [PurchaseBillController::class, 'store'])->name('purchase-bills.store');
     });
@@ -163,7 +171,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('can:inventory.view')->group(function () {
         Route::get('/sale-orders', [SaleOrderController::class, 'index'])->name('sale-orders.index');
     });
-    Route::middleware('can:sale-orders.manage')->group(function () {
+    Route::middleware(['can:sale-orders.manage', 'branch.selected'])->group(function () {
         Route::get('/sale-orders/create', [SaleOrderController::class, 'create'])->name('sale-orders.create');
         Route::post('/sale-orders', [SaleOrderController::class, 'store'])->name('sale-orders.store');
     });
@@ -180,7 +188,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('can:inventory.view')->group(function () {
         Route::get('/delivery-challans', [DeliveryChallanController::class, 'index'])->name('delivery-challans.index');
     });
-    Route::middleware('can:delivery-challans.manage')->group(function () {
+    Route::middleware(['can:delivery-challans.manage', 'branch.selected'])->group(function () {
         Route::get('/delivery-challans/create', [DeliveryChallanController::class, 'create'])->name('delivery-challans.create');
         Route::post('/delivery-challans', [DeliveryChallanController::class, 'store'])->name('delivery-challans.store');
     });
@@ -198,7 +206,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('can:inventory.view')->group(function () {
         Route::get('/sale-invoices', [SaleInvoiceController::class, 'index'])->name('sale-invoices.index');
     });
-    Route::middleware('can:sale-invoices.manage')->group(function () {
+    Route::middleware(['can:sale-invoices.manage', 'branch.selected'])->group(function () {
         Route::get('/sale-invoices/create', [SaleInvoiceController::class, 'create'])->name('sale-invoices.create');
         Route::post('/sale-invoices', [SaleInvoiceController::class, 'store'])->name('sale-invoices.store');
     });
@@ -219,13 +227,24 @@ Route::middleware('auth')->group(function () {
     Route::middleware('can:inventory.view')->group(function () {
         Route::get('/stock-adjustments', [StockAdjustmentController::class, 'index'])->name('stock-adjustments.index');
     });
-    Route::middleware('can:stock-adjustments.manage')->group(function () {
+    Route::middleware(['can:stock-adjustments.manage', 'branch.selected'])->group(function () {
         Route::get('/stock-adjustments/create', [StockAdjustmentController::class, 'create'])->name('stock-adjustments.create');
         Route::post('/stock-adjustments', [StockAdjustmentController::class, 'store'])->name('stock-adjustments.store');
     });
+    Route::middleware('can:stock-transfers.manage')->group(function () {
+        Route::get('/stock-transfers', [StockTransferController::class, 'index'])->name('stock-transfers.index');
+        Route::get('/stock-transfers/create', [StockTransferController::class, 'create'])->name('stock-transfers.create')->middleware('branch.selected');
+        Route::post('/stock-transfers', [StockTransferController::class, 'store'])->name('stock-transfers.store')->middleware('branch.selected');
+        Route::get('/stock-transfers/{stockTransfer}', [StockTransferController::class, 'show'])->name('stock-transfers.show');
+    });
+
     Route::middleware('can:inventory.view')->group(function () {
         Route::get('/stock-adjustments/{stockAdjustment}', [StockAdjustmentController::class, 'show'])->name('stock-adjustments.show');
     });
+    Route::middleware(['can:stock-adjustments.approve', 'branch.selected'])->group(function () {
+        Route::post('/stock-adjustments/assign-unassigned', [StockAdjustmentController::class, 'assignUnassigned'])->name('stock-adjustments.assign-unassigned');
+    });
+
     Route::middleware('can:stock-adjustments.approve')->group(function () {
         Route::post('/stock-adjustments/{stockAdjustment}/decision', [StockAdjustmentController::class, 'decide'])->name('stock-adjustments.decide');
     });
@@ -251,9 +270,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/documents/{document}/download', [DocumentController::class, 'download'])->name('documents.download');
     });
 
-    Route::middleware('can:expenses.manage')->group(function () {
+    Route::middleware(['can:expenses.manage', 'branch.selected'])->group(function () {
         Route::get('/expenses/create', [ExpenseController::class, 'create'])->name('expenses.create');
         Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
+    });
+
+    Route::middleware('can:expenses.manage')->group(function () {
         Route::get('/expenses/{expense}/edit', [ExpenseController::class, 'edit'])->name('expenses.edit');
         Route::put('/expenses/{expense}', [ExpenseController::class, 'update'])->name('expenses.update');
         Route::post('/expenses/{expense}/cancel', [ExpenseController::class, 'cancel'])->name('expenses.cancel');
@@ -284,6 +306,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('can:reports.view')->prefix('reports')->name('reports.')->group(function () {
         Route::get('/', [ReportController::class, 'index'])->name('index');
         Route::get('/category-wise', [ReportController::class, 'categoryWise'])->name('category-wise');
+        Route::get('/branch-wise', [ReportController::class, 'branchWise'])->name('branch-wise');
         Route::get('/vendor-wise', [ReportController::class, 'vendorWise'])->name('vendor-wise');
         Route::get('/payment-wise', [ReportController::class, 'paymentWise'])->name('payment-wise');
         Route::get('/monthly-comparison', [ReportController::class, 'monthlyComparison'])->name('monthly-comparison');

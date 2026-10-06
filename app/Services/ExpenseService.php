@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Branch;
 use App\Models\Company;
 use App\Models\Expense;
 use App\Models\FinancialYear;
@@ -92,19 +93,20 @@ class ExpenseService
         });
     }
 
-    public function create(array $data, Company $company, FinancialYear $financialYear, User $creator, array $files = []): Expense
+    public function create(array $data, Company $company, Branch $branch, FinancialYear $financialYear, User $creator, array $files = []): Expense
     {
         if ($financialYear->is_locked) {
             throw new RuntimeException('This financial year is locked. New expenses cannot be added.');
         }
 
-        return DB::transaction(function () use ($data, $company, $financialYear, $creator, $files) {
+        return DB::transaction(function () use ($data, $company, $branch, $financialYear, $creator, $files) {
             $amounts = $this->calculateAmounts($data);
 
             $expense = Expense::create([
                 ...$data,
                 ...$amounts,
                 'company_id' => $company->id,
+                'branch_id' => $branch->id,
                 'financial_year_id' => $financialYear->id,
                 'expense_number' => $this->generateExpenseNumber($company, $financialYear),
                 'created_by' => $creator->id,

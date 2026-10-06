@@ -12,10 +12,10 @@ class InventoryReportService
 {
     public function __construct(private StockLevelService $stockLevelService) {}
 
-    public function lowStock(Company $company): Collection
+    public function lowStock(Company $company, ?int $branchId, bool $allBranches): Collection
     {
         $products = Product::where('company_id', $company->id)->where('status', 'active')->get();
-        $stockLevels = $this->stockLevelService->currentStock($products);
+        $stockLevels = $this->stockLevelService->currentStock($products, $branchId, $allBranches);
 
         return $products
             ->map(fn ($product) => (object) [
@@ -27,10 +27,13 @@ class InventoryReportService
             ->values();
     }
 
-    public function movementHistory(Company $company, ?int $productId = null, ?string $from = null, ?string $to = null): LengthAwarePaginator
+    public function movementHistory(Company $company, ?int $branchId, bool $allBranches, ?int $productId = null, ?string $from = null, ?string $to = null): LengthAwarePaginator
     {
         return StockMovement::where('company_id', $company->id)
-            ->with(['product', 'creator'])
+            ->when(! $allBranches, fn ($query) => $branchId === null
+                ? $query->whereNull('branch_id')
+                : $query->where('branch_id', $branchId))
+            ->with(['product', 'creator', 'branch'])
             ->when($productId, fn ($query) => $query->where('product_id', $productId))
             ->when($from, fn ($query) => $query->whereDate('movement_date', '>=', $from))
             ->when($to, fn ($query) => $query->whereDate('movement_date', '<=', $to))

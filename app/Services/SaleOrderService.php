@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Branch;
 use App\Models\Company;
 use App\Models\FinancialYear;
 use App\Models\SaleOrder;
@@ -16,15 +17,16 @@ class SaleOrderService
 
     public function __construct(private AuditLogService $auditLog) {}
 
-    public function create(array $data, Company $company, FinancialYear $financialYear, User $creator): SaleOrder
+    public function create(array $data, Company $company, Branch $branch, FinancialYear $financialYear, User $creator): SaleOrder
     {
-        return DB::transaction(function () use ($data, $company, $financialYear, $creator) {
+        return DB::transaction(function () use ($data, $company, $branch, $financialYear, $creator) {
             $items = $data['items'];
             unset($data['items']);
 
             $order = SaleOrder::create([
                 ...$data,
                 'company_id' => $company->id,
+                'branch_id' => $branch->id,
                 'financial_year_id' => $financialYear->id,
                 'order_number' => $this->generateSequentialNumber(SaleOrder::class, 'SO', $company, $financialYear),
                 'status' => 'Draft',

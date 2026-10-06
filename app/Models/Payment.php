@@ -14,6 +14,7 @@ class Payment extends Model
 
     protected $fillable = [
         'company_id',
+        'branch_id',
         'financial_year_id',
         'party_id',
         'direction',
@@ -34,6 +35,11 @@ class Payment extends Model
         'amount' => 'decimal:2',
         'payment_date' => 'date',
     ];
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
 
     public function company(): BelongsTo
     {

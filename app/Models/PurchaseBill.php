@@ -14,6 +14,7 @@ class PurchaseBill extends Model
 
     protected $fillable = [
         'company_id',
+        'branch_id',
         'financial_year_id',
         'goods_receipt_id',
         'purchase_order_id',
@@ -43,6 +44,11 @@ class PurchaseBill extends Model
         'tds_amount' => 'decimal:2',
         'total_amount' => 'decimal:2',
     ];
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
 
     public function company(): BelongsTo
     {

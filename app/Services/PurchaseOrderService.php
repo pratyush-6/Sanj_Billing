@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Branch;
 use App\Models\Company;
 use App\Models\FinancialYear;
 use App\Models\PurchaseOrder;
@@ -19,15 +20,16 @@ class PurchaseOrderService
         private StockMovementService $stockMovementService,
     ) {}
 
-    public function create(array $data, Company $company, FinancialYear $financialYear, User $creator): PurchaseOrder
+    public function create(array $data, Company $company, Branch $branch, FinancialYear $financialYear, User $creator): PurchaseOrder
     {
-        return DB::transaction(function () use ($data, $company, $financialYear, $creator) {
+        return DB::transaction(function () use ($data, $company, $branch, $financialYear, $creator) {
             $items = $data['items'];
             unset($data['items']);
 
             $purchaseOrder = PurchaseOrder::create([
                 ...$data,
                 'company_id' => $company->id,
+                'branch_id' => $branch->id,
                 'financial_year_id' => $financialYear->id,
                 'po_number' => $this->generateSequentialNumber(PurchaseOrder::class, 'PO', $company, $financialYear),
                 'status' => 'Draft',
@@ -90,6 +92,7 @@ class PurchaseOrderService
                 $this->stockMovementService->postIn(
                     $purchaseOrder->company,
                     $purchaseOrder->financialYear,
+                    $purchaseOrder->branch_id,
                     $item->product,
                     (float) $item->quantity,
                     $purchaseOrder->po_date->toDateString(),

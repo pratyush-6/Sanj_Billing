@@ -48,6 +48,7 @@ class PaymentService
         return DB::transaction(function () use ($data, $company, $financialYear, $creator, $direction, $party, $source, $amount) {
             $payment = Payment::create([
                 'company_id' => $company->id,
+                'branch_id' => $source->branch_id,
                 'financial_year_id' => $financialYear->id,
                 'party_id' => $party->id,
                 'direction' => $direction,

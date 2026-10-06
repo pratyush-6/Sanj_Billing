@@ -28,7 +28,7 @@ class ExpenseController extends Controller
     {
         $company = current_company();
 
-        $expenses = Expense::query()
+        $expenses = scope_to_branch(Expense::query())
             ->with(['category', 'subCategory', 'vendor', 'paymentMethod', 'bankAccount', 'documents'])
             ->where('company_id', $company?->id)
             ->when($request->filled('date_from'), fn ($query) => $query->whereDate('expense_date', '>=', $request->date('date_from')))
@@ -94,6 +94,7 @@ class ExpenseController extends Controller
             $expense = $this->expenseService->create(
                 $data,
                 $company,
+                current_branch_or_fail(),
                 $financialYear,
                 Auth::user(),
                 $request->file('attachments', []),

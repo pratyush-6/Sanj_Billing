@@ -24,6 +24,11 @@ class User extends Authenticatable
         return $this->belongsToMany(Company::class);
     }
 
+    public function branches(): BelongsToMany
+    {
+        return $this->belongsToMany(Branch::class);
+    }
+
     /**
      * Get the attributes that should be cast.
      *

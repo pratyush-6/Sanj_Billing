@@ -6,6 +6,7 @@ use App\Models\Account;
 use App\Models\BankAccount;
 use App\Models\Expense;
 use App\Services\AccountingService;
+use App\Services\BranchContextService;
 use App\Services\InventoryReportService;
 use App\Services\PartyLedgerService;
 use App\Services\ReportService;
@@ -30,8 +31,12 @@ class DashboardController extends Controller
         $lowStock = null;
         $outstandingDues = null;
 
+        $branchContext = app(BranchContextService::class);
+        $branchScope = $branchContext->scope();
+        $reportScope = $branchContext->reportScope();
+
         if ($company && $activeFinancialYear) {
-            $baseQuery = Expense::where('company_id', $company->id)
+            $baseQuery = scope_to_branch(Expense::where('company_id', $company->id))
                 ->where('financial_year_id', $activeFinancialYear->id)
                 ->where('status', '!=', 'Cancelled');
 
@@ -42,9 +47,9 @@ class DashboardController extends Controller
             ];
 
             if (auth()->user()->can('reports.view')) {
-                $categoryRows = $this->reports->categoryWise($company->id, null, null, $activeFinancialYear->id);
-                $paymentRows = $this->reports->paymentMethodWise($company->id, null, null, $activeFinancialYear->id);
-                $vendorRows = $this->reports->vendorWise($company->id, null, null, $activeFinancialYear->id)
+                $categoryRows = $this->reports->categoryWise($company->id, null, null, $activeFinancialYear->id, $reportScope);
+                $paymentRows = $this->reports->paymentMethodWise($company->id, null, null, $activeFinancialYear->id, $reportScope);
+                $vendorRows = $this->reports->vendorWise($company->id, null, null, $activeFinancialYear->id, $reportScope)
                     ->filter(fn ($row) => $row->vendor_id > 0)
                     ->take(6);
 
@@ -52,7 +57,7 @@ class DashboardController extends Controller
                     'category' => $categoryRows,
                     'payment' => $paymentRows,
                     'topVendors' => $vendorRows,
-                    'monthlyTrend' => $this->reports->monthlyTrend($company->id, 6),
+                    'monthlyTrend' => $this->reports->monthlyTrend($company->id, 6, $reportScope),
                 ];
             }
 
@@ -65,7 +70,7 @@ class DashboardController extends Controller
                 $liabilityAccounts = Account::where('company_id', $company->id)->where('type', 'Liability')->whereDoesntHave('children')->get();
                 $payable = array_sum($this->accountingService->liveBalances($liabilityAccounts));
 
-                $profitAndLoss = $this->accountingService->profitAndLoss($company, $activeFinancialYear);
+                $profitAndLoss = $this->accountingService->profitAndLoss($company, $activeFinancialYear, $reportScope);
 
                 $financials = [
                     'net_profit' => $profitAndLoss['profit_before_tax'],
@@ -77,7 +82,7 @@ class DashboardController extends Controller
         }
 
         if ($company && auth()->user()->can('inventory.view')) {
-            $lowStock = $this->inventoryReports->lowStock($company)->take(6);
+            $lowStock = $this->inventoryReports->lowStock($company, $branchScope['branchId'], $branchScope['allBranches'])->take(6);
         }
 
         if ($company && auth()->user()->can('parties.manage')) {

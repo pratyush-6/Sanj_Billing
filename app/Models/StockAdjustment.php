@@ -12,6 +12,8 @@ class StockAdjustment extends Model
 
     protected $fillable = [
         'company_id',
+        'branch_id',
+        'assignment_group',
         'financial_year_id',
         'product_id',
         'adjustment_number',
@@ -34,6 +36,11 @@ class StockAdjustment extends Model
         'unit_cost' => 'decimal:4',
         'approved_at' => 'datetime',
     ];
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
 
     public function company(): BelongsTo
     {

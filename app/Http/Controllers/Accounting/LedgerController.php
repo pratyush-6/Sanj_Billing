@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Accounting;
 use App\Http\Controllers\Controller;
 use App\Models\Account;
 use App\Services\AccountingService;
+use App\Services\BranchContextService;
 use Illuminate\Http\Request;
 
 class LedgerController extends Controller
@@ -26,7 +27,7 @@ class LedgerController extends Controller
         $dateFrom = $request->filled('date_from') ? $request->string('date_from')->toString() : null;
         $dateTo = $request->filled('date_to') ? $request->string('date_to')->toString() : null;
 
-        $ledger = $account ? $this->accountingService->ledger($account, $dateFrom, $dateTo) : null;
+        $ledger = $account ? $this->accountingService->ledger($account, $dateFrom, $dateTo, app(BranchContextService::class)->reportScope()) : null;
 
         return view('accounting.ledger.index', [
             'accounts' => $accounts,

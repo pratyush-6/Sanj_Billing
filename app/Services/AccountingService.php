@@ -475,6 +475,7 @@ class AccountingService
         return DB::transaction(function () use ($entry) {
             $reversal = JournalEntry::create([
                 'company_id' => $entry->company_id,
+                'branch_id' => $entry->branch_id,
                 'financial_year_id' => $entry->financial_year_id,
                 'entry_date' => now()->toDateString(),
                 'entry_number' => $this->generateEntryNumber($entry->company, $entry->financialYear),
@@ -523,6 +524,7 @@ class AccountingService
         return DB::transaction(function () use ($company, $financialYear, $entryDate, $narration, $source, $lines) {
             $entry = JournalEntry::create([
                 'company_id' => $company->id,
+                'branch_id' => $source?->branch_id,
                 'financial_year_id' => $financialYear->id,
                 'entry_date' => $entryDate,
                 'entry_number' => $this->generateEntryNumber($company, $financialYear),
@@ -555,16 +557,17 @@ class AccountingService
         });
     }
 
-    public function ledger(Account $account, ?string $from = null, ?string $to = null): array
+    public function ledger(Account $account, ?string $from = null, ?string $to = null, ?array $scope = null): array
     {
         $openingBalance = $from
-            ? $this->computeBalances(collect([$account]), null, Carbon::parse($from)->subDay()->toDateString())[$account->id] ?? 0.0
+            ? $this->computeBalances(collect([$account]), null, Carbon::parse($from)->subDay()->toDateString(), $scope)[$account->id] ?? 0.0
             : 0.0;
 
         $items = JournalEntryItem::where('account_id', $account->id)
-            ->whereHas('journalEntry', function ($query) use ($from, $to) {
+            ->whereHas('journalEntry', function ($query) use ($from, $to, $scope) {
                 $query->when($from, fn ($q) => $q->whereDate('entry_date', '>=', $from))
-                    ->when($to, fn ($q) => $q->whereDate('entry_date', '<=', $to));
+                    ->when($to, fn ($q) => $q->whereDate('entry_date', '<=', $to))
+                    ->when($scope !== null, fn ($q) => $this->applyBranchScope($q, $scope));
             })
             ->with('journalEntry')
             ->get()
@@ -592,7 +595,7 @@ class AccountingService
         return ['opening_balance' => $openingBalance, 'rows' => $rows, 'closing_balance' => $running];
     }
 
-    public function trialBalance(Company $company, ?string $asOfDate = null): Collection
+    public function trialBalance(Company $company, ?string $asOfDate = null, ?array $scope = null): Collection
     {
         $accounts = Account::where('company_id', $company->id)
             ->whereDoesntHave('children')
@@ -600,7 +603,7 @@ class AccountingService
             ->orderBy('name')
             ->get();
 
-        $balances = $this->computeBalances($accounts, null, $asOfDate);
+        $balances = $this->computeBalances($accounts, null, $asOfDate, $scope);
 
         return $accounts->map(function ($account) use ($balances) {
             $balance = $balances[$account->id] ?? 0.0;
@@ -614,7 +617,7 @@ class AccountingService
         })->filter(fn ($row) => $row->debit != 0 || $row->credit != 0)->values();
     }
 
-    public function profitAndLoss(Company $company, FinancialYear $financialYear): array
+    public function profitAndLoss(Company $company, FinancialYear $financialYear, ?array $scope = null): array
     {
         $incomeAccounts = Account::where('company_id', $company->id)->where('type', 'Income')->whereDoesntHave('children')->get();
         $expenseAccounts = Account::where('company_id', $company->id)->where('type', 'Expense')->whereDoesntHave('children')->get();
@@ -622,8 +625,8 @@ class AccountingService
         $from = $financialYear->start_date->toDateString();
         $to = $financialYear->end_date->toDateString();
 
-        $incomeBalances = $this->computeBalances($incomeAccounts, $from, $to);
-        $expenseBalances = $this->computeBalances($expenseAccounts, $from, $to);
+        $incomeBalances = $this->computeBalances($incomeAccounts, $from, $to, $scope);
+        $expenseBalances = $this->computeBalances($expenseAccounts, $from, $to, $scope);
 
         $totalIncome = array_sum($incomeBalances);
         $totalExpense = array_sum($expenseBalances);
@@ -702,14 +705,14 @@ class AccountingService
         ];
     }
 
-    public function liveBalances(Collection $accounts, ?string $asOfDate = null): array
+    public function liveBalances(Collection $accounts, ?string $asOfDate = null, ?array $scope = null): array
     {
-        return $this->computeBalances($accounts, null, $asOfDate);
+        return $this->computeBalances($accounts, null, $asOfDate, $scope);
     }
 
-    public function liveBalance(Account $account, ?string $asOfDate = null): float
+    public function liveBalance(Account $account, ?string $asOfDate = null, ?array $scope = null): float
     {
-        return $this->liveBalances(collect([$account]), $asOfDate)[$account->id] ?? 0.0;
+        return $this->liveBalances(collect([$account]), $asOfDate, $scope)[$account->id] ?? 0.0;
     }
 
     /**
@@ -719,16 +722,17 @@ class AccountingService
      * separate "opening_balance + journal deltas" bookkeeping that could double-count or
      * drift, and the trial balance always balances by construction.
      */
-    private function computeBalances(Collection $accounts, ?string $from, ?string $to): array
+    private function computeBalances(Collection $accounts, ?string $from, ?string $to, ?array $scope = null): array
     {
         if ($accounts->isEmpty()) {
             return [];
         }
 
         $sums = JournalEntryItem::whereIn('account_id', $accounts->pluck('id'))
-            ->whereHas('journalEntry', function ($query) use ($from, $to) {
+            ->whereHas('journalEntry', function ($query) use ($from, $to, $scope) {
                 $query->when($from, fn ($q) => $q->whereDate('entry_date', '>=', $from))
-                    ->when($to, fn ($q) => $q->whereDate('entry_date', '<=', $to));
+                    ->when($to, fn ($q) => $q->whereDate('entry_date', '<=', $to))
+                    ->when($scope !== null, fn ($q) => $this->applyBranchScope($q, $scope));
             })
             ->selectRaw('account_id, SUM(debit) as total_debit, SUM(credit) as total_credit')
             ->groupBy('account_id')
@@ -743,6 +747,16 @@ class AccountingService
 
             return [$account->id => $delta];
         })->all();
+    }
+
+    /**
+     * $scope['branchId'] null is the unassigned bucket (entries with no branch).
+     */
+    private function applyBranchScope($query, array $scope)
+    {
+        return $scope['branchId'] === null
+            ? $query->whereNull('branch_id')
+            : $query->where(fn ($query) => $query->where('branch_id', $scope['branchId'])->orWhereNull('branch_id'));
     }
 
     private function controlAccount(int $companyId, string $key): ?Account

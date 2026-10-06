@@ -24,7 +24,7 @@ class SaleOrderController extends Controller
     {
         $companyId = current_company()?->id;
 
-        $orders = SaleOrder::where('company_id', $companyId)
+        $orders = scope_to_branch(SaleOrder::where('company_id', $companyId))
             ->with(['party', 'creator'])
             ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')))
             ->when($request->filled('party_id'), fn ($query) => $query->where('party_id', $request->integer('party_id')))
@@ -54,7 +54,7 @@ class SaleOrderController extends Controller
             return redirect()->route('sale-orders.create')->with('error', 'No active financial year. Please set one up first.');
         }
 
-        $order = $this->saleOrderService->create($request->validated(), $company, $financialYear, Auth::user());
+        $order = $this->saleOrderService->create($request->validated(), $company, current_branch_or_fail(), $financialYear, Auth::user());
 
         return redirect()->route('sale-orders.show', $order)->with('status', "Sale Order {$order->order_number} saved as draft.");
     }

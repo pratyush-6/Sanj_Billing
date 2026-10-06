@@ -48,6 +48,7 @@ class PurchaseBillService
 
             $bill = PurchaseBill::create([
                 'company_id' => $company->id,
+                'branch_id' => $purchaseOrder->branch_id,
                 'financial_year_id' => $financialYear->id,
                 'purchase_order_id' => $purchaseOrder->id,
                 'party_id' => $party->id,

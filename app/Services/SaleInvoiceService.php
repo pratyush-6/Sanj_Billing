@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Branch;
 use App\Models\Company;
 use App\Models\DeliveryChallan;
 use App\Models\DeliveryChallanItem;
@@ -35,7 +36,7 @@ class SaleInvoiceService
      * stock-out itself). Mixing the two within one invoice is rejected outright,
      * matching scope decision 4.
      */
-    public function create(array $data, Company $company, FinancialYear $financialYear, User $creator): SaleInvoice
+    public function create(array $data, Company $company, Branch $branch, FinancialYear $financialYear, User $creator): SaleInvoice
     {
         $items = $data['items'];
         $linkedCount = collect($items)->filter(fn ($item) => ! empty($item['delivery_challan_item_id']))->count();
@@ -46,13 +47,15 @@ class SaleInvoiceService
 
         $isFromChallan = $linkedCount > 0;
 
-        return DB::transaction(function () use ($data, $items, $isFromChallan, $company, $financialYear, $creator) {
+        return DB::transaction(function () use ($data, $items, $isFromChallan, $company, $branch, $financialYear, $creator) {
             $party = Party::where('company_id', $company->id)->where('is_customer', true)->findOrFail($data['party_id']);
 
             $challanItems = collect();
             if ($isFromChallan) {
                 $challanItems = $this->validateChallanLines($items, $company, $party);
             }
+
+            $branchId = $isFromChallan ? $challanItems->first()->deliveryChallan->branch_id : $branch->id;
 
             $lines = $this->buildLines($items, $company, $party);
             $totals = $this->sumTotals($lines);
@@ -65,6 +68,7 @@ class SaleInvoiceService
 
             $invoice = SaleInvoice::create([
                 'company_id' => $company->id,
+                'branch_id' => $branchId,
                 'financial_year_id' => $financialYear->id,
                 'party_id' => $party->id,
                 'invoice_number' => $this->generateSequentialNumber(SaleInvoice::class, 'INV', $company, $financialYear),
@@ -94,6 +98,7 @@ class SaleInvoiceService
                     $movement = $this->stockMovementService->postOut(
                         $company,
                         $financialYear,
+                        $branchId,
                         Product::find($line['product_id']),
                         (float) $line['quantity'],
                         $data['invoice_date'],
@@ -212,6 +217,10 @@ class SaleInvoiceService
 
         if ($challanItems->count() !== $challanItemIds->count()) {
             throw new RuntimeException('One of the selected delivery challan lines could not be found.');
+        }
+
+        if ($challanItems->pluck('deliveryChallan.branch_id')->unique()->count() > 1) {
+            throw new RuntimeException('All delivery challan lines on one invoice must come from the same branch.');
         }
 
         $invoicedByItem = SaleInvoiceItem::whereIn('delivery_challan_item_id', $challanItemIds)

@@ -64,6 +64,7 @@ class CompanyContextService
         }
 
         Session::put('current_company_id', $company->id);
+        Session::forget('current_branch_id');
 
         return true;
     }

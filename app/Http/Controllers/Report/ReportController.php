@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BankAccount;
 use App\Models\FinancialYear;
 use App\Services\AccountingService;
+use App\Services\BranchContextService;
 use App\Services\ReportService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -20,6 +21,31 @@ class ReportController extends Controller
         private AccountingService $accountingService,
     ) {}
 
+    private function reportScope(): ?array
+    {
+        return app(BranchContextService::class)->reportScope();
+    }
+
+    public function branchWise(Request $request)
+    {
+        $company = current_company_or_fail();
+        $financialYears = $this->financialYears();
+        $financialYearId = $request->integer('financial_year_id') ?: $company->activeFinancialYear()?->id;
+        $dateFrom = $request->input('date_from');
+        $dateTo = $request->input('date_to');
+
+        $rows = $this->reports->branchWise($company->id, $dateFrom, $dateTo, $financialYearId);
+
+        return view('reports.branch-wise', [
+            'rows' => $rows,
+            'total' => (float) $rows->sum('total'),
+            'financialYears' => $financialYears,
+            'financialYearId' => $financialYearId,
+            'dateFrom' => $dateFrom,
+            'dateTo' => $dateTo,
+        ]);
+    }
+
     public function index()
     {
         return view('reports.index', [
@@ -32,7 +58,7 @@ class ReportController extends Controller
         $company = current_company_or_fail();
         [$dateFrom, $dateTo, $financialYearId] = $this->resolveFilters($request);
 
-        $rows = $this->reports->categoryWise($company->id, $dateFrom, $dateTo, $financialYearId);
+        $rows = $this->reports->categoryWise($company->id, $dateFrom, $dateTo, $financialYearId, $this->reportScope());
 
         return view('reports.category-wise', [
             'rows' => $rows,
@@ -47,7 +73,7 @@ class ReportController extends Controller
         $company = current_company_or_fail();
         [$dateFrom, $dateTo, $financialYearId] = $this->resolveFilters($request);
 
-        $rows = $this->reports->vendorWise($company->id, $dateFrom, $dateTo, $financialYearId);
+        $rows = $this->reports->vendorWise($company->id, $dateFrom, $dateTo, $financialYearId, $this->reportScope());
 
         return view('reports.vendor-wise', [
             'rows' => $rows,
@@ -62,8 +88,8 @@ class ReportController extends Controller
         $company = current_company_or_fail();
         [$dateFrom, $dateTo, $financialYearId] = $this->resolveFilters($request);
 
-        $paymentMethodRows = $this->reports->paymentMethodWise($company->id, $dateFrom, $dateTo, $financialYearId);
-        $bankAccountRows = $this->reports->bankAccountWise($company->id, $dateFrom, $dateTo, $financialYearId);
+        $paymentMethodRows = $this->reports->paymentMethodWise($company->id, $dateFrom, $dateTo, $financialYearId, $this->reportScope());
+        $bankAccountRows = $this->reports->bankAccountWise($company->id, $dateFrom, $dateTo, $financialYearId, $this->reportScope());
 
         return view('reports.payment-wise', [
             'paymentMethodRows' => $paymentMethodRows,
@@ -78,7 +104,7 @@ class ReportController extends Controller
         $company = current_company_or_fail();
         $financialYear = $this->resolveFinancialYear($request, $company->id);
 
-        $data = $financialYear ? $this->reports->monthlyComparison($company->id, $financialYear) : ['months' => collect(), 'rows' => collect()];
+        $data = $financialYear ? $this->reports->monthlyComparison($company->id, $financialYear, $this->reportScope()) : ['months' => collect(), 'rows' => collect()];
 
         return view('reports.monthly-comparison', [
             'months' => $data['months'],
@@ -94,7 +120,7 @@ class ReportController extends Controller
         $financialYear = $this->resolveFinancialYear($request, $company->id);
 
         $data = $financialYear
-            ? $this->reports->financialYearSummary($company->id, $financialYear)
+            ? $this->reports->financialYearSummary($company->id, $financialYear, $this->reportScope())
             : ['rows' => collect(), 'total' => 0];
 
         return view('reports.financial-year-summary', [
@@ -110,7 +136,7 @@ class ReportController extends Controller
         $company = current_company_or_fail();
         $date = $request->string('date')->toString() ?: now()->toDateString();
 
-        $data = $this->reports->dailySummary($company->id, $date);
+        $data = $this->reports->dailySummary($company->id, $date, $this->reportScope());
 
         return view('reports.daily', $data);
     }
@@ -122,7 +148,7 @@ class ReportController extends Controller
         $from = $month.'-01';
         $to = date('Y-m-t', strtotime($from));
 
-        $data = $this->reports->monthlySummary($company->id, $from, $to);
+        $data = $this->reports->monthlySummary($company->id, $from, $to, $this->reportScope());
 
         return view('reports.monthly', [...$data, 'month' => $month]);
     }
@@ -168,24 +194,24 @@ class ReportController extends Controller
             'category-wise' => [
                 'Category-wise Expense Report',
                 ['Category', 'Count', 'Total Amount'],
-                $this->reports->categoryWise($company->id, $dateFrom, $dateTo, $financialYearId)
+                $this->reports->categoryWise($company->id, $dateFrom, $dateTo, $financialYearId, $this->reportScope())
                     ->map(fn ($row) => [$row->category_name, $row->count, (float) $row->total]),
             ],
             'vendor-wise' => [
                 'Vendor-wise Expense Report',
                 ['Vendor', 'Count', 'Total Amount'],
-                $this->reports->vendorWise($company->id, $dateFrom, $dateTo, $financialYearId)
+                $this->reports->vendorWise($company->id, $dateFrom, $dateTo, $financialYearId, $this->reportScope())
                     ->map(fn ($row) => [$row->vendor_name, $row->count, (float) $row->total]),
             ],
             'payment-wise' => [
                 'Payment-wise Expense Report',
                 ['Payment Method', 'Count', 'Total Amount'],
-                $this->reports->paymentMethodWise($company->id, $dateFrom, $dateTo, $financialYearId)
+                $this->reports->paymentMethodWise($company->id, $dateFrom, $dateTo, $financialYearId, $this->reportScope())
                     ->map(fn ($row) => [$row->payment_method_name, $row->count, (float) $row->total]),
             ],
             'financial-year-summary' => (function () use ($company, $request) {
                 $financialYear = $this->resolveFinancialYear($request, $company->id);
-                $data = $financialYear ? $this->reports->financialYearSummary($company->id, $financialYear) : ['rows' => collect()];
+                $data = $financialYear ? $this->reports->financialYearSummary($company->id, $financialYear, $this->reportScope()) : ['rows' => collect()];
 
                 return [
                     'Financial Year Expense Summary',

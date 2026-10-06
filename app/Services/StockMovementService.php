@@ -23,6 +23,7 @@ class StockMovementService
     public function postIn(
         Company $company,
         FinancialYear $financialYear,
+        ?int $branchId,
         Product $product,
         float $quantity,
         string $movementDate,
@@ -35,18 +36,18 @@ class StockMovementService
         $unitCost = $unitCost !== null ? round($unitCost, 4) : null;
         $totalCost = $unitCost !== null ? round($unitCost * $quantity, 2) : null;
 
-        return $this->post($company, $financialYear, $product, 'In', $quantity, $movementDate, $source, $referenceNumber, $notes, $creator, $unitCost, $totalCost);
+        return $this->post($company, $financialYear, $branchId, $product, 'In', $quantity, $movementDate, $source, $referenceNumber, $notes, $creator, $unitCost, $totalCost);
     }
 
     /**
-     * The single choke point for outbound cost: computes the current weighted-average
-     * cost itself (StockLevelService::averageCostFor(), row-locked for the rest of
-     * this transaction) and snapshots it onto the movement — callers never pass a
-     * cost in, so every Out movement in the app is valued the same consistent way.
+     * The single choke point for outbound cost and stock sufficiency. Locks the product
+     * row so concurrent outflows of one product serialize across every branch, then
+     * checks the branch holds enough stock and snapshots its weighted-average cost.
      */
     public function postOut(
         Company $company,
         FinancialYear $financialYear,
+        ?int $branchId,
         Product $product,
         float $quantity,
         string $movementDate,
@@ -55,17 +56,26 @@ class StockMovementService
         ?string $notes,
         User $creator,
     ): StockMovement {
-        return DB::transaction(function () use ($company, $financialYear, $product, $quantity, $movementDate, $source, $referenceNumber, $notes, $creator) {
-            $unitCost = $this->stockLevelService->averageCostFor($product, lock: true);
+        return DB::transaction(function () use ($company, $financialYear, $branchId, $product, $quantity, $movementDate, $source, $referenceNumber, $notes, $creator) {
+            Product::whereKey($product->id)->lockForUpdate()->first();
+
+            $available = $this->stockLevelService->currentStockFor($product, $branchId);
+
+            if ($quantity > $available + 0.01) {
+                throw new RuntimeException("Only {$available} {$product->name} in stock at this branch; cannot issue {$quantity}.");
+            }
+
+            $unitCost = $this->stockLevelService->averageCostFor($product, $branchId);
             $totalCost = round($unitCost * $quantity, 2);
 
-            return $this->post($company, $financialYear, $product, 'Out', $quantity, $movementDate, $source, $referenceNumber, $notes, $creator, $unitCost, $totalCost);
+            return $this->post($company, $financialYear, $branchId, $product, 'Out', $quantity, $movementDate, $source, $referenceNumber, $notes, $creator, $unitCost, $totalCost);
         });
     }
 
     private function post(
         Company $company,
         FinancialYear $financialYear,
+        ?int $branchId,
         Product $product,
         string $direction,
         float $quantity,
@@ -87,6 +97,7 @@ class StockMovementService
 
         return StockMovement::create([
             'company_id' => $company->id,
+            'branch_id' => $branchId,
             'financial_year_id' => $financialYear->id,
             'product_id' => $product->id,
             'direction' => $direction,

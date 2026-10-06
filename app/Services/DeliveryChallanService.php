@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Branch;
 use App\Models\Company;
 use App\Models\DeliveryChallan;
 use App\Models\FinancialYear;
@@ -19,15 +20,16 @@ class DeliveryChallanService
         private StockMovementService $stockMovementService,
     ) {}
 
-    public function create(array $data, Company $company, FinancialYear $financialYear, User $creator): DeliveryChallan
+    public function create(array $data, Company $company, Branch $branch, FinancialYear $financialYear, User $creator): DeliveryChallan
     {
-        return DB::transaction(function () use ($data, $company, $financialYear, $creator) {
+        return DB::transaction(function () use ($data, $company, $branch, $financialYear, $creator) {
             $items = $data['items'];
             unset($data['items']);
 
             $challan = DeliveryChallan::create([
                 ...$data,
                 'company_id' => $company->id,
+                'branch_id' => $branch->id,
                 'financial_year_id' => $financialYear->id,
                 'challan_number' => $this->generateSequentialNumber(DeliveryChallan::class, 'DC', $company, $financialYear),
                 'status' => 'Draft',
@@ -84,6 +86,7 @@ class DeliveryChallanService
                 $this->stockMovementService->postOut(
                     $challan->company,
                     $challan->financialYear,
+                    $challan->branch_id,
                     $item->product,
                     (float) $item->quantity,
                     $challan->challan_date->toDateString(),

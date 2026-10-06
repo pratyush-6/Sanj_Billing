@@ -11,6 +11,47 @@
             <x-ui.alert variant="danger">{{ session('error') }}</x-ui.alert>
         @endif
 
+        @can('stock-adjustments.approve')
+            @if ($branch)
+                <x-ui.card>
+                    <p class="text-sm font-semibold text-ink-900 dark:text-ink-50">Move unassigned stock into {{ $branch->name }}</p>
+                    <p class="text-xs text-ink-500 dark:text-ink-400 mt-1">Stock recorded before branches existed belongs to no branch. Moving it here posts immediately and keeps its value.</p>
+                    <form method="POST" action="{{ route('stock-adjustments.assign-unassigned') }}" class="grid grid-cols-1 sm:grid-cols-5 gap-3 items-end mt-4 text-sm">
+                        @csrf
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">Product</label>
+                            <select name="product_id" required class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
+                                <option value="">Select</option>
+                                @foreach ($products as $product)
+                                    <option value="{{ $product->id }}">{{ $product->displayLabel() }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">Quantity</label>
+                            <input type="number" name="quantity" step="0.01" min="0.01" required class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">Date</label>
+                            <input type="date" name="adjustment_date" value="{{ date('Y-m-d') }}" required class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">Reason</label>
+                            <select name="reason" required class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
+                                <option value="">Select</option>
+                                @foreach ($reasons as $reason)
+                                    <option value="{{ $reason }}">{{ $reason }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="sm:col-span-5">
+                            <x-primary-button>Move into {{ $branch->name }}</x-primary-button>
+                        </div>
+                    </form>
+                </x-ui.card>
+            @endif
+        @endcan
+
         <div class="flex justify-end">
             @can('stock-adjustments.manage')
                 <a href="{{ route('stock-adjustments.create') }}">

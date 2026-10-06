@@ -9,6 +9,7 @@ use App\Models\GstRate;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Unit;
+use App\Services\BranchContextService;
 use App\Services\MasterDataService;
 use App\Services\StockLevelService;
 use Illuminate\Http\RedirectResponse;
@@ -38,10 +39,12 @@ class ProductController extends Controller
             ->paginate(20)
             ->withQueryString();
 
+        $scope = app(BranchContextService::class)->scope();
+
         return view('products.index', [
             'products' => $products,
             'categories' => ProductCategory::where('company_id', $companyId)->orderBy('name')->get(),
-            'stockLevels' => $this->stockLevelService->currentStock(collect($products->items())),
+            'stockLevels' => $this->stockLevelService->currentStock(collect($products->items()), $scope['branchId'], $scope['allBranches']),
         ]);
     }
 

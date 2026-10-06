@@ -71,14 +71,14 @@
 
                 <x-ui.section title="Line Items">
                     <div class="overflow-x-auto -mx-6">
-                        <table class="min-w-full divide-y divide-ink-100 dark:divide-ink-800">
+                        <table class="w-full min-w-[56rem] divide-y divide-ink-100 dark:divide-ink-800">
                             <thead>
                                 <tr>
-                                    <th class="px-6 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Product</th>
-                                    <th class="px-3 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide w-28">Qty</th>
-                                    <th class="px-3 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide w-32">Unit Price</th>
-                                    <th class="px-3 py-2 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide w-28">Amount</th>
-                                    <th class="px-3 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Notes</th>
+                                    <th class="px-6 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[16rem]">Product</th>
+                                    <th class="px-3 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[11rem]">Qty</th>
+                                    <th class="px-3 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[8rem]">Unit Price</th>
+                                    <th class="px-3 py-2 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[8rem]">Amount</th>
+                                    <th class="px-3 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[10rem]">Notes</th>
                                     <th class="px-3 py-2 w-10"></th>
                                 </tr>
                             </thead>
@@ -86,7 +86,7 @@
                                 <template x-for="(item, index) in items" :key="index">
                                     <tr>
                                         <td class="px-6 py-2">
-                                            <select :name="`items[${index}][product_id]`" x-model="item.product_id" class="block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
+                                            <select :name="`items[${index}][product_id]`" x-model="item.product_id" class="block w-full min-w-[14rem] bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
                                                 <option value="">Select product</option>
                                                 <template x-for="product in products" :key="product.id">
                                                     <option :value="product.id" x-text="product.label" :selected="item.product_id == product.id"></option>
@@ -95,13 +95,13 @@
                                         </td>
                                         <td class="px-3 py-2">
                                             <div class="flex items-center gap-1.5">
-                                                <input type="number" step="0.01" min="0.01" :name="`items[${index}][quantity]`" x-model.number="item.quantity" class="block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
+                                                <input type="number" step="0.01" min="0.01" :name="`items[${index}][quantity]`" x-model.number="item.quantity" class="block w-28 min-w-[6rem] text-right bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
                                                 <span class="text-xs text-ink-400 dark:text-ink-500 whitespace-nowrap" x-text="unitCode(item)"></span>
                                             </div>
                                             <p class="text-xs text-ink-400 dark:text-ink-500 mt-1" x-show="secondaryHint(item)" x-text="secondaryHint(item)"></p>
                                         </td>
                                         <td class="px-3 py-2">
-                                            <input type="number" step="0.01" min="0" :name="`items[${index}][unit_price]`" x-model.number="item.unit_price" class="block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
+                                            <input type="number" step="0.01" min="0" :name="`items[${index}][unit_price]`" x-model.number="item.unit_price" class="block w-full min-w-[6rem] text-right bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
                                         </td>
                                         <td class="px-3 py-2 text-right text-sm text-ink-700 dark:text-ink-200" x-text="((parseFloat(item.quantity) || 0) * (parseFloat(item.unit_price) || 0)).toFixed(2)"></td>
                                         <td class="px-3 py-2">

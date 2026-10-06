@@ -13,6 +13,7 @@ class SaleOrder extends Model
 
     protected $fillable = [
         'company_id',
+        'branch_id',
         'financial_year_id',
         'party_id',
         'order_number',
@@ -25,6 +26,11 @@ class SaleOrder extends Model
     protected $casts = [
         'order_date' => 'date',
     ];
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
 
     public function company(): BelongsTo
     {

@@ -14,6 +14,7 @@ class DeliveryChallan extends Model
 
     protected $fillable = [
         'company_id',
+        'branch_id',
         'financial_year_id',
         'sale_order_id',
         'party_id',
@@ -27,6 +28,11 @@ class DeliveryChallan extends Model
     protected $casts = [
         'challan_date' => 'date',
     ];
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
 
     public function company(): BelongsTo
     {

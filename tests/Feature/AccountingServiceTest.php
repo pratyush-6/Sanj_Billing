@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Branch;
 use App\Models\BankAccount;
 use App\Models\Company;
 use App\Models\Expense;
@@ -30,6 +31,8 @@ class AccountingServiceTest extends TestCase
     private PaymentMethod $paymentMethod;
 
     private User $user;
+
+    private Branch $branch;
 
     protected function setUp(): void
     {
@@ -67,6 +70,13 @@ class AccountingServiceTest extends TestCase
         ]);
 
         $this->user = User::factory()->create();
+
+        $this->branch = Branch::create([
+            'company_id' => $this->company->id,
+            'name' => 'Main',
+            'code' => 'MAIN',
+            'status' => 'active',
+        ]);
     }
 
     private function createExpense(array $overrides = []): Expense
@@ -84,7 +94,7 @@ class AccountingServiceTest extends TestCase
             'status' => 'Approved',
         ], $overrides);
 
-        return app(ExpenseService::class)->create($data, $this->company, $this->financialYear, $this->user);
+        return app(ExpenseService::class)->create($data, $this->company, $this->branch, $this->financialYear, $this->user);
     }
 
     public function test_expense_posts_a_balanced_journal_entry(): void

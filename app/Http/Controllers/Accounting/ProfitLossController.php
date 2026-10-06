@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Accounting;
 
 use App\Http\Controllers\Controller;
 use App\Services\AccountingService;
+use App\Services\BranchContextService;
 use Illuminate\Http\Request;
 
 class ProfitLossController extends Controller
@@ -19,7 +20,7 @@ class ProfitLossController extends Controller
             ? $financialYears->firstWhere('id', $request->integer('financial_year_id'))
             : $company->activeFinancialYear();
 
-        $data = $financialYear ? $this->accountingService->profitAndLoss($company, $financialYear) : null;
+        $data = $financialYear ? $this->accountingService->profitAndLoss($company, $financialYear, app(BranchContextService::class)->reportScope()) : null;
 
         return view('accounting.profit-loss.index', [
             'data' => $data,

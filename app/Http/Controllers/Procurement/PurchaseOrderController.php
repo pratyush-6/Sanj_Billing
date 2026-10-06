@@ -24,7 +24,7 @@ class PurchaseOrderController extends Controller
     {
         $companyId = current_company()?->id;
 
-        $purchaseOrders = PurchaseOrder::where('company_id', $companyId)
+        $purchaseOrders = scope_to_branch(PurchaseOrder::where('company_id', $companyId))
             ->with(['vendor', 'creator'])
             ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')))
             ->when($request->filled('vendor_id'), fn ($query) => $query->where('vendor_id', $request->integer('vendor_id')))
@@ -54,7 +54,7 @@ class PurchaseOrderController extends Controller
             return redirect()->route('purchase-orders.create')->with('error', 'No active financial year. Please set one up first.');
         }
 
-        $purchaseOrder = $this->purchaseOrderService->create($request->validated(), $company, $financialYear, Auth::user());
+        $purchaseOrder = $this->purchaseOrderService->create($request->validated(), $company, current_branch_or_fail(), $financialYear, Auth::user());
 
         return redirect()->route('purchase-orders.show', $purchaseOrder)->with('status', "Purchase Order {$purchaseOrder->po_number} saved as draft.");
     }

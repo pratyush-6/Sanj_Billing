@@ -10,6 +10,7 @@
             ['route' => 'reports.monthly', 'title' => 'Monthly Expense', 'description' => 'Totals and breakdown for a month.'],
             ['route' => 'reports.category-wise', 'title' => 'Category-wise', 'description' => 'Spending grouped by expense category.'],
             ['route' => 'reports.vendor-wise', 'title' => 'Vendor-wise', 'description' => 'Spending grouped by vendor/supplier.'],
+            ['route' => 'reports.branch-wise', 'title' => 'Branch-wise', 'description' => 'Expenses split across every branch of the company.'],
             ['route' => 'reports.payment-wise', 'title' => 'Payment-wise', 'description' => 'Spending by payment method and account.'],
             ['route' => 'reports.bank-cash-book', 'title' => 'Cash & Bank Book', 'description' => 'Running balance per account.'],
             ['route' => 'reports.monthly-comparison', 'title' => 'Monthly Comparison', 'description' => 'Category totals across months, with charts.'],

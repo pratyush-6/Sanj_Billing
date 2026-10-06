@@ -13,6 +13,7 @@ class RolePermissionSeeder extends Seeder
     {
         $names = [
             'companies.manage',
+            'branches.manage',
             'financial-years.manage',
             'users.manage',
             'roles.manage',
@@ -38,6 +39,7 @@ class RolePermissionSeeder extends Seeder
             'sale-invoices.manage',
             'stock-adjustments.manage',
             'stock-adjustments.approve',
+            'stock-transfers.manage',
         ];
 
         $permissions = collect($names)->mapWithKeys(
@@ -51,6 +53,7 @@ class RolePermissionSeeder extends Seeder
 
         $admin = Role::findOrCreate('Admin', 'web');
         $admin->syncPermissions($permissions->only([
+            'branches.manage',
             'financial-years.manage',
             'users.manage',
             'settings.manage',
@@ -75,6 +78,7 @@ class RolePermissionSeeder extends Seeder
             'sale-invoices.manage',
             'stock-adjustments.manage',
             'stock-adjustments.approve',
+            'stock-transfers.manage',
         ])->values());
 
         $accountant = Role::findOrCreate('Accountant', 'web');
@@ -95,6 +99,7 @@ class RolePermissionSeeder extends Seeder
             'delivery-challans.manage',
             'sale-invoices.manage',
             'stock-adjustments.manage',
+            'stock-transfers.manage',
         ])->values());
 
         $ca = Role::findOrCreate('CA', 'web');

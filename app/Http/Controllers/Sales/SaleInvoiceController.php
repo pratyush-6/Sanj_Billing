@@ -30,7 +30,7 @@ class SaleInvoiceController extends Controller
     {
         $companyId = current_company()?->id;
 
-        $invoices = SaleInvoice::where('company_id', $companyId)
+        $invoices = scope_to_branch(SaleInvoice::where('company_id', $companyId))
             ->with(['party', 'payments'])
             ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')))
             ->latest('invoice_date')
@@ -112,7 +112,7 @@ class SaleInvoiceController extends Controller
         }
 
         try {
-            $invoice = $this->saleInvoiceService->create($request->validated(), $company, $financialYear, Auth::user());
+            $invoice = $this->saleInvoiceService->create($request->validated(), $company, current_branch_or_fail(), $financialYear, Auth::user());
         } catch (RuntimeException $exception) {
             return redirect()->route('sale-invoices.create')->withInput()->with('error', $exception->getMessage());
         }

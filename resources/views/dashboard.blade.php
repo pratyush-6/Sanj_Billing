@@ -5,6 +5,13 @@
 
     <div class="space-y-6">
 
+        @if (session('status'))
+            <x-ui.alert variant="success">{{ session('status') }}</x-ui.alert>
+        @endif
+        @if (session('error'))
+            <x-ui.alert variant="danger">{{ session('error') }}</x-ui.alert>
+        @endif
+
         @if (! $company)
             @can('companies.manage')
                 <x-ui.alert variant="warning" title="Welcome to KSRGlobal. Let's set things up.">

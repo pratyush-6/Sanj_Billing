@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Accounting;
 
 use App\Http\Controllers\Controller;
 use App\Services\AccountingService;
+use App\Services\BranchContextService;
 use Illuminate\Http\Request;
 
 class TrialBalanceController extends Controller
@@ -15,7 +16,7 @@ class TrialBalanceController extends Controller
         $company = current_company_or_fail();
         $asOfDate = $request->filled('as_of_date') ? $request->string('as_of_date')->toString() : now()->toDateString();
 
-        $rows = $this->accountingService->trialBalance($company, $asOfDate);
+        $rows = $this->accountingService->trialBalance($company, $asOfDate, app(BranchContextService::class)->reportScope());
 
         return view('accounting.trial-balance.index', [
             'rows' => $rows,

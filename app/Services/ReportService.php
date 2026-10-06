@@ -7,21 +7,29 @@ use App\Models\FinancialYear;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
+/**
+ * $scope null means every branch of the company (unassigned included). A scope of
+ * ['branchId' => null] means only the unassigned bucket; ['branchId' => 5] means one
+ * branch. Every report method takes the same optional scope.
+ */
 class ReportService
 {
-    private function baseQuery(int $companyId, ?string $dateFrom = null, ?string $dateTo = null, ?int $financialYearId = null): Builder
+    private function baseQuery(int $companyId, ?string $dateFrom = null, ?string $dateTo = null, ?int $financialYearId = null, ?array $scope = null): Builder
     {
         return Expense::query()
             ->where('expenses.company_id', $companyId)
             ->where('expenses.status', '!=', 'Cancelled')
             ->when($financialYearId, fn ($query) => $query->where('expenses.financial_year_id', $financialYearId))
             ->when($dateFrom, fn ($query) => $query->whereDate('expenses.expense_date', '>=', $dateFrom))
-            ->when($dateTo, fn ($query) => $query->whereDate('expenses.expense_date', '<=', $dateTo));
+            ->when($dateTo, fn ($query) => $query->whereDate('expenses.expense_date', '<=', $dateTo))
+            ->when($scope !== null, fn ($query) => $scope['branchId'] === null
+                ? $query->whereNull('expenses.branch_id')
+                : $query->where(fn ($query) => $query->where('expenses.branch_id', $scope['branchId'])->orWhereNull('expenses.branch_id')));
     }
 
-    public function categoryWise(int $companyId, ?string $dateFrom = null, ?string $dateTo = null, ?int $financialYearId = null): Collection
+    public function categoryWise(int $companyId, ?string $dateFrom = null, ?string $dateTo = null, ?int $financialYearId = null, ?array $scope = null): Collection
     {
-        return $this->baseQuery($companyId, $dateFrom, $dateTo, $financialYearId)
+        return $this->baseQuery($companyId, $dateFrom, $dateTo, $financialYearId, $scope)
             ->join('expense_categories', 'expense_categories.id', '=', 'expenses.expense_category_id')
             ->selectRaw('expense_categories.id as category_id, expense_categories.name as category_name, SUM(expenses.total_amount) as total, COUNT(*) as count')
             ->groupBy('expense_categories.id', 'expense_categories.name')
@@ -30,9 +38,24 @@ class ReportService
             ->map(fn ($row) => (object) $row->getAttributes());
     }
 
-    public function vendorWise(int $companyId, ?string $dateFrom = null, ?string $dateTo = null, ?int $financialYearId = null): Collection
+    /**
+     * Expenses split by the branch that recorded them — the one report that always
+     * spans branches. Unassigned expenses appear as their own row.
+     */
+    public function branchWise(int $companyId, ?string $dateFrom = null, ?string $dateTo = null, ?int $financialYearId = null): Collection
     {
         return $this->baseQuery($companyId, $dateFrom, $dateTo, $financialYearId)
+            ->leftJoin('branches', 'branches.id', '=', 'expenses.branch_id')
+            ->selectRaw("COALESCE(branches.id, 0) as branch_id, COALESCE(branches.name, 'Unassigned') as branch_name, SUM(expenses.total_amount) as total, COUNT(*) as count")
+            ->groupBy('branches.id', 'branches.name')
+            ->orderByDesc('total')
+            ->get()
+            ->map(fn ($row) => (object) $row->getAttributes());
+    }
+
+    public function vendorWise(int $companyId, ?string $dateFrom = null, ?string $dateTo = null, ?int $financialYearId = null, ?array $scope = null): Collection
+    {
+        return $this->baseQuery($companyId, $dateFrom, $dateTo, $financialYearId, $scope)
             ->leftJoin('parties', 'parties.id', '=', 'expenses.vendor_id')
             ->selectRaw("COALESCE(parties.id, 0) as vendor_id, COALESCE(parties.name, 'No Vendor') as vendor_name, SUM(expenses.total_amount) as total, COUNT(*) as count")
             ->groupBy('parties.id', 'parties.name')
@@ -41,9 +64,9 @@ class ReportService
             ->map(fn ($row) => (object) $row->getAttributes());
     }
 
-    public function paymentMethodWise(int $companyId, ?string $dateFrom = null, ?string $dateTo = null, ?int $financialYearId = null): Collection
+    public function paymentMethodWise(int $companyId, ?string $dateFrom = null, ?string $dateTo = null, ?int $financialYearId = null, ?array $scope = null): Collection
     {
-        return $this->baseQuery($companyId, $dateFrom, $dateTo, $financialYearId)
+        return $this->baseQuery($companyId, $dateFrom, $dateTo, $financialYearId, $scope)
             ->leftJoin('payment_methods', 'payment_methods.id', '=', 'expenses.payment_method_id')
             ->selectRaw("COALESCE(payment_methods.id, 0) as payment_method_id, COALESCE(payment_methods.name, 'Unspecified') as payment_method_name, SUM(expenses.total_amount) as total, COUNT(*) as count")
             ->groupBy('payment_methods.id', 'payment_methods.name')
@@ -52,9 +75,9 @@ class ReportService
             ->map(fn ($row) => (object) $row->getAttributes());
     }
 
-    public function bankAccountWise(int $companyId, ?string $dateFrom = null, ?string $dateTo = null, ?int $financialYearId = null): Collection
+    public function bankAccountWise(int $companyId, ?string $dateFrom = null, ?string $dateTo = null, ?int $financialYearId = null, ?array $scope = null): Collection
     {
-        return $this->baseQuery($companyId, $dateFrom, $dateTo, $financialYearId)
+        return $this->baseQuery($companyId, $dateFrom, $dateTo, $financialYearId, $scope)
             ->leftJoin('bank_accounts', 'bank_accounts.id', '=', 'expenses.bank_account_id')
             ->selectRaw("COALESCE(bank_accounts.id, 0) as bank_account_id, COALESCE(bank_accounts.account_name, 'Unspecified') as account_name, SUM(expenses.total_amount) as total, COUNT(*) as count")
             ->groupBy('bank_accounts.id', 'bank_accounts.account_name')
@@ -63,7 +86,7 @@ class ReportService
             ->map(fn ($row) => (object) $row->getAttributes());
     }
 
-    public function monthlyComparison(int $companyId, FinancialYear $financialYear): array
+    public function monthlyComparison(int $companyId, FinancialYear $financialYear, ?array $scope = null): array
     {
         $months = collect();
         $cursor = $financialYear->start_date->copy()->startOfMonth();
@@ -74,7 +97,7 @@ class ReportService
             $cursor->addMonth();
         }
 
-        $rows = $this->baseQuery($companyId, null, null, $financialYear->id)
+        $rows = $this->baseQuery($companyId, null, null, $financialYear->id, $scope)
             ->join('expense_categories', 'expense_categories.id', '=', 'expenses.expense_category_id')
             ->selectRaw("expense_categories.id as category_id, expense_categories.name as category_name, DATE_FORMAT(expenses.expense_date, '%Y-%m') as ym, SUM(expenses.total_amount) as total")
             ->groupBy('expense_categories.id', 'expense_categories.name', 'ym')
@@ -98,9 +121,9 @@ class ReportService
         return ['months' => $months, 'rows' => $grid];
     }
 
-    public function financialYearSummary(int $companyId, FinancialYear $financialYear): array
+    public function financialYearSummary(int $companyId, FinancialYear $financialYear, ?array $scope = null): array
     {
-        $rows = $this->categoryWise($companyId, null, null, $financialYear->id);
+        $rows = $this->categoryWise($companyId, null, null, $financialYear->id, $scope);
         $grandTotal = (float) $rows->sum('total');
 
         $rows = $rows->map(fn ($row) => (object) [
@@ -111,11 +134,11 @@ class ReportService
         return ['rows' => $rows, 'total' => $grandTotal];
     }
 
-    public function dailySummary(int $companyId, string $date): array
+    public function dailySummary(int $companyId, string $date, ?array $scope = null): array
     {
-        $categories = $this->categoryWise($companyId, $date, $date);
+        $categories = $this->categoryWise($companyId, $date, $date, null, $scope);
 
-        $expenses = $this->baseQuery($companyId, $date, $date)
+        $expenses = $this->baseQuery($companyId, $date, $date, null, $scope)
             ->with(['category', 'vendor', 'paymentMethod'])
             ->orderBy('id')
             ->get();
@@ -128,9 +151,9 @@ class ReportService
         ];
     }
 
-    public function monthlySummary(int $companyId, string $from, string $to): array
+    public function monthlySummary(int $companyId, string $from, string $to, ?array $scope = null): array
     {
-        $categories = $this->categoryWise($companyId, $from, $to);
+        $categories = $this->categoryWise($companyId, $from, $to, null, $scope);
 
         return [
             'from' => $from,
@@ -140,11 +163,11 @@ class ReportService
         ];
     }
 
-    public function monthlyTrend(int $companyId, int $months = 6): Collection
+    public function monthlyTrend(int $companyId, int $months = 6, ?array $scope = null): Collection
     {
         $start = now()->subMonths($months - 1)->startOfMonth();
 
-        $rows = $this->baseQuery($companyId, $start->toDateString(), now()->toDateString())
+        $rows = $this->baseQuery($companyId, $start->toDateString(), now()->toDateString(), null, $scope)
             ->selectRaw("DATE_FORMAT(expense_date, '%Y-%m') as ym, SUM(total_amount) as total")
             ->groupBy('ym')
             ->pluck('total', 'ym');

@@ -25,6 +25,7 @@ if (auth()->user()->can('inventory.view')) {
     $inventoryItems[] = ['route' => 'products.index', 'label' => 'Products', 'pattern' => 'products.*'];
     $inventoryItems[] = ['route' => 'product-categories.index', 'label' => 'Product Categories', 'pattern' => 'product-categories.*'];
     $inventoryItems[] = ['route' => 'stock-adjustments.index', 'label' => 'Stock Adjustments', 'pattern' => 'stock-adjustments.*'];
+    $inventoryItems[] = ['route' => 'stock-transfers.index', 'label' => 'Stock Transfers', 'pattern' => 'stock-transfers.*'];
     $inventoryItems[] = ['route' => 'inventory-reports.low-stock', 'label' => 'Low Stock Report', 'pattern' => 'inventory-reports.low-stock'];
     $inventoryItems[] = ['route' => 'inventory-reports.movements', 'label' => 'Stock Movements', 'pattern' => 'inventory-reports.movements'];
 }
@@ -84,6 +85,9 @@ if (auth()->user()->can('financial-years.manage')) {
 if (auth()->user()->can('companies.manage')) {
     $companyItems[] = ['route' => 'companies.index', 'label' => 'Companies', 'pattern' => 'companies.*'];
 }
+if (auth()->user()->can('branches.manage')) {
+    $companyItems[] = ['route' => 'branches.index', 'label' => 'Branches', 'pattern' => 'branches.*'];
+}
 if ($companyItems) {
     $navGroups['Company'] = ['icon' => 'building', 'items' => $companyItems];
 }
@@ -139,8 +143,9 @@ $icons = [
         </a>
     </div>
 
+    <div class="flex items-start gap-2 px-3 pt-3">
     @if ($currentCompany && $accessibleCompanies->count() > 1)
-        <div class="px-3 pt-3" x-data="{ open: false }" @click.outside="open = false">
+        <div class="flex-1 min-w-0" x-data="{ open: false }" @click.outside="open = false">
             <div class="relative">
                 <button @click="open = ! open" type="button" class="flex w-full items-center justify-between gap-2 rounded-lg border border-ink-200 dark:border-ink-700 px-3 py-2 text-sm hover:bg-ink-50 dark:hover:bg-ink-800">
                     <span class="truncate font-medium text-ink-800 dark:text-ink-100">{{ $currentCompany->name }}</span>
@@ -166,6 +171,51 @@ $icons = [
             </div>
         </div>
     @endif
+
+    @if ($currentCompany)
+        @php($branchContext = app(\App\Services\BranchContextService::class))
+        @php($accessibleBranches = $branchContext->accessibleBranches())
+        @php($currentBranch = current_branch())
+        <div class="flex-1 min-w-0" x-data="{ open: false }" @click.outside="open = false">
+            <div class="relative">
+                <button @click="open = ! open" type="button" class="flex w-full items-center justify-between gap-2 rounded-lg border border-ink-200 dark:border-ink-700 px-3 py-2 text-sm hover:bg-ink-50 dark:hover:bg-ink-800">
+                    <span class="truncate font-medium text-ink-800 dark:text-ink-100">
+                        {{ $branchContext->isAllBranches() ? 'All branches' : ($currentBranch?->name ?? 'No branch') }}
+                    </span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-ink-400 dark:text-ink-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" /></svg>
+                </button>
+                <div x-show="open" x-transition style="display: none;" class="absolute z-40 mt-1 w-full rounded-lg border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-800 shadow-lg py-1">
+                    @forelse ($accessibleBranches as $branch)
+                        <form method="POST" action="{{ route('branches.switch', $branch) }}">
+                            @csrf
+                            <button type="submit" @class([
+                                'flex w-full items-center justify-between px-3 py-2 text-sm text-left hover:bg-ink-50 dark:hover:bg-ink-700',
+                                'text-brand-700 dark:text-brand-400 font-medium' => ! $branchContext->isAllBranches() && $currentBranch?->id === $branch->id,
+                                'text-ink-700 dark:text-ink-200' => $branchContext->isAllBranches() || $currentBranch?->id !== $branch->id,
+                            ])>
+                                {{ $branch->name }}
+                            </button>
+                        </form>
+                    @empty
+                        <div class="px-3 py-2 text-sm text-ink-400 dark:text-ink-500">No branch assigned.</div>
+                    @endforelse
+                    @if ($accessibleBranches->count() > 1)
+                        <form method="POST" action="{{ route('branches.switch-all') }}" class="border-t border-ink-100 dark:border-ink-700">
+                            @csrf
+                            <button type="submit" class="flex w-full items-center px-3 py-2 text-sm text-left text-ink-700 dark:text-ink-200 hover:bg-ink-50 dark:hover:bg-ink-700">
+                                All branches (reports)
+                            </button>
+                        </form>
+                    @endif
+                    @can('branches.manage')
+                        <a href="{{ route('branches.index') }}" class="block border-t border-ink-100 dark:border-ink-700 px-3 py-2 text-sm text-brand-600 dark:text-brand-400 hover:bg-ink-50 dark:hover:bg-ink-700">Manage branches</a>
+                    @endcan
+                </div>
+            </div>
+        </div>
+    @endif
+
+    </div>
 
     <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1"
          x-data

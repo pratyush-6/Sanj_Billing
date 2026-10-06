@@ -14,6 +14,7 @@ class SaleInvoice extends Model
 
     protected $fillable = [
         'company_id',
+        'branch_id',
         'financial_year_id',
         'party_id',
         'invoice_number',
@@ -41,6 +42,11 @@ class SaleInvoice extends Model
         'tds_amount' => 'decimal:2',
         'total_amount' => 'decimal:2',
     ];
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
 
     public function company(): BelongsTo
     {
