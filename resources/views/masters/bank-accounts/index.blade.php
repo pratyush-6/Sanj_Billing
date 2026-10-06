@@ -26,8 +26,8 @@
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Type</th>
                             <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Opening Balance</th>
                             <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Current Balance</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Status</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Actions</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.status') }}</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
@@ -45,10 +45,10 @@
                                     {{ number_format($balances[$account->id] ?? 0, 2) }}
                                 </td>
                                 <td class="px-4 py-3.5 text-sm">
-                                    <x-ui.badge :variant="$account->status === 'active' ? 'success' : 'neutral'">{{ ucfirst($account->status) }}</x-ui.badge>
+                                    <x-ui.badge :variant="$account->status === 'active' ? 'success' : 'neutral'">{{ enum_label(ucfirst($account->status)) }}</x-ui.badge>
                                 </td>
                                 <td class="px-4 py-3.5 text-right text-sm">
-                                    <a href="{{ route('bank-accounts.edit', $account) }}" class="text-brand-600 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 font-medium">Edit</a>
+                                    <a href="{{ route('bank-accounts.edit', $account) }}" class="text-brand-600 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 font-medium">{{ __('common.edit') }}</a>
                                 </td>
                             </tr>
                         @empty

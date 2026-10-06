@@ -64,15 +64,15 @@
     <table class="items">
         <thead>
             <tr>
-                <th>Product</th>
+                <th>{{ __('common.product') }}</th>
                 <th>HSN</th>
-                <th class="numeric">Qty</th>
+                <th class="numeric">{{ __('common.qty') }}</th>
                 <th class="numeric">Rate</th>
                 <th class="numeric">Taxable</th>
                 <th class="numeric">CGST</th>
                 <th class="numeric">SGST</th>
                 <th class="numeric">IGST</th>
-                <th class="numeric">Amount</th>
+                <th class="numeric">{{ __('common.amount') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -116,7 +116,7 @@
             </tr>
         @endif
         <tr class="grand-total">
-            <td>Total</td>
+            <td>{{ __('common.total') }}</td>
             <td class="numeric">{{ number_format($invoice->total_amount, 2) }}</td>
         </tr>
     </table>

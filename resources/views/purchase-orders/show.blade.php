@@ -19,7 +19,7 @@
             <div class="flex flex-wrap items-start justify-between gap-4">
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 flex-1">
                     <div>
-                        <div class="text-xs text-ink-400 dark:text-ink-500 uppercase tracking-wide">Vendor</div>
+                        <div class="text-xs text-ink-400 dark:text-ink-500 uppercase tracking-wide">{{ __('common.vendor') }}</div>
                         <div class="text-sm font-medium text-ink-900 dark:text-ink-50 mt-1">{{ $purchaseOrder->vendor->name }}</div>
                     </div>
                     <div>
@@ -39,7 +39,7 @@
                     'Submitted' => 'success',
                     'Cancelled' => 'danger',
                     default => 'neutral',
-                }" class="text-sm">{{ $purchaseOrder->status }}</x-ui.badge>
+                }" class="text-sm">{{ enum_label($purchaseOrder->status) }}</x-ui.badge>
             </div>
 
             @if ($purchaseOrder->notes)
@@ -50,7 +50,7 @@
                 <div class="flex flex-wrap items-center gap-3 mt-6 border-t border-ink-100 dark:border-ink-800 pt-4">
                     @if ($purchaseOrder->status === 'Draft')
                         <a href="{{ route('purchase-orders.edit', $purchaseOrder) }}">
-                            <x-secondary-button>Edit</x-secondary-button>
+                            <x-secondary-button>{{ __('common.edit') }}</x-secondary-button>
                         </a>
                         <form method="POST" action="{{ route('purchase-orders.submit', $purchaseOrder) }}" onsubmit="return confirm('Submit this purchase order? Stock will be updated immediately and it cannot be edited after that.');">
                             @csrf
@@ -58,7 +58,7 @@
                         </form>
                         <form method="POST" action="{{ route('purchase-orders.cancel', $purchaseOrder) }}" onsubmit="return confirm('Cancel this purchase order?');">
                             @csrf
-                            <x-danger-button type="submit">Cancel</x-danger-button>
+                            <x-danger-button type="submit">{{ __('common.cancel') }}</x-danger-button>
                         </form>
                     @endif
                     @if ($purchaseOrder->status === 'Submitted' && ! $purchaseOrder->purchaseBill)
@@ -72,7 +72,7 @@
             @if ($purchaseOrder->purchaseBill)
                 <div class="border-t border-ink-100 dark:border-ink-800 mt-4 pt-4">
                     <div class="text-xs text-ink-400 dark:text-ink-500 uppercase tracking-wide mb-1">Purchase Bill</div>
-                    <a href="{{ route('purchase-bills.show', $purchaseOrder->purchaseBill) }}" class="text-sm text-brand-600 dark:text-brand-400 hover:underline">{{ $purchaseOrder->purchaseBill->bill_number }} ({{ $purchaseOrder->purchaseBill->status }})</a>
+                    <a href="{{ route('purchase-bills.show', $purchaseOrder->purchaseBill) }}" class="text-sm text-brand-600 dark:text-brand-400 hover:underline">{{ $purchaseOrder->purchaseBill->bill_number }} ({{ enum_label($purchaseOrder->purchaseBill->status) }})</a>
                 </div>
             @endif
 
@@ -98,11 +98,11 @@
                 <table class="min-w-full divide-y divide-ink-100 dark:divide-ink-800">
                     <thead>
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Product</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Qty</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Unit Price</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Amount</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Notes</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.product') }}</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.qty') }}</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.unit_price') }}</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.amount') }}</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.notes') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
@@ -118,7 +118,7 @@
                     </tbody>
                     <tfoot>
                         <tr class="border-t border-ink-200 dark:border-ink-700">
-                            <td colspan="3" class="px-4 py-3 text-right text-sm font-semibold text-ink-800 dark:text-ink-100">Total</td>
+                            <td colspan="3" class="px-4 py-3 text-right text-sm font-semibold text-ink-800 dark:text-ink-100">{{ __('common.total') }}</td>
                             <td class="px-4 py-3 text-right text-sm font-semibold text-ink-900 dark:text-ink-50">{{ number_format($purchaseOrder->totalAmount(), 2) }}</td>
                             <td></td>
                         </tr>

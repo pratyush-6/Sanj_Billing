@@ -33,6 +33,28 @@ if (! function_exists('current_branch_or_fail')) {
     }
 }
 
+if (! function_exists('ui_label')) {
+    function ui_label(string $text): string
+    {
+        $map = trans('labels');
+
+        return is_array($map) && isset($map[$text]) ? $map[$text] : $text;
+    }
+}
+
+if (! function_exists('enum_label')) {
+    function enum_label(?string $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return $value;
+        }
+
+        $map = trans('enums');
+
+        return is_array($map) && isset($map[$value]) ? $map[$value] : $value;
+    }
+}
+
 if (! function_exists('scope_to_branch')) {
     function scope_to_branch(\Illuminate\Database\Eloquent\Builder $query, string $column = 'branch_id'): \Illuminate\Database\Eloquent\Builder
     {

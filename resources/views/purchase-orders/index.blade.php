@@ -25,16 +25,16 @@
         <x-ui.card>
             <form method="GET" class="grid grid-cols-2 sm:grid-cols-4 gap-3 items-end text-sm">
                 <div>
-                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">Status</label>
+                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ __('common.status') }}</label>
                     <select name="status" onchange="this.form.submit()" class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                         <option value="">All</option>
                         @foreach ($statuses as $status)
-                            <option value="{{ $status }}" @selected(request('status') === $status)>{{ $status }}</option>
+                            <option value="{{ enum_label($status) }}" @selected(request('status') === $status)>{{ enum_label($status) }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">Vendor</label>
+                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ __('common.vendor') }}</label>
                     <select name="vendor_id" onchange="this.form.submit()" class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                         <option value="">All</option>
                         @foreach ($vendors as $vendor)
@@ -51,12 +51,12 @@
                     <thead class="bg-ink-50/80 dark:bg-ink-800/80">
                         <tr>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">PO #</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Vendor</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Date</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.vendor') }}</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.date') }}</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Expected Delivery</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Total</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Status</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Actions</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.total') }}</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.status') }}</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
@@ -74,7 +74,7 @@
                                         'Submitted' => 'success',
                                         'Cancelled' => 'danger',
                                         default => 'neutral',
-                                    }">{{ $purchaseOrder->status }}</x-ui.badge>
+                                    }">{{ enum_label($purchaseOrder->status) }}</x-ui.badge>
                                 </td>
                                 <td class="px-4 py-3.5 text-right text-sm">
                                     <a href="{{ route('purchase-orders.show', $purchaseOrder) }}" class="text-brand-600 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 font-medium">View</a>

@@ -1,0 +1,47 @@
+<?php
+
+return [
+    'welcome_title' => "Welcome to KSRGlobal. Let's set things up.",
+    'start_company' => 'Start by creating your company profile.',
+    'set_up_company' => 'Set Up Company →',
+    'no_access_title' => 'No company access yet.',
+    'no_access' => "You haven't been granted access to a company. Contact your administrator.",
+    'no_fy_title' => 'No active financial year.',
+    'no_fy' => 'Create and activate a financial year to begin recording transactions.',
+    'create_fy' => 'Create Financial Year →',
+
+    'company' => 'Company',
+    'active_fy' => 'Active Financial Year',
+    'today' => 'Today',
+    'this_month' => 'This Month',
+    'total_fy' => 'Total for the financial year',
+    'net_profit' => 'Net Profit',
+    'current_fy' => 'Current financial year',
+    'cash_balance' => 'Cash Balance',
+    'bank_balance' => 'Bank Balance',
+    'payable' => 'Payable',
+    'payable_hint' => 'GST + TDS + other liabilities',
+
+    'expense_by_category' => 'Expense by Category',
+    'no_expenses' => 'No expenses yet',
+    'monthly_trend' => 'Monthly Trend',
+    'expenses' => 'Expenses',
+    'by_payment_method' => 'By Payment Method',
+    'top_vendors' => 'Top Vendors',
+    'no_vendor_expenses' => 'No vendor expenses yet',
+    'amount' => 'Amount',
+
+    'low_stock' => 'Low Stock',
+    'view_all' => 'View all →',
+    'outstanding_dues' => 'Outstanding Dues',
+    'you_will_get' => 'You will get ',
+    'you_will_give' => 'You will give ',
+
+    'modules' => 'Modules',
+    'record_expenses' => 'Record & search expenses',
+    'manage_parties' => 'Manage vendors & customers',
+    'expense_reports' => 'Expense reports & exports',
+    'accounting_desc' => 'Ledger, trial balance, P&L, balance sheet',
+    'inventory_desc' => 'Products, stock levels & adjustments',
+    'procurement_desc' => 'Purchase orders & bills',
+];

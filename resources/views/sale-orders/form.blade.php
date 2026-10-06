@@ -45,7 +45,7 @@
                 <x-ui.section title="Order Details">
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
                         <div>
-                            <x-input-label for="party_id" value="Customer *" />
+                            <x-input-label for="party_id" :value="ui_label('Customer *')" />
                             <select id="party_id" name="party_id" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
                                 <option value="">Select</option>
                                 @foreach ($parties as $party)
@@ -56,7 +56,7 @@
                         </div>
 
                         <div>
-                            <x-input-label for="order_date" value="Order Date *" />
+                            <x-input-label for="order_date" :value="ui_label('Order Date *')" />
                             <x-text-input id="order_date" name="order_date" type="date" class="mt-1 block w-full" :value="old('order_date', $order?->order_date?->format('Y-m-d') ?? date('Y-m-d'))" required />
                             <x-input-error :messages="$errors->get('order_date')" class="mt-2" />
                         </div>
@@ -68,11 +68,11 @@
                         <table class="min-w-full divide-y divide-ink-100 dark:divide-ink-800">
                             <thead>
                                 <tr>
-                                    <th class="px-6 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Product</th>
-                                    <th class="px-3 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide w-28">Qty</th>
-                                    <th class="px-3 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide w-32">Unit Price</th>
-                                    <th class="px-3 py-2 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide w-28">Amount</th>
-                                    <th class="px-3 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Notes</th>
+                                    <th class="px-6 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.product') }}</th>
+                                    <th class="px-3 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide w-28">{{ __('common.qty') }}</th>
+                                    <th class="px-3 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide w-32">{{ __('common.unit_price') }}</th>
+                                    <th class="px-3 py-2 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide w-28">{{ __('common.amount') }}</th>
+                                    <th class="px-3 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.notes') }}</th>
                                     <th class="px-3 py-2 w-10"></th>
                                 </tr>
                             </thead>
@@ -124,13 +124,13 @@
                 </x-ui.section>
 
                 <div>
-                    <x-input-label for="notes" value="Notes" />
+                    <x-input-label for="notes" :value="ui_label('Notes')" />
                     <textarea id="notes" name="notes" rows="2" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">{{ old('notes', $order?->notes) }}</textarea>
                 </div>
 
                 <div class="flex items-center gap-4 border-t border-ink-100 dark:border-ink-800 pt-6">
                     <x-primary-button>{{ $order ? __('Update Order') : __('Save as Draft') }}</x-primary-button>
-                    <a href="{{ $order ? route('sale-orders.show', $order) : route('sale-orders.index') }}" class="text-sm text-ink-500 dark:text-ink-400 hover:text-ink-700 dark:hover:text-ink-200">Cancel</a>
+                    <a href="{{ $order ? route('sale-orders.show', $order) : route('sale-orders.index') }}" class="text-sm text-ink-500 dark:text-ink-400 hover:text-ink-700 dark:hover:text-ink-200">{{ __('common.cancel') }}</a>
                 </div>
             </form>
         </x-ui.card>

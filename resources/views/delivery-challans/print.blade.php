@@ -53,10 +53,10 @@
     <table class="items">
         <thead>
             <tr>
-                <th>Product</th>
+                <th>{{ __('common.product') }}</th>
                 <th>SKU</th>
-                <th class="numeric">Quantity</th>
-                <th>Notes</th>
+                <th class="numeric">{{ __('common.quantity') }}</th>
+                <th>{{ __('common.notes') }}</th>
             </tr>
         </thead>
         <tbody>

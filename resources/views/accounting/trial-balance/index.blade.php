@@ -7,7 +7,7 @@
         <x-ui.card>
             <form method="GET" class="flex items-end gap-3 text-sm">
                 <div>
-                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">As of</label>
+                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ ui_label('As of') }}</label>
                     <input type="date" name="as_of_date" value="{{ $asOfDate }}" class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                 </div>
                 <x-secondary-button type="submit">View</x-secondary-button>
@@ -37,7 +37,7 @@
                         @forelse ($rows as $row)
                             <tr class="hover:bg-ink-50/60 dark:hover:bg-ink-800/60">
                                 <td class="px-4 py-3.5 text-sm font-medium text-ink-900 dark:text-ink-50">{{ $row->account->name }}</td>
-                                <td class="px-4 py-3.5 text-sm text-ink-500 dark:text-ink-400">{{ $row->account->type }}</td>
+                                <td class="px-4 py-3.5 text-sm text-ink-500 dark:text-ink-400">{{ enum_label($row->account->type) }}</td>
                                 <td class="px-4 py-3.5 text-sm text-right text-ink-900 dark:text-ink-50">{{ $row->debit > 0 ? number_format($row->debit, 2) : '—' }}</td>
                                 <td class="px-4 py-3.5 text-sm text-right text-ink-900 dark:text-ink-50">{{ $row->credit > 0 ? number_format($row->credit, 2) : '—' }}</td>
                             </tr>
@@ -51,7 +51,7 @@
                     </tbody>
                     <tfoot>
                         <tr class="bg-ink-50/60 dark:bg-ink-800/60 font-semibold">
-                            <td class="px-4 py-3 text-sm text-ink-900 dark:text-ink-50" colspan="2">Total</td>
+                            <td class="px-4 py-3 text-sm text-ink-900 dark:text-ink-50" colspan="2">{{ __('common.total') }}</td>
                             <td class="px-4 py-3 text-sm text-right text-ink-900 dark:text-ink-50">{{ number_format($totalDebit, 2) }}</td>
                             <td class="px-4 py-3 text-sm text-right text-ink-900 dark:text-ink-50">{{ number_format($totalCredit, 2) }}</td>
                         </tr>

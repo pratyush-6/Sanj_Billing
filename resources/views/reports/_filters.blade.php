@@ -2,16 +2,16 @@
 
 <form method="GET" class="grid grid-cols-2 sm:grid-cols-4 gap-3 items-end text-sm">
     <div>
-        <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">From</label>
+        <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ ui_label('From') }}</label>
         <input type="date" name="date_from" value="{{ request('date_from') }}" class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
     </div>
     <div>
-        <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">To</label>
+        <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ ui_label('To') }}</label>
         <input type="date" name="date_to" value="{{ request('date_to') }}" class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
     </div>
     @if ($showFinancialYear)
         <div>
-            <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">Financial Year</label>
+            <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ ui_label('Financial Year') }}</label>
             <select name="financial_year_id" class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                 <option value="">All</option>
                 @foreach ($financialYears as $fy)

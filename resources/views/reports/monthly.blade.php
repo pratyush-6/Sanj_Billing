@@ -7,7 +7,7 @@
         <x-ui.card>
             <form method="GET" class="flex items-end gap-3 text-sm">
                 <div>
-                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">Month</label>
+                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ ui_label('Month') }}</label>
                     <input type="month" name="month" value="{{ $month }}" class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                 </div>
                 <x-secondary-button type="submit">View</x-secondary-button>

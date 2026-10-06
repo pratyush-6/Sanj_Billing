@@ -45,7 +45,7 @@
                 <x-ui.section title="Purchase Order Details">
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
                         <div>
-                            <x-input-label for="vendor_id" value="Vendor *" />
+                            <x-input-label for="vendor_id" :value="ui_label('Vendor *')" />
                             <select id="vendor_id" name="vendor_id" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
                                 <option value="">Select</option>
                                 @foreach ($vendors as $vendor)
@@ -56,13 +56,13 @@
                         </div>
 
                         <div>
-                            <x-input-label for="po_date" value="PO Date *" />
+                            <x-input-label for="po_date" :value="ui_label('PO Date *')" />
                             <x-text-input id="po_date" name="po_date" type="date" class="mt-1 block w-full" :value="old('po_date', $purchaseOrder?->po_date?->format('Y-m-d') ?? date('Y-m-d'))" required />
                             <x-input-error :messages="$errors->get('po_date')" class="mt-2" />
                         </div>
 
                         <div>
-                            <x-input-label for="expected_delivery_date" value="Expected Delivery" />
+                            <x-input-label for="expected_delivery_date" :value="ui_label('Expected Delivery')" />
                             <x-text-input id="expected_delivery_date" name="expected_delivery_date" type="date" class="mt-1 block w-full" :value="old('expected_delivery_date', $purchaseOrder?->expected_delivery_date?->format('Y-m-d'))" />
                             <x-input-error :messages="$errors->get('expected_delivery_date')" class="mt-2" />
                         </div>
@@ -74,11 +74,11 @@
                         <table class="w-full min-w-[56rem] divide-y divide-ink-100 dark:divide-ink-800">
                             <thead>
                                 <tr>
-                                    <th class="px-6 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[16rem]">Product</th>
-                                    <th class="px-3 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[11rem]">Qty</th>
-                                    <th class="px-3 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[8rem]">Unit Price</th>
-                                    <th class="px-3 py-2 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[8rem]">Amount</th>
-                                    <th class="px-3 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[10rem]">Notes</th>
+                                    <th class="px-6 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[16rem]">{{ __('common.product') }}</th>
+                                    <th class="px-3 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[11rem]">{{ __('common.qty') }}</th>
+                                    <th class="px-3 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[8rem]">{{ __('common.unit_price') }}</th>
+                                    <th class="px-3 py-2 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[8rem]">{{ __('common.amount') }}</th>
+                                    <th class="px-3 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[10rem]">{{ __('common.notes') }}</th>
                                     <th class="px-3 py-2 w-10"></th>
                                 </tr>
                             </thead>
@@ -130,13 +130,13 @@
                 </x-ui.section>
 
                 <div>
-                    <x-input-label for="notes" value="Notes" />
+                    <x-input-label for="notes" :value="ui_label('Notes')" />
                     <textarea id="notes" name="notes" rows="2" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">{{ old('notes', $purchaseOrder?->notes) }}</textarea>
                 </div>
 
                 <div class="flex items-center gap-4 border-t border-ink-100 dark:border-ink-800 pt-6">
                     <x-primary-button>{{ $purchaseOrder ? __('Update Purchase Order') : __('Save as Draft') }}</x-primary-button>
-                    <a href="{{ $purchaseOrder ? route('purchase-orders.show', $purchaseOrder) : route('purchase-orders.index') }}" class="text-sm text-ink-500 dark:text-ink-400 hover:text-ink-700 dark:hover:text-ink-200">Cancel</a>
+                    <a href="{{ $purchaseOrder ? route('purchase-orders.show', $purchaseOrder) : route('purchase-orders.index') }}" class="text-sm text-ink-500 dark:text-ink-400 hover:text-ink-700 dark:hover:text-ink-200">{{ __('common.cancel') }}</a>
                 </div>
             </form>
         </x-ui.card>

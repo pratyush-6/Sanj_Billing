@@ -36,7 +36,7 @@
                     'Converted' => 'brand',
                     'Cancelled' => 'danger',
                     default => 'neutral',
-                }" class="text-sm">{{ $order->status }}</x-ui.badge>
+                }" class="text-sm">{{ enum_label($order->status) }}</x-ui.badge>
             </div>
 
             @if ($order->notes)
@@ -47,7 +47,7 @@
                 <div class="flex flex-wrap items-center gap-3 mt-6 border-t border-ink-100 dark:border-ink-800 pt-4">
                     @if ($order->status === 'Draft')
                         <a href="{{ route('sale-orders.edit', $order) }}">
-                            <x-secondary-button>Edit</x-secondary-button>
+                            <x-secondary-button>{{ __('common.edit') }}</x-secondary-button>
                         </a>
                         <form method="POST" action="{{ route('sale-orders.confirm', $order) }}">
                             @csrf
@@ -57,7 +57,7 @@
                     @if (in_array($order->status, ['Draft', 'Confirmed']))
                         <form method="POST" action="{{ route('sale-orders.cancel', $order) }}" onsubmit="return confirm('Cancel this sale order?');">
                             @csrf
-                            <x-danger-button type="submit">Cancel</x-danger-button>
+                            <x-danger-button type="submit">{{ __('common.cancel') }}</x-danger-button>
                         </form>
                     @endif
                 </div>
@@ -72,11 +72,11 @@
                 <table class="min-w-full divide-y divide-ink-100 dark:divide-ink-800">
                     <thead>
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Product</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Qty</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Unit Price</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Amount</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Notes</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.product') }}</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.qty') }}</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.unit_price') }}</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.amount') }}</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.notes') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
@@ -92,7 +92,7 @@
                     </tbody>
                     <tfoot>
                         <tr class="border-t border-ink-200 dark:border-ink-700">
-                            <td colspan="3" class="px-4 py-3 text-right text-sm font-semibold text-ink-800 dark:text-ink-100">Total</td>
+                            <td colspan="3" class="px-4 py-3 text-right text-sm font-semibold text-ink-800 dark:text-ink-100">{{ __('common.total') }}</td>
                             <td class="px-4 py-3 text-right text-sm font-semibold text-ink-900 dark:text-ink-50">{{ number_format($order->totalAmount(), 2) }}</td>
                             <td></td>
                         </tr>

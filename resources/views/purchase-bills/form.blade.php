@@ -12,7 +12,7 @@
             <x-ui.card>
                 <form method="GET" action="{{ route('purchase-bills.create') }}" class="flex flex-wrap items-end gap-3">
                     <div class="flex-1 min-w-[280px]">
-                        <x-input-label for="purchase_order_id" value="Select a submitted Purchase Order to bill *" />
+                        <x-input-label for="purchase_order_id" :value="ui_label('Select a submitted Purchase Order to bill *')" />
                         <select id="purchase_order_id" name="purchase_order_id" onchange="this.form.submit()" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
                             <option value="">Select a purchase order</option>
                             @foreach ($eligiblePurchaseOrders as $po)
@@ -46,17 +46,17 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
                         <div>
-                            <x-input-label for="bill_date" value="Bill Date *" />
+                            <x-input-label for="bill_date" :value="ui_label('Bill Date *')" />
                             <x-text-input id="bill_date" name="bill_date" type="date" class="mt-1 block w-full" :value="old('bill_date', $bill?->bill_date?->format('Y-m-d') ?? date('Y-m-d'))" required />
                             <x-input-error :messages="$errors->get('bill_date')" class="mt-2" />
                         </div>
                         <div>
-                            <x-input-label for="due_date" value="Due Date" />
+                            <x-input-label for="due_date" :value="ui_label('Due Date')" />
                             <x-text-input id="due_date" name="due_date" type="date" class="mt-1 block w-full" :value="old('due_date', $bill?->due_date?->format('Y-m-d'))" />
                             <x-input-error :messages="$errors->get('due_date')" class="mt-2" />
                         </div>
                         <div>
-                            <x-input-label for="tds_section_id" value="TDS Section" />
+                            <x-input-label for="tds_section_id" :value="ui_label('TDS Section')" />
                             <select id="tds_section_id" name="tds_section_id" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
                                 <option value="">None</option>
                                 @foreach ($tdsSections as $tdsSection)
@@ -72,9 +72,9 @@
                             <table class="min-w-full divide-y divide-ink-100 dark:divide-ink-800">
                                 <thead>
                                     <tr>
-                                        <th class="px-6 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Product</th>
-                                        <th class="px-3 py-2 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Qty</th>
-                                        <th class="px-3 py-2 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Unit Price</th>
+                                        <th class="px-6 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.product') }}</th>
+                                        <th class="px-3 py-2 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.qty') }}</th>
+                                        <th class="px-3 py-2 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.unit_price') }}</th>
                                         <th class="px-3 py-2 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Taxable Amount</th>
                                     </tr>
                                 </thead>
@@ -107,13 +107,13 @@
                     </x-ui.section>
 
                     <div>
-                        <x-input-label for="notes" value="Notes" />
+                        <x-input-label for="notes" :value="ui_label('Notes')" />
                         <textarea id="notes" name="notes" rows="2" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">{{ old('notes', $bill?->notes) }}</textarea>
                     </div>
 
                     <div class="flex items-center gap-4 border-t border-ink-100 dark:border-ink-800 pt-6">
                         <x-primary-button>{{ $bill ? __('Update Bill') : __('Save as Draft') }}</x-primary-button>
-                        <a href="{{ $bill ? route('purchase-bills.show', $bill) : route('purchase-bills.index') }}" class="text-sm text-ink-500 dark:text-ink-400 hover:text-ink-700 dark:hover:text-ink-200">Cancel</a>
+                        <a href="{{ $bill ? route('purchase-bills.show', $bill) : route('purchase-bills.index') }}" class="text-sm text-ink-500 dark:text-ink-400 hover:text-ink-700 dark:hover:text-ink-200">{{ __('common.cancel') }}</a>
                     </div>
                 </form>
             </x-ui.card>

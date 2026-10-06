@@ -7,11 +7,11 @@
         <x-ui.card>
             <form method="GET" class="flex flex-wrap gap-4 items-end">
                 <div>
-                    <label class="block text-xs font-medium text-ink-500 dark:text-ink-400 uppercase mb-1">Module</label>
+                    <label class="block text-xs font-medium text-ink-500 dark:text-ink-400 uppercase mb-1">{{ ui_label('Module') }}</label>
                     <select name="module" class="bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
                         <option value="">All</option>
                         @foreach ($modules as $module)
-                            <option value="{{ $module }}" @selected(request('module') === $module)>{{ $module }}</option>
+                            <option value="{{ $module }}" @selected(request('module') === $module)>{{ enum_label($module) }}</option>
                         @endforeach
                     </select>
                 </div>

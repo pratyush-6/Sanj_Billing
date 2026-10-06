@@ -8,6 +8,7 @@ use App\Http\Controllers\Accounting\ProfitLossController;
 use App\Http\Controllers\Accounting\TrialBalanceController;
 use App\Http\Controllers\Calendar\CalendarController;
 use App\Http\Controllers\Company\BranchController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\Company\CompanyController;
 use App\Http\Controllers\Company\FinancialYearController;
 use App\Http\Controllers\DashboardController;
@@ -57,6 +58,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::post('/companies/{company}/switch', [CompanyController::class, 'switch'])->name('companies.switch');
+    Route::post('/locale/{locale}', [LocaleController::class, 'update'])->name('locale.update');
     Route::post('/branches/all/switch', [BranchController::class, 'switchAll'])->name('branches.switch-all');
     Route::post('/branches/{branch}/switch', [BranchController::class, 'switch'])->name('branches.switch');
 

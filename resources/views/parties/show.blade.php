@@ -20,7 +20,7 @@
         <x-ui.card>
             <div class="flex items-center gap-1.5 mb-4">
                 @if ($party->is_vendor)
-                    <x-ui.badge variant="info">Vendor</x-ui.badge>
+                    <x-ui.badge variant="info">{{ __('common.vendor') }}</x-ui.badge>
                 @endif
                 @if ($party->is_customer)
                     <x-ui.badge variant="brand">Customer</x-ui.badge>
@@ -44,12 +44,12 @@
                     <table class="min-w-full divide-y divide-ink-100 dark:divide-ink-800">
                         <thead class="bg-ink-50/80 dark:bg-ink-800/80">
                             <tr>
-                                <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Product</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.product') }}</th>
                                 <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Vendor SKU</th>
                                 <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Price</th>
                                 <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Lead Time (days)</th>
                                 <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Preferred</th>
-                                <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Actions</th>
+                                <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
@@ -69,7 +69,7 @@
                                         <input form="vp-form-{{ $vendorProduct->id }}" type="checkbox" name="is_preferred" value="1" @checked($vendorProduct->is_preferred) class="rounded bg-white dark:bg-ink-800 border-ink-300 dark:border-ink-600 text-brand-600 dark:text-brand-400 focus:ring-brand-500">
                                     </td>
                                     <td class="px-4 py-3.5 text-right text-sm whitespace-nowrap">
-                                        <button form="vp-form-{{ $vendorProduct->id }}" type="submit" class="text-brand-600 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 font-medium">Save</button>
+                                        <button form="vp-form-{{ $vendorProduct->id }}" type="submit" class="text-brand-600 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 font-medium">{{ __('common.save') }}</button>
                                         <form method="POST" action="{{ route('parties.products.destroy', [$party, $vendorProduct]) }}" class="inline" onsubmit="return confirm('Remove this product pricing?');">
                                             @csrf
                                             @method('DELETE')
@@ -94,7 +94,7 @@
                         <form method="POST" action="{{ route('parties.products.store', $party) }}" class="flex flex-wrap items-end gap-3 px-4 py-4 border-t border-ink-100 dark:border-ink-800">
                             @csrf
                             <div>
-                                <x-input-label value="Add Product" class="!mb-1" />
+                                <x-input-label :value="ui_label('Add Product')" class="!mb-1" />
                                 <select name="product_id" class="bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500" required>
                                     <option value="">Select product</option>
                                     @foreach ($availableProducts as $product)
@@ -103,15 +103,15 @@
                                 </select>
                             </div>
                             <div>
-                                <x-input-label value="Price" class="!mb-1" />
+                                <x-input-label :value="ui_label('Price')" class="!mb-1" />
                                 <input type="number" step="0.01" min="0" name="price" class="w-28 bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500" required>
                             </div>
                             <div>
-                                <x-input-label value="Vendor SKU" class="!mb-1" />
+                                <x-input-label :value="ui_label('Vendor SKU')" class="!mb-1" />
                                 <input type="text" name="vendor_sku" class="w-32 bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                             </div>
                             <div>
-                                <x-input-label value="Lead Time (days)" class="!mb-1" />
+                                <x-input-label :value="ui_label('Lead Time (days)')" class="!mb-1" />
                                 <input type="number" min="0" name="lead_time_days" class="w-24 bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                             </div>
                             <x-secondary-button type="submit">Add</x-secondary-button>
@@ -130,10 +130,10 @@
                     <thead class="bg-ink-50/80 dark:bg-ink-800/80">
                         <tr>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Expense #</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Date</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.date') }}</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Category</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Amount</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Status</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.amount') }}</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.status') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
@@ -144,7 +144,7 @@
                                 <td class="px-4 py-3.5 text-sm text-ink-600 dark:text-ink-300">{{ $expense->category->name }}</td>
                                 <td class="px-4 py-3.5 text-sm text-right font-medium text-ink-900 dark:text-ink-50">{{ number_format($expense->total_amount, 2) }}</td>
                                 <td class="px-4 py-3.5 text-sm">
-                                    <x-ui.badge :variant="match($expense->status) { 'Approved' => 'success', 'Draft' => 'warning', 'Cancelled' => 'danger', default => 'neutral' }">{{ $expense->status }}</x-ui.badge>
+                                    <x-ui.badge :variant="match($expense->status) { 'Approved' => 'success', 'Draft' => 'warning', 'Cancelled' => 'danger', default => 'neutral' }">{{ enum_label($expense->status) }}</x-ui.badge>
                                 </td>
                             </tr>
                         @empty

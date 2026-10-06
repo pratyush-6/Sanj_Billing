@@ -27,13 +27,13 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
                     <div>
-                        <x-input-label value="From branch" />
+                        <x-input-label :value="ui_label('From branch')" />
                         <div class="mt-1 text-sm font-medium text-ink-900 dark:text-ink-50">{{ $from?->name }}</div>
                         <p class="text-xs text-ink-400 dark:text-ink-500 mt-1">The branch selected at the top of the page.</p>
                     </div>
 
                     <div>
-                        <x-input-label for="to_branch_id" value="To branch *" />
+                        <x-input-label for="to_branch_id" :value="ui_label('To branch *')" />
                         <select id="to_branch_id" name="to_branch_id" required class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
                             <option value="">Select</option>
                             @foreach ($destinations as $destination)
@@ -44,20 +44,20 @@
                     </div>
 
                     <div>
-                        <x-input-label for="transfer_date" value="Transfer date *" />
+                        <x-input-label for="transfer_date" :value="ui_label('Transfer date *')" />
                         <x-text-input id="transfer_date" name="transfer_date" type="date" class="mt-1 block w-full" :value="old('transfer_date', date('Y-m-d'))" required />
                         <x-input-error :messages="$errors->get('transfer_date')" class="mt-2" />
                     </div>
                 </div>
 
                 <div>
-                    <x-input-label value="Products" />
+                    <x-input-label :value="ui_label('Products')" />
                     <div class="mt-2 overflow-x-auto">
                         <table class="w-full min-w-[32rem] divide-y divide-ink-100 dark:divide-ink-800">
                             <thead>
                                 <tr>
-                                    <th class="px-2 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[16rem]">Product</th>
-                                    <th class="px-2 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[9rem]">Quantity</th>
+                                    <th class="px-2 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[16rem]">{{ __('common.product') }}</th>
+                                    <th class="px-2 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[9rem]">{{ __('common.quantity') }}</th>
                                     <th class="px-2 py-2 w-10"></th>
                                 </tr>
                             </thead>
@@ -88,13 +88,13 @@
                 </div>
 
                 <div>
-                    <x-input-label for="notes" value="Notes" />
+                    <x-input-label for="notes" :value="ui_label('Notes')" />
                     <textarea id="notes" name="notes" rows="2" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">{{ old('notes') }}</textarea>
                 </div>
 
                 <div class="flex items-center gap-4 border-t border-ink-100 dark:border-ink-800 pt-6">
                     <x-primary-button :disabled="$destinations->isEmpty()">Complete Transfer</x-primary-button>
-                    <a href="{{ route('stock-transfers.index') }}" class="text-sm text-ink-500 dark:text-ink-400 hover:text-ink-700 dark:hover:text-ink-200">Cancel</a>
+                    <a href="{{ route('stock-transfers.index') }}" class="text-sm text-ink-500 dark:text-ink-400 hover:text-ink-700 dark:hover:text-ink-200">{{ __('common.cancel') }}</a>
                 </div>
             </form>
         </x-ui.card>

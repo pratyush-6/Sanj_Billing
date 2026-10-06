@@ -1,18 +1,18 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
     <div>
-        <x-input-label for="name" value="Category Name *" />
+        <x-input-label for="name" :value="ui_label('Category Name *')" />
         <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $category?->name)" required />
         <x-input-error :messages="$errors->get('name')" class="mt-2" />
     </div>
 
     <div>
-        <x-input-label for="code" value="Category Code" />
+        <x-input-label for="code" :value="ui_label('Category Code')" />
         <x-text-input id="code" name="code" type="text" class="mt-1 block w-full" :value="old('code', $category?->code)" />
         <x-input-error :messages="$errors->get('code')" class="mt-2" />
     </div>
 
     <div>
-        <x-input-label for="expense_nature" value="Expense Nature" />
+        <x-input-label for="expense_nature" :value="ui_label('Expense Nature')" />
         <select id="expense_nature" name="expense_nature" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
             <option value="">Select</option>
             @foreach ($natureOptions as $option)
@@ -23,7 +23,7 @@
     </div>
 
     <div>
-        <x-input-label for="status" value="Status *" />
+        <x-input-label for="status" :value="ui_label('Status *')" />
         <select id="status" name="status" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
             <option value="active" @selected(old('status', $category?->status ?? 'active') === 'active')>Active</option>
             <option value="inactive" @selected(old('status', $category?->status) === 'inactive')>Inactive</option>
@@ -32,7 +32,7 @@
     </div>
 
     <div class="sm:col-span-2">
-        <x-input-label for="description" value="Description" />
+        <x-input-label for="description" :value="ui_label('Description')" />
         <textarea id="description" name="description" rows="2" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">{{ old('description', $category?->description) }}</textarea>
         <x-input-error :messages="$errors->get('description')" class="mt-2" />
     </div>
@@ -40,6 +40,6 @@
     <div class="flex items-center gap-2">
         <input type="hidden" name="tax_applicable" value="0">
         <input type="checkbox" id="tax_applicable" name="tax_applicable" value="1" class="rounded bg-white dark:bg-ink-800 border-ink-300 dark:border-ink-600 text-brand-600 dark:text-brand-400 focus:ring-brand-500" @checked(old('tax_applicable', $category?->tax_applicable))>
-        <x-input-label for="tax_applicable" value="Tax applicable by default" class="!mb-0" />
+        <x-input-label for="tax_applicable" :value="ui_label('Tax applicable by default')" class="!mb-0" />
     </div>
 </div>

@@ -7,7 +7,7 @@
         <x-ui.card>
             <form method="GET" class="grid grid-cols-2 sm:grid-cols-4 gap-3 items-end text-sm">
                 <div>
-                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">Product</label>
+                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ __('common.product') }}</label>
                     <select name="product_id" onchange="this.form.submit()" class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                         <option value="">All</option>
                         @foreach ($products as $product)
@@ -16,11 +16,11 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">From</label>
+                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ ui_label('From') }}</label>
                     <input type="date" name="date_from" value="{{ request('date_from') }}" class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                 </div>
                 <div>
-                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">To</label>
+                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ ui_label('To') }}</label>
                     <input type="date" name="date_to" value="{{ request('date_to') }}" class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                 </div>
                 <div>
@@ -34,12 +34,12 @@
                 <table class="min-w-full divide-y divide-ink-100 dark:divide-ink-800">
                     <thead class="bg-ink-50/80 dark:bg-ink-800/80">
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Date</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Product</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.date') }}</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.product') }}</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Direction</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Qty</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.qty') }}</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Reference</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Notes</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.notes') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
@@ -48,7 +48,7 @@
                                 <td class="px-4 py-3.5 text-sm text-ink-600 dark:text-ink-300">{{ $movement->movement_date->format('d-M-Y') }}</td>
                                 <td class="px-4 py-3.5 text-sm text-ink-700 dark:text-ink-200">{{ $movement->product->name }}</td>
                                 <td class="px-4 py-3.5 text-sm">
-                                    <x-ui.badge :variant="$movement->direction === 'In' ? 'success' : 'warning'">{{ $movement->direction }}</x-ui.badge>
+                                    <x-ui.badge :variant="$movement->direction === 'In' ? 'success' : 'warning'">{{ enum_label($movement->direction) }}</x-ui.badge>
                                 </td>
                                 <td class="px-4 py-3.5 text-sm text-right text-ink-700 dark:text-ink-200 font-medium">{{ number_format($movement->quantity, 2) }}</td>
                                 <td class="px-4 py-3.5 text-sm">

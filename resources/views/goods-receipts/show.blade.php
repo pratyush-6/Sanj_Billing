@@ -25,7 +25,7 @@
                         </div>
                     </div>
                     <div>
-                        <div class="text-xs text-ink-400 dark:text-ink-500 uppercase tracking-wide">Vendor</div>
+                        <div class="text-xs text-ink-400 dark:text-ink-500 uppercase tracking-wide">{{ __('common.vendor') }}</div>
                         <div class="text-sm font-medium text-ink-900 dark:text-ink-50 mt-1">{{ $goodsReceipt->purchaseOrder->vendor->name }}</div>
                     </div>
                     <div>
@@ -37,7 +37,7 @@
                         <div class="text-sm font-medium text-ink-900 dark:text-ink-50 mt-1">{{ $goodsReceipt->creator?->name ?? '—' }}</div>
                     </div>
                 </div>
-                <x-ui.badge :variant="$goodsReceipt->status === 'Completed' ? 'success' : 'neutral'" class="text-sm">{{ $goodsReceipt->status }}</x-ui.badge>
+                <x-ui.badge :variant="$goodsReceipt->status === 'Completed' ? 'success' : 'neutral'" class="text-sm">{{ enum_label($goodsReceipt->status) }}</x-ui.badge>
             </div>
 
             @if ($goodsReceipt->notes)
@@ -49,7 +49,7 @@
             @if ($goodsReceipt->purchaseBill)
                 <div class="border-t border-ink-100 dark:border-ink-800 mt-4 pt-4">
                     <div class="text-xs text-ink-400 dark:text-ink-500 uppercase tracking-wide mb-1">Purchase Bill</div>
-                    <a href="{{ route('purchase-bills.show', $goodsReceipt->purchaseBill) }}" class="text-sm text-brand-600 dark:text-brand-400 hover:underline">{{ $goodsReceipt->purchaseBill->bill_number }} ({{ $goodsReceipt->purchaseBill->status }})</a>
+                    <a href="{{ route('purchase-bills.show', $goodsReceipt->purchaseBill) }}" class="text-sm text-brand-600 dark:text-brand-400 hover:underline">{{ $goodsReceipt->purchaseBill->bill_number }} ({{ enum_label($goodsReceipt->purchaseBill->status) }})</a>
                 </div>
             @endif
         </x-ui.card>
@@ -62,9 +62,9 @@
                 <table class="min-w-full divide-y divide-ink-100 dark:divide-ink-800">
                     <thead>
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Product</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.product') }}</th>
                             <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Qty Received</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Notes</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.notes') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-ink-100 dark:divide-ink-800">

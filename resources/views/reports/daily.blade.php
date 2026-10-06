@@ -7,7 +7,7 @@
         <x-ui.card>
             <form method="GET" class="flex items-end gap-3 text-sm">
                 <div>
-                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">Date</label>
+                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ __('common.date') }}</label>
                     <input type="date" name="date" value="{{ $date }}" class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                 </div>
                 <x-secondary-button type="submit">View</x-secondary-button>
@@ -42,9 +42,9 @@
                             <tr>
                                 <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Expense #</th>
                                 <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Category</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Vendor</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.vendor') }}</th>
                                 <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Payment</th>
-                                <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Amount</th>
+                                <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.amount') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-ink-100 dark:divide-ink-800">

@@ -3,7 +3,7 @@
         <x-ui.page-header :title="'Sale Invoice '.$invoice->invoice_number">
             <x-slot name="actions">
                 <a href="{{ route('sale-invoices.print', $invoice) }}" target="_blank">
-                    <x-secondary-button>Print</x-secondary-button>
+                    <x-secondary-button>{{ __('common.print') }}</x-secondary-button>
                 </a>
                 <a href="{{ route('sale-invoices.index') }}" class="text-sm text-ink-500 dark:text-ink-400 hover:text-ink-700 dark:hover:text-ink-200">&larr; Back to Sale Invoices</a>
             </x-slot>
@@ -50,7 +50,7 @@
                         <div class="text-sm font-medium text-ink-900 dark:text-ink-50 mt-1">{{ $invoice->creator?->name ?? '—' }}</div>
                     </div>
                 </div>
-                <x-ui.badge :variant="match($invoice->status) { 'Posted' => 'success', 'Cancelled' => 'danger', default => 'neutral' }" class="text-sm">{{ $invoice->status }}</x-ui.badge>
+                <x-ui.badge :variant="match($invoice->status) { 'Posted' => 'success', 'Cancelled' => 'danger', default => 'neutral' }" class="text-sm">{{ enum_label($invoice->status) }}</x-ui.badge>
             </div>
 
             @if ($invoice->notes)
@@ -61,7 +61,7 @@
                 <div class="flex flex-wrap items-center gap-3 mt-6 border-t border-ink-100 dark:border-ink-800 pt-4">
                     @if ($invoice->status === 'Draft')
                         <a href="{{ route('sale-invoices.edit', $invoice) }}">
-                            <x-secondary-button>Edit</x-secondary-button>
+                            <x-secondary-button>{{ __('common.edit') }}</x-secondary-button>
                         </a>
                         <form method="POST" action="{{ route('sale-invoices.post', $invoice) }}" onsubmit="return confirm('Post this invoice? It will affect your accounts and cannot be edited afterwards.');">
                             @csrf
@@ -75,7 +75,7 @@
                         </form>
                         <form method="POST" action="{{ route('sale-invoices.cancel', $invoice) }}" onsubmit="return confirm('Cancel this sale invoice?');">
                             @csrf
-                            <x-danger-button type="submit">Cancel</x-danger-button>
+                            <x-danger-button type="submit">{{ __('common.cancel') }}</x-danger-button>
                         </form>
                     @endif
                 </div>
@@ -90,15 +90,15 @@
                 <table class="min-w-full divide-y divide-ink-100 dark:divide-ink-800">
                     <thead>
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Product</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.product') }}</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">HSN</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Qty</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.qty') }}</th>
                             <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Rate</th>
                             <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Taxable</th>
                             <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">CGST</th>
                             <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">SGST</th>
                             <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">IGST</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Amount</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.amount') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
@@ -140,7 +140,7 @@
                             </tr>
                         @endif
                         <tr class="border-t border-ink-200 dark:border-ink-700">
-                            <td colspan="4" class="px-4 py-3 text-right text-sm font-semibold text-ink-800 dark:text-ink-100">Total</td>
+                            <td colspan="4" class="px-4 py-3 text-right text-sm font-semibold text-ink-800 dark:text-ink-100">{{ __('common.total') }}</td>
                             <td colspan="5" class="px-4 py-3 text-right text-sm font-semibold text-ink-900 dark:text-ink-50">{{ number_format($invoice->total_amount, 2) }}</td>
                         </tr>
                         <tr>
@@ -165,11 +165,11 @@
                     <thead>
                         <tr>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Payment #</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Date</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Amount</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Status</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.date') }}</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.amount') }}</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.status') }}</th>
                             @can('sale-invoices.manage')
-                                <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Actions</th>
+                                <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.actions') }}</th>
                             @endcan
                         </tr>
                     </thead>
@@ -180,14 +180,14 @@
                                 <td class="px-4 py-3.5 text-sm text-ink-600 dark:text-ink-300">{{ $payment->payment_date->format('d-M-Y') }}</td>
                                 <td class="px-4 py-3.5 text-sm text-right text-ink-700 dark:text-ink-200">{{ number_format($payment->amount, 2) }}</td>
                                 <td class="px-4 py-3.5 text-sm">
-                                    <x-ui.badge :variant="$payment->status === 'Posted' ? 'success' : 'danger'">{{ $payment->status }}</x-ui.badge>
+                                    <x-ui.badge :variant="$payment->status === 'Posted' ? 'success' : 'danger'">{{ enum_label($payment->status) }}</x-ui.badge>
                                 </td>
                                 @can('sale-invoices.manage')
                                     <td class="px-4 py-3.5 text-right text-sm">
                                         @if ($payment->status === 'Posted')
                                             <form method="POST" action="{{ route('sale-invoices.payments.cancel', [$invoice, $payment]) }}" onsubmit="return confirm('Cancel this payment?');">
                                                 @csrf
-                                                <button type="submit" class="text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 font-medium">Cancel</button>
+                                                <button type="submit" class="text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 font-medium">{{ __('common.cancel') }}</button>
                                             </form>
                                         @endif
                                     </td>
@@ -204,15 +204,15 @@
                         <form method="POST" action="{{ route('sale-invoices.payments.store', $invoice) }}" class="flex flex-wrap items-end gap-3 px-4 py-4 border-t border-ink-100 dark:border-ink-800">
                             @csrf
                             <div>
-                                <x-input-label value="Amount *" class="!mb-1" />
+                                <x-input-label :value="ui_label('Amount *')" class="!mb-1" />
                                 <input type="number" step="0.01" min="0.01" max="{{ $invoice->amountDue() }}" name="amount" value="{{ $invoice->amountDue() }}" class="w-32 bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500" required>
                             </div>
                             <div>
-                                <x-input-label value="Date *" class="!mb-1" />
+                                <x-input-label :value="ui_label('Date *')" class="!mb-1" />
                                 <input type="date" name="payment_date" value="{{ date('Y-m-d') }}" class="bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500" required>
                             </div>
                             <div>
-                                <x-input-label value="Bank / Cash Account *" class="!mb-1" />
+                                <x-input-label :value="ui_label('Bank / Cash Account *')" class="!mb-1" />
                                 <select name="bank_account_id" class="bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500" required>
                                     <option value="">Select</option>
                                     @foreach ($bankAccounts as $bankAccount)
@@ -221,7 +221,7 @@
                                 </select>
                             </div>
                             <div>
-                                <x-input-label value="Payment Method *" class="!mb-1" />
+                                <x-input-label :value="ui_label('Payment Method *')" class="!mb-1" />
                                 <select name="payment_method_id" class="bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500" required>
                                     <option value="">Select</option>
                                     @foreach ($paymentMethods as $paymentMethod)
@@ -230,7 +230,7 @@
                                 </select>
                             </div>
                             <div>
-                                <x-input-label value="Reference #" class="!mb-1" />
+                                <x-input-label :value="ui_label('Reference #')" class="!mb-1" />
                                 <input type="text" name="reference_number" class="w-32 bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                             </div>
                             <x-secondary-button type="submit">Record Payment</x-secondary-button>

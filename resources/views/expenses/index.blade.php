@@ -25,15 +25,15 @@
         <x-ui.card>
             <form method="GET" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 items-end text-sm">
                 <div>
-                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">From</label>
+                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ ui_label('From') }}</label>
                     <input type="date" name="date_from" value="{{ request('date_from') }}" class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                 </div>
                 <div>
-                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">To</label>
+                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ ui_label('To') }}</label>
                     <input type="date" name="date_to" value="{{ request('date_to') }}" class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                 </div>
                 <div>
-                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">Category</label>
+                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ ui_label('Category') }}</label>
                     <select name="expense_category_id" class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                         <option value="">All</option>
                         @foreach ($categories as $category)
@@ -42,7 +42,7 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">Vendor</label>
+                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ __('common.vendor') }}</label>
                     <select name="vendor_id" class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                         <option value="">All</option>
                         @foreach ($vendors as $vendor)
@@ -51,7 +51,7 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">Payment Mode</label>
+                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ ui_label('Payment Mode') }}</label>
                     <select name="payment_method_id" class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                         <option value="">All</option>
                         @foreach ($paymentMethods as $method)
@@ -60,7 +60,7 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">Account</label>
+                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ ui_label('Account') }}</label>
                     <select name="bank_account_id" class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                         <option value="">All</option>
                         @foreach ($bankAccounts as $account)
@@ -69,11 +69,11 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">Status</label>
+                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ __('common.status') }}</label>
                     <select name="status" class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                         <option value="">All</option>
                         @foreach (config('expense.statuses') as $status)
-                            <option value="{{ $status }}" @selected(request('status') === $status)>{{ $status }}</option>
+                            <option value="{{ enum_label($status) }}" @selected(request('status') === $status)>{{ enum_label($status) }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -90,14 +90,14 @@
                     <thead class="bg-ink-50/80 dark:bg-ink-800/80">
                         <tr>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Expense #</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Date</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.date') }}</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Category</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Vendor</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.vendor') }}</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Payment</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Amount</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.amount') }}</th>
                             <th class="px-4 py-3 text-center text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Bill</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Status</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Actions</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.status') }}</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
@@ -117,15 +117,15 @@
                                     @endif
                                 </td>
                                 <td class="px-4 py-3.5 text-sm">
-                                    <x-ui.badge :variant="match($expense->status) { 'Approved' => 'success', 'Draft' => 'warning', 'Cancelled' => 'danger', default => 'neutral' }">{{ $expense->status }}</x-ui.badge>
+                                    <x-ui.badge :variant="match($expense->status) { 'Approved' => 'success', 'Draft' => 'warning', 'Cancelled' => 'danger', default => 'neutral' }">{{ enum_label($expense->status) }}</x-ui.badge>
                                 </td>
                                 <td class="px-4 py-3.5 text-right text-sm whitespace-nowrap">
                                     @can('expenses.manage')
                                         @if ($expense->status !== 'Cancelled')
-                                            <a href="{{ route('expenses.edit', $expense) }}" class="text-brand-600 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 font-medium">Edit</a>
+                                            <a href="{{ route('expenses.edit', $expense) }}" class="text-brand-600 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 font-medium">{{ __('common.edit') }}</a>
                                             <form method="POST" action="{{ route('expenses.cancel', $expense) }}" class="inline" onsubmit="return confirm('Cancel this expense?');">
                                                 @csrf
-                                                <button class="text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 font-medium ml-2">Cancel</button>
+                                                <button class="text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 font-medium ml-2">{{ __('common.cancel') }}</button>
                                             </form>
                                         @endif
                                     @endcan

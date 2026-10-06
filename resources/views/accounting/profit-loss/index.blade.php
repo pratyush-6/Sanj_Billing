@@ -7,7 +7,7 @@
         <x-ui.card>
             <form method="GET" class="flex items-end gap-3 text-sm">
                 <div>
-                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">Financial Year</label>
+                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ ui_label('Financial Year') }}</label>
                     <select name="financial_year_id" class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                         @foreach ($financialYears as $fy)
                             <option value="{{ $fy->id }}" @selected(($financialYear?->id ?? request('financial_year_id')) == $fy->id)>{{ $fy->name }}</option>
@@ -50,7 +50,7 @@
                 <div class="divide-y divide-ink-100 dark:divide-ink-800">
                     @forelse ($data['expenses_by_nature'] as $nature => $amount)
                         <div class="flex items-center justify-between px-4 py-2.5 text-sm">
-                            <span class="text-ink-700 dark:text-ink-200">{{ $nature }}</span>
+                            <span class="text-ink-700 dark:text-ink-200">{{ enum_label($nature) }}</span>
                             <span class="font-medium text-ink-900 dark:text-ink-50">{{ number_format($amount, 2) }}</span>
                         </div>
                     @empty

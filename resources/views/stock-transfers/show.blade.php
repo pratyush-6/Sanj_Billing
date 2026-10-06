@@ -23,7 +23,7 @@
                     <div class="text-sm font-medium text-ink-900 dark:text-ink-50 mt-1">{{ $transfer->toBranch->name }}</div>
                 </div>
                 <div>
-                    <div class="text-xs text-ink-400 dark:text-ink-500 uppercase tracking-wide">Date</div>
+                    <div class="text-xs text-ink-400 dark:text-ink-500 uppercase tracking-wide">{{ __('common.date') }}</div>
                     <div class="text-sm font-medium text-ink-900 dark:text-ink-50 mt-1">{{ $transfer->transfer_date->format('d-M-Y') }}</div>
                 </div>
                 <div>
@@ -42,8 +42,8 @@
                 <table class="min-w-full divide-y divide-ink-100 dark:divide-ink-800">
                     <thead class="bg-ink-50/80 dark:bg-ink-800/80">
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Product</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Quantity</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.product') }}</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.quantity') }}</th>
                             <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Unit cost</th>
                             <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Value</th>
                         </tr>

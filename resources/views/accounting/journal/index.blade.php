@@ -7,7 +7,7 @@
         <x-ui.card>
             <form method="GET" class="flex items-end gap-3 text-sm">
                 <div>
-                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">Financial Year</label>
+                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ ui_label('Financial Year') }}</label>
                     <select name="financial_year_id" class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                         @foreach ($financialYears as $fy)
                             <option value="{{ $fy->id }}" @selected($selectedFinancialYearId == $fy->id)>{{ $fy->name }}</option>
@@ -24,10 +24,10 @@
                     <thead class="bg-ink-50/80 dark:bg-ink-800/80">
                         <tr>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Entry #</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Date</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.date') }}</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Narration</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Amount</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Status</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.amount') }}</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.status') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
@@ -38,7 +38,7 @@
                                 <td class="px-4 py-3.5 text-sm text-ink-700 dark:text-ink-200">{{ $entry->narration }}</td>
                                 <td class="px-4 py-3.5 text-sm text-right font-medium text-ink-900 dark:text-ink-50">{{ number_format($entry->items->sum('debit'), 2) }}</td>
                                 <td class="px-4 py-3.5 text-sm">
-                                    <x-ui.badge :variant="$entry->status === 'Posted' ? 'success' : 'neutral'">{{ $entry->status }}</x-ui.badge>
+                                    <x-ui.badge :variant="$entry->status === 'Posted' ? 'success' : 'neutral'">{{ enum_label($entry->status) }}</x-ui.badge>
                                 </td>
                             </tr>
                         @empty

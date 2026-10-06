@@ -51,13 +51,13 @@
                 <x-ui.section title="Details">
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
                         <div>
-                            <x-input-label for="expense_date" value="Expense Date *" />
+                            <x-input-label for="expense_date" :value="ui_label('Expense Date *')" />
                             <x-text-input id="expense_date" name="expense_date" type="date" class="mt-1 block w-full" :value="old('expense_date', $expense?->expense_date?->format('Y-m-d') ?? date('Y-m-d'))" required />
                             <x-input-error :messages="$errors->get('expense_date')" class="mt-2" />
                         </div>
 
                         <div>
-                            <x-input-label for="expense_category_id" value="Category *" />
+                            <x-input-label for="expense_category_id" :value="ui_label('Category *')" />
                             <select id="expense_category_id" name="expense_category_id" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
                                 <option value="">Select</option>
                                 @foreach ($categories as $category)
@@ -68,7 +68,7 @@
                         </div>
 
                         <div>
-                            <x-input-label for="expense_sub_category_id" value="Sub Category" />
+                            <x-input-label for="expense_sub_category_id" :value="ui_label('Sub Category')" />
                             <select id="expense_sub_category_id" name="expense_sub_category_id" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
                                 <option value="">None</option>
                                 @foreach ($categories as $category)
@@ -81,7 +81,7 @@
                         </div>
 
                         <div>
-                            <x-input-label for="vendor_id" value="Vendor" />
+                            <x-input-label for="vendor_id" :value="ui_label('Vendor')" />
                             <select id="vendor_id" name="vendor_id" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
                                 <option value="">None</option>
                                 @foreach ($vendors as $vendor)
@@ -92,7 +92,7 @@
                         </div>
 
                         <div>
-                            <x-input-label for="purchase_order_id" value="Purchase Order" />
+                            <x-input-label for="purchase_order_id" :value="ui_label('Purchase Order')" />
                             <select id="purchase_order_id" name="purchase_order_id" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
                                 <option value="">None</option>
                                 @foreach ($purchaseOrders as $po)
@@ -103,7 +103,7 @@
                         </div>
 
                         <div class="sm:col-span-2">
-                            <x-input-label for="description" value="Description" />
+                            <x-input-label for="description" :value="ui_label('Description')" />
                             <x-text-input id="description" name="description" type="text" class="mt-1 block w-full" :value="old('description', $expense?->description)" />
                             <x-input-error :messages="$errors->get('description')" class="mt-2" />
                         </div>
@@ -113,12 +113,12 @@
                 <x-ui.section title="Amount" description="Enter Quantity + Rate, or a fixed Taxable Amount.">
                     <div class="grid grid-cols-2 sm:grid-cols-5 gap-6">
                         <div>
-                            <x-input-label for="quantity" value="Quantity" />
+                            <x-input-label for="quantity" :value="ui_label('Quantity')" />
                             <x-text-input id="quantity" name="quantity" type="number" step="0.01" x-model="quantity" class="mt-1 block w-full" />
                             <x-input-error :messages="$errors->get('quantity')" class="mt-2" />
                         </div>
                         <div>
-                            <x-input-label for="unit_id" value="Unit" />
+                            <x-input-label for="unit_id" :value="ui_label('Unit')" />
                             <select id="unit_id" name="unit_id" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
                                 <option value="">—</option>
                                 @foreach ($units as $unit)
@@ -127,26 +127,26 @@
                             </select>
                         </div>
                         <div>
-                            <x-input-label for="rate" value="Rate" />
+                            <x-input-label for="rate" :value="ui_label('Rate')" />
                             <x-text-input id="rate" name="rate" type="number" step="0.01" x-model="rate" class="mt-1 block w-full" />
                             <x-input-error :messages="$errors->get('rate')" class="mt-2" />
                         </div>
                         <div>
-                            <x-input-label for="taxable_amount" value="Taxable Amount" />
+                            <x-input-label for="taxable_amount" :value="ui_label('Taxable Amount')" />
                             <x-text-input id="taxable_amount" name="taxable_amount" type="number" step="0.01" x-model="taxableAmount" class="mt-1 block w-full" />
                             <p class="text-xs text-ink-400 dark:text-ink-500 mt-1" x-show="quantity && rate">Auto: qty &times; rate</p>
                             <x-input-error :messages="$errors->get('taxable_amount')" class="mt-2" />
                         </div>
                         <div>
-                            <x-input-label for="discount" value="Discount" />
+                            <x-input-label for="discount" :value="ui_label('Discount')" />
                             <x-text-input id="discount" name="discount" type="number" step="0.01" x-model="discount" class="mt-1 block w-full" />
                         </div>
                         <div>
-                            <x-input-label for="gst_amount" value="GST Amount" />
+                            <x-input-label for="gst_amount" :value="ui_label('GST Amount')" />
                             <x-text-input id="gst_amount" name="gst_amount" type="number" step="0.01" x-model="gstAmount" class="mt-1 block w-full" />
                         </div>
                         <div>
-                            <x-input-label for="tds_amount" value="TDS Amount" />
+                            <x-input-label for="tds_amount" :value="ui_label('TDS Amount')" />
                             <x-text-input id="tds_amount" name="tds_amount" type="number" step="0.01" :value="old('tds_amount', $expense?->tds_amount)" class="mt-1 block w-full" />
                         </div>
                         <div class="flex flex-col justify-end col-span-2 sm:col-span-1">
@@ -159,21 +159,21 @@
                 <x-ui.section title="Business / Personal">
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
                         <div>
-                            <x-input-label for="nature_of_use" value="Nature of Use *" />
+                            <x-input-label for="nature_of_use" :value="ui_label('Nature of Use *')" />
                             <select id="nature_of_use" name="nature_of_use" x-model="natureOfUse" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
                                 @foreach ($natureOptions as $option)
-                                    <option value="{{ $option }}">{{ $option }}</option>
+                                    <option value="{{ $option }}">{{ enum_label($option) }}</option>
                                 @endforeach
                             </select>
                             <x-input-error :messages="$errors->get('nature_of_use')" class="mt-2" />
                         </div>
                         <div x-show="natureOfUse === 'Mixed'">
-                            <x-input-label for="business_amount" value="Business Portion" />
+                            <x-input-label for="business_amount" :value="ui_label('Business Portion')" />
                             <x-text-input id="business_amount" name="business_amount" type="number" step="0.01" :value="old('business_amount', $expense?->business_amount)" class="mt-1 block w-full" />
                             <x-input-error :messages="$errors->get('business_amount')" class="mt-2" />
                         </div>
                         <div x-show="natureOfUse === 'Mixed'">
-                            <x-input-label for="personal_amount" value="Personal Portion" />
+                            <x-input-label for="personal_amount" :value="ui_label('Personal Portion')" />
                             <x-text-input id="personal_amount" name="personal_amount" type="number" step="0.01" :value="old('personal_amount', $expense?->personal_amount)" class="mt-1 block w-full" />
                             <x-input-error :messages="$errors->get('personal_amount')" class="mt-2" />
                         </div>
@@ -183,7 +183,7 @@
                 <x-ui.section title="Payment">
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
                         <div>
-                            <x-input-label for="payment_method_id" value="Payment Mode *" />
+                            <x-input-label for="payment_method_id" :value="ui_label('Payment Mode *')" />
                             <select id="payment_method_id" name="payment_method_id" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
                                 <option value="">Select</option>
                                 @foreach ($paymentMethods as $method)
@@ -193,7 +193,7 @@
                             <x-input-error :messages="$errors->get('payment_method_id')" class="mt-2" />
                         </div>
                         <div>
-                            <x-input-label for="bank_account_id" value="Bank / Cash Account *" />
+                            <x-input-label for="bank_account_id" :value="ui_label('Bank / Cash Account *')" />
                             <select id="bank_account_id" name="bank_account_id" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
                                 <option value="">Select</option>
                                 @foreach ($bankAccounts as $account)
@@ -203,7 +203,7 @@
                             <x-input-error :messages="$errors->get('bank_account_id')" class="mt-2" />
                         </div>
                         <div>
-                            <x-input-label for="expense_nature" value="Expense Nature" />
+                            <x-input-label for="expense_nature" :value="ui_label('Expense Nature')" />
                             <select id="expense_nature" name="expense_nature" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
                                 <option value="">Select</option>
                                 @foreach ($expenseNatureOptions as $option)
@@ -217,17 +217,17 @@
                 <x-ui.section title="Invoice / Bill">
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
                         <div>
-                            <x-input-label for="invoice_number" value="Invoice Number" />
+                            <x-input-label for="invoice_number" :value="ui_label('Invoice Number')" />
                             <x-text-input id="invoice_number" name="invoice_number" type="text" class="mt-1 block w-full" :value="old('invoice_number', $expense?->invoice_number)" />
                             <x-input-error :messages="$errors->get('invoice_number')" class="mt-2" />
                         </div>
                         <div>
-                            <x-input-label for="invoice_date" value="Invoice Date" />
+                            <x-input-label for="invoice_date" :value="ui_label('Invoice Date')" />
                             <x-text-input id="invoice_date" name="invoice_date" type="date" class="mt-1 block w-full" :value="old('invoice_date', $expense?->invoice_date?->format('Y-m-d'))" />
                             <x-input-error :messages="$errors->get('invoice_date')" class="mt-2" />
                         </div>
                         <div>
-                            <x-input-label for="attachments" value="Attach Bill(s)" />
+                            <x-input-label for="attachments" :value="ui_label('Attach Bill(s)')" />
                             <input id="attachments" name="attachments[]" type="file" multiple accept=".pdf,.jpg,.jpeg,.png" class="mt-1 block w-full text-sm text-ink-600 dark:text-ink-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-brand-50 file:text-brand-700 file:text-sm file:font-medium hover:file:bg-brand-100">
                             <x-input-error :messages="$errors->get('attachments')" class="mt-2" />
                         </div>
@@ -246,13 +246,13 @@
                 </x-ui.section>
 
                 <div>
-                    <x-input-label for="notes" value="Notes" />
+                    <x-input-label for="notes" :value="ui_label('Notes')" />
                     <textarea id="notes" name="notes" rows="2" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">{{ old('notes', $expense?->notes) }}</textarea>
                 </div>
 
                 <div class="flex items-center gap-4 border-t border-ink-100 dark:border-ink-800 pt-6">
                     <x-primary-button>{{ $expense ? __('Update Expense') : __('Save Expense') }}</x-primary-button>
-                    <a href="{{ route('expenses.index') }}" class="text-sm text-ink-500 dark:text-ink-400 hover:text-ink-700 dark:hover:text-ink-200">Cancel</a>
+                    <a href="{{ route('expenses.index') }}" class="text-sm text-ink-500 dark:text-ink-400 hover:text-ink-700 dark:hover:text-ink-200">{{ __('common.cancel') }}</a>
                 </div>
             </form>
         </x-ui.card>

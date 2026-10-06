@@ -25,11 +25,11 @@
         <x-ui.card>
             <form method="GET" class="grid grid-cols-2 sm:grid-cols-4 gap-3 items-end text-sm">
                 <div>
-                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">Status</label>
+                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ __('common.status') }}</label>
                     <select name="status" onchange="this.form.submit()" class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                         <option value="">All</option>
                         @foreach ($statuses as $status)
-                            <option value="{{ $status }}" @selected(request('status') === $status)>{{ $status }}</option>
+                            <option value="{{ enum_label($status) }}" @selected(request('status') === $status)>{{ enum_label($status) }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -43,11 +43,11 @@
                         <tr>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Invoice #</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Customer</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Date</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Total</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.date') }}</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.total') }}</th>
                             <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Due</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Status</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Actions</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.status') }}</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
@@ -61,7 +61,7 @@
                                 <td class="px-4 py-3.5 text-sm text-right text-ink-600 dark:text-ink-300">{{ number_format($invoice->total_amount, 2) }}</td>
                                 <td class="px-4 py-3.5 text-sm text-right {{ $invoice->amountDue() > 0 ? 'text-rose-600 dark:text-rose-400 font-medium' : 'text-ink-600 dark:text-ink-300' }}">{{ number_format($invoice->amountDue(), 2) }}</td>
                                 <td class="px-4 py-3.5 text-sm">
-                                    <x-ui.badge :variant="match($invoice->status) { 'Posted' => 'success', 'Cancelled' => 'danger', default => 'neutral' }">{{ $invoice->status }}</x-ui.badge>
+                                    <x-ui.badge :variant="match($invoice->status) { 'Posted' => 'success', 'Cancelled' => 'danger', default => 'neutral' }">{{ enum_label($invoice->status) }}</x-ui.badge>
                                 </td>
                                 <td class="px-4 py-3.5 text-right text-sm">
                                     <a href="{{ route('sale-invoices.show', $invoice) }}" class="text-brand-600 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 font-medium">View</a>

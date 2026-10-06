@@ -1,24 +1,24 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
     <div>
-        <x-input-label for="name" value="Name *" />
+        <x-input-label for="name" :value="ui_label('Name *')" />
         <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user?->name)" required />
         <x-input-error :messages="$errors->get('name')" class="mt-2" />
     </div>
 
     <div>
-        <x-input-label for="email" value="Email *" />
+        <x-input-label for="email" :value="ui_label('Email *')" />
         <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user?->email)" required />
         <x-input-error :messages="$errors->get('email')" class="mt-2" />
     </div>
 
     <div>
-        <x-input-label for="phone" value="Phone" />
+        <x-input-label for="phone" :value="ui_label('Phone')" />
         <x-text-input id="phone" name="phone" type="text" class="mt-1 block w-full" :value="old('phone', $user?->phone)" />
         <x-input-error :messages="$errors->get('phone')" class="mt-2" />
     </div>
 
     <div>
-        <x-input-label for="role" value="Role *" />
+        <x-input-label for="role" :value="ui_label('Role *')" />
         <select id="role" name="role" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
             <option value="">Select role</option>
             @foreach ($roles as $role)
@@ -29,7 +29,7 @@
     </div>
 
     <div>
-        <x-input-label for="status" value="Status *" />
+        <x-input-label for="status" :value="ui_label('Status *')" />
         <select id="status" name="status" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
             <option value="active" @selected(old('status', $user?->status ?? 'active') === 'active')>Active</option>
             <option value="inactive" @selected(old('status', $user?->status) === 'inactive')>Inactive</option>
@@ -44,13 +44,13 @@
     </div>
 
     <div>
-        <x-input-label for="password_confirmation" value="Confirm Password" />
+        <x-input-label for="password_confirmation" :value="ui_label('Confirm Password')" />
         <x-text-input id="password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" />
     </div>
 </div>
 
 <div class="mt-6 pt-6 border-t border-ink-100 dark:border-ink-800">
-    <x-input-label value="Company Access" />
+    <x-input-label :value="ui_label('Company Access')" />
     <p class="text-xs text-ink-400 dark:text-ink-500 mb-3">Which companies can this user see and work in. Super Admins automatically have access to every company.</p>
     <div class="space-y-2">
         @forelse ($companies as $company)

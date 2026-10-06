@@ -19,16 +19,16 @@
             <div class="flex flex-wrap items-start justify-between gap-4">
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-6 flex-1">
                     <div>
-                        <div class="text-xs text-ink-400 dark:text-ink-500 uppercase tracking-wide">Product</div>
+                        <div class="text-xs text-ink-400 dark:text-ink-500 uppercase tracking-wide">{{ __('common.product') }}</div>
                         <div class="text-sm font-medium text-ink-900 dark:text-ink-50 mt-1">{{ $adjustment->product->displayLabel() }}</div>
                     </div>
                     <div>
                         <div class="text-xs text-ink-400 dark:text-ink-500 uppercase tracking-wide">Type</div>
-                        <div class="text-sm font-medium text-ink-900 dark:text-ink-50 mt-1">{{ $adjustment->type }} by {{ number_format($adjustment->quantity, 2) }}</div>
+                        <div class="text-sm font-medium text-ink-900 dark:text-ink-50 mt-1">{{ enum_label($adjustment->type) }} by {{ number_format($adjustment->quantity, 2) }}</div>
                     </div>
                     <div>
-                        <div class="text-xs text-ink-400 dark:text-ink-500 uppercase tracking-wide">Reason</div>
-                        <div class="text-sm font-medium text-ink-900 dark:text-ink-50 mt-1">{{ $adjustment->reason }}</div>
+                        <div class="text-xs text-ink-400 dark:text-ink-500 uppercase tracking-wide">{{ __('common.reason') }}</div>
+                        <div class="text-sm font-medium text-ink-900 dark:text-ink-50 mt-1">{{ enum_label($adjustment->reason) }}</div>
                     </div>
                     <div>
                         <div class="text-xs text-ink-400 dark:text-ink-500 uppercase tracking-wide">Adjustment Date</div>
@@ -39,7 +39,7 @@
                         <div class="text-sm font-medium text-ink-900 dark:text-ink-50 mt-1">{{ $adjustment->creator?->name ?? '—' }}</div>
                     </div>
                 </div>
-                <x-ui.badge :variant="match($adjustment->status) { 'Approved' => 'success', 'Rejected' => 'danger', default => 'neutral' }" class="text-sm">{{ $adjustment->status }}</x-ui.badge>
+                <x-ui.badge :variant="match($adjustment->status) { 'Approved' => 'success', 'Rejected' => 'danger', default => 'neutral' }" class="text-sm">{{ enum_label($adjustment->status) }}</x-ui.badge>
             </div>
 
             @if ($adjustment->notes)
@@ -48,7 +48,7 @@
 
             @if ($adjustment->status !== 'Pending')
                 <div class="text-sm text-ink-600 dark:text-ink-300 mt-4 border-t border-ink-100 dark:border-ink-800 pt-4">
-                    {{ $adjustment->status }} by {{ $adjustment->approver?->name ?? 'Unknown' }} on {{ $adjustment->approved_at?->format('d-M-Y H:i') }}
+                    {{ enum_label($adjustment->status) }} by {{ $adjustment->approver?->name ?? 'Unknown' }} on {{ $adjustment->approved_at?->format('d-M-Y H:i') }}
                     @if ($adjustment->approval_comments)
                         <p class="mt-1">"{{ $adjustment->approval_comments }}"</p>
                     @endif

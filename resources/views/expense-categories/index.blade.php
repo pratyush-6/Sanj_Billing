@@ -23,11 +23,11 @@
                 <table class="min-w-full divide-y divide-ink-100 dark:divide-ink-800">
                     <thead class="bg-ink-50/80 dark:bg-ink-800/80">
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Name</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.name') }}</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Nature</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Sub Categories</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Status</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Actions</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.status') }}</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
@@ -37,10 +37,10 @@
                                 <td class="px-4 py-3.5 text-sm text-ink-600 dark:text-ink-300">{{ $category->expense_nature ?? '—' }}</td>
                                 <td class="px-4 py-3.5 text-sm text-ink-600 dark:text-ink-300">{{ $category->subCategories->count() }}</td>
                                 <td class="px-4 py-3.5 text-sm">
-                                    <x-ui.badge :variant="$category->status === 'active' ? 'success' : 'neutral'">{{ ucfirst($category->status) }}</x-ui.badge>
+                                    <x-ui.badge :variant="$category->status === 'active' ? 'success' : 'neutral'">{{ enum_label(ucfirst($category->status)) }}</x-ui.badge>
                                 </td>
                                 <td class="px-4 py-3.5 text-right text-sm">
-                                    <a href="{{ route('expense-categories.edit', $category) }}" class="text-brand-600 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 font-medium">Edit</a>
+                                    <a href="{{ route('expense-categories.edit', $category) }}" class="text-brand-600 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 font-medium">{{ __('common.edit') }}</a>
                                 </td>
                             </tr>
                         @empty

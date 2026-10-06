@@ -27,7 +27,7 @@
                 <table class="min-w-full divide-y divide-ink-100 dark:divide-ink-800">
                     <thead>
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Date</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.date') }}</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Type</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Reference</th>
                             <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Debit</th>
@@ -71,11 +71,11 @@
                             <table class="min-w-full text-sm">
                                 <thead>
                                     <tr>
-                                        <th class="text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide py-1 pr-4">Date</th>
+                                        <th class="text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide py-1 pr-4">{{ __('common.date') }}</th>
                                         <th class="text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide py-1 pr-4">Type</th>
                                         <th class="text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide py-1 pr-4">Reference</th>
-                                        <th class="text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide py-1 pr-4">Qty</th>
-                                        <th class="text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide py-1">Amount</th>
+                                        <th class="text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide py-1 pr-4">{{ __('common.qty') }}</th>
+                                        <th class="text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide py-1">{{ __('common.amount') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>

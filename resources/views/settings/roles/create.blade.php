@@ -13,7 +13,7 @@
                 @csrf
 
                 <div>
-                    <x-input-label for="name" value="Role Name *" />
+                    <x-input-label for="name" :value="ui_label('Role Name *')" />
                     <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name')" required autofocus />
                     <x-input-error :messages="$errors->get('name')" class="mt-2" />
                     <p class="text-xs text-ink-400 dark:text-ink-500 mt-1">You'll set its permissions on the next screen.</p>

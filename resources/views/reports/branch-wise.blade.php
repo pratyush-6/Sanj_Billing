@@ -43,7 +43,7 @@
                         </tbody>
                         <tfoot>
                             <tr class="bg-ink-50/60 dark:bg-ink-800/60 font-semibold">
-                                <td class="px-4 py-3 text-sm text-ink-900 dark:text-ink-50">Total</td>
+                                <td class="px-4 py-3 text-sm text-ink-900 dark:text-ink-50">{{ __('common.total') }}</td>
                                 <td class="px-4 py-3 text-sm text-right text-ink-900 dark:text-ink-50">{{ $rows->sum('count') }}</td>
                                 <td class="px-4 py-3 text-sm text-right text-ink-900 dark:text-ink-50">{{ number_format($total, 2) }}</td>
                             </tr>

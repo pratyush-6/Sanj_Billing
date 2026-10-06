@@ -18,6 +18,12 @@
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap" rel="stylesheet" />
+        @if (app()->getLocale() === 'hi')
+            <link href="https://fonts.bunny.net/css?family=noto-sans-devanagari:400,500,600,700&display=swap" rel="stylesheet" />
+            <style>
+                html[lang="hi"] body { font-family: "Noto Sans Devanagari", "Plus Jakarta Sans", sans-serif; }
+            </style>
+        @endif
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -81,6 +87,19 @@
                             {{ $__fy->name }}
                         </span>
                     @endif
+
+                    <div class="flex items-center gap-1 text-xs font-medium">
+                        @foreach (['en' => 'English', 'hi' => 'हिन्दी'] as $code => $name)
+                            <form method="POST" action="{{ route('locale.update', $code) }}">
+                                @csrf
+                                <button type="submit" @class([
+                                    'rounded-md px-2 py-1 transition',
+                                    'bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-400' => app()->getLocale() === $code,
+                                    'text-ink-500 hover:text-ink-700 dark:text-ink-400 dark:hover:text-ink-200' => app()->getLocale() !== $code,
+                                ])>{{ $name }}</button>
+                            </form>
+                        @endforeach
+                    </div>
 
                     <div class="relative" x-data="{ open: false }" @click.outside="open = false">
                         <button @click="open = ! open" class="flex items-center text-ink-400 hover:text-ink-600 dark:text-ink-500 dark:hover:text-ink-300 transition" title="Theme">

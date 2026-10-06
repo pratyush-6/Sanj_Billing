@@ -44,7 +44,7 @@
                     'Invoiced' => 'brand',
                     'Cancelled' => 'danger',
                     default => 'neutral',
-                }" class="text-sm">{{ $challan->status }}</x-ui.badge>
+                }" class="text-sm">{{ enum_label($challan->status) }}</x-ui.badge>
             </div>
 
             @if ($challan->notes)
@@ -53,12 +53,12 @@
 
             <div class="flex flex-wrap items-center gap-3 mt-6 border-t border-ink-100 dark:border-ink-800 pt-4">
                 <a href="{{ route('delivery-challans.print', $challan) }}" target="_blank">
-                    <x-secondary-button>Print</x-secondary-button>
+                    <x-secondary-button>{{ __('common.print') }}</x-secondary-button>
                 </a>
                 @can('delivery-challans.manage')
                     @if ($challan->status === 'Draft')
                         <a href="{{ route('delivery-challans.edit', $challan) }}">
-                            <x-secondary-button>Edit</x-secondary-button>
+                            <x-secondary-button>{{ __('common.edit') }}</x-secondary-button>
                         </a>
                         <form method="POST" action="{{ route('delivery-challans.complete', $challan) }}" onsubmit="return confirm('Complete this delivery challan? Stock will be reduced and it can no longer be edited.');">
                             @csrf
@@ -66,7 +66,7 @@
                         </form>
                         <form method="POST" action="{{ route('delivery-challans.cancel', $challan) }}" onsubmit="return confirm('Cancel this delivery challan?');">
                             @csrf
-                            <x-danger-button type="submit">Cancel</x-danger-button>
+                            <x-danger-button type="submit">{{ __('common.cancel') }}</x-danger-button>
                         </form>
                     @endif
                 @endcan
@@ -88,9 +88,9 @@
                 <table class="min-w-full divide-y divide-ink-100 dark:divide-ink-800">
                     <thead>
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Product</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Qty</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Notes</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.product') }}</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.qty') }}</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.notes') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-ink-100 dark:divide-ink-800">

@@ -31,7 +31,7 @@
                     <table class="min-w-full divide-y divide-ink-100 dark:divide-ink-800">
                         <thead class="bg-ink-50/80 dark:bg-ink-800/80">
                             <tr>
-                                <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Vendor</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.vendor') }}</th>
                                 <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Count</th>
                                 <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Total Amount</th>
                             </tr>
@@ -53,7 +53,7 @@
                         </tbody>
                         <tfoot>
                             <tr class="bg-ink-50/60 dark:bg-ink-800/60 font-semibold">
-                                <td class="px-4 py-3 text-sm text-ink-900 dark:text-ink-50">Total</td>
+                                <td class="px-4 py-3 text-sm text-ink-900 dark:text-ink-50">{{ __('common.total') }}</td>
                                 <td class="px-4 py-3 text-sm text-right text-ink-900 dark:text-ink-50">{{ $rows->sum('count') }}</td>
                                 <td class="px-4 py-3 text-sm text-right text-ink-900 dark:text-ink-50">{{ number_format($total, 2) }}</td>
                             </tr>

@@ -96,8 +96,8 @@
 
                             @can('daily-notes.manage')
                                 <div class="flex items-center gap-3 mt-3 pt-3 border-t border-ink-100 dark:border-ink-800">
-                                    <button type="button" @click="openEditModal(note)" class="text-xs font-medium text-brand-600 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300">Edit</button>
-                                    <button type="button" @click="confirmDelete(note)" class="text-xs font-medium text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300">Delete</button>
+                                    <button type="button" @click="openEditModal(note)" class="text-xs font-medium text-brand-600 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300">{{ __('common.edit') }}</button>
+                                    <button type="button" @click="confirmDelete(note)" class="text-xs font-medium text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300">{{ __('common.delete') }}</button>
                                 </div>
                             @endcan
                         </div>
@@ -114,25 +114,25 @@
                     <h3 class="text-base font-semibold text-ink-900 dark:text-ink-50" x-text="modalMode === 'add' ? 'Add Note' : 'Edit Note'"></h3>
 
                     <div>
-                        <x-input-label value="Title *" />
+                        <x-input-label :value="ui_label('Title *')" />
                         <x-text-input type="text" class="mt-1 block w-full" x-model="form.title" required autofocus />
                         <p x-show="formErrors.title" x-text="formErrors.title && formErrors.title[0]" class="text-sm text-rose-600 dark:text-rose-400 mt-1"></p>
                     </div>
 
                     <div>
-                        <x-input-label value="Description" />
+                        <x-input-label :value="ui_label('Description')" />
                         <textarea x-model="form.content" rows="3" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500"></textarea>
                         <p x-show="formErrors.content" x-text="formErrors.content && formErrors.content[0]" class="text-sm text-rose-600 dark:text-rose-400 mt-1"></p>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <x-input-label value="Time" />
+                            <x-input-label :value="ui_label('Time')" />
                             <input type="time" x-model="form.time" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
                             <p x-show="formErrors.time" x-text="formErrors.time && formErrors.time[0]" class="text-sm text-rose-600 dark:text-rose-400 mt-1"></p>
                         </div>
                         <div>
-                            <x-input-label value="Category" />
+                            <x-input-label :value="ui_label('Category')" />
                             <select x-model="form.category" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
                                 <option value="">None</option>
                                 <template x-for="option in categories" :key="option">
@@ -143,7 +143,7 @@
                     </div>
 
                     <div class="flex items-center justify-end gap-3 pt-2">
-                        <x-secondary-button type="button" @click="closeModal">Cancel</x-secondary-button>
+                        <x-secondary-button type="button" @click="closeModal">{{ __('common.cancel') }}</x-secondary-button>
                         <x-primary-button type="submit" x-bind:disabled="saving">
                             <span x-text="saving ? 'Saving...' : 'Save Note'"></span>
                         </x-primary-button>
@@ -161,8 +161,8 @@
                     "<span x-text="deleteTarget?.title"></span>" will be permanently removed. This can't be undone.
                 </p>
                 <div class="flex items-center justify-end gap-3">
-                    <x-secondary-button type="button" @click="cancelDelete">Cancel</x-secondary-button>
-                    <x-danger-button type="button" @click="deleteNote">Delete</x-danger-button>
+                    <x-secondary-button type="button" @click="cancelDelete">{{ __('common.cancel') }}</x-secondary-button>
+                    <x-danger-button type="button" @click="deleteNote">{{ __('common.delete') }}</x-danger-button>
                 </div>
             </div>
         </div>

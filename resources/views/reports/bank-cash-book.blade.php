@@ -7,7 +7,7 @@
         <x-ui.card>
             <form method="GET" class="grid grid-cols-2 sm:grid-cols-4 gap-3 items-end text-sm">
                 <div>
-                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">Account</label>
+                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ ui_label('Account') }}</label>
                     <select name="bank_account_id" class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                         @foreach ($bankAccounts as $account)
                             <option value="{{ $account->id }}" @selected($bankAccount?->id === $account->id)>{{ $account->account_name }}</option>
@@ -15,11 +15,11 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">From</label>
+                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ ui_label('From') }}</label>
                     <input type="date" name="date_from" value="{{ $dateFrom }}" class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                 </div>
                 <div>
-                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">To</label>
+                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ ui_label('To') }}</label>
                     <input type="date" name="date_to" value="{{ $dateTo }}" class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                 </div>
                 <x-secondary-button type="submit">View</x-secondary-button>
@@ -41,7 +41,7 @@
                     <table class="min-w-full divide-y divide-ink-100 dark:divide-ink-800">
                         <thead class="bg-ink-50/80 dark:bg-ink-800/80">
                             <tr>
-                                <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Date</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.date') }}</th>
                                 <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Particulars</th>
                                 <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Reference</th>
                                 <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Deposit</th>

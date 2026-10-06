@@ -5,7 +5,7 @@
 
     <div class="max-w-3xl space-y-4">
         <div class="flex items-center gap-3">
-            <x-ui.badge :variant="$entry->status === 'Posted' ? 'success' : 'neutral'">{{ $entry->status }}</x-ui.badge>
+            <x-ui.badge :variant="$entry->status === 'Posted' ? 'success' : 'neutral'">{{ enum_label($entry->status) }}</x-ui.badge>
             @if ($entry->reverses)
                 <a href="{{ route('accounting.journal.show', $entry->reverses) }}" class="text-xs text-ink-500 dark:text-ink-400 hover:text-brand-600 dark:hover:text-brand-400">
                     Reverses {{ $entry->reverses->entry_number }}
@@ -39,7 +39,7 @@
                     </tbody>
                     <tfoot>
                         <tr class="bg-ink-50/60 dark:bg-ink-800/60 font-semibold">
-                            <td class="px-4 py-3 text-sm text-ink-900 dark:text-ink-50">Total</td>
+                            <td class="px-4 py-3 text-sm text-ink-900 dark:text-ink-50">{{ __('common.total') }}</td>
                             <td class="px-4 py-3 text-sm text-right text-ink-900 dark:text-ink-50">{{ number_format($entry->items->sum('debit'), 2) }}</td>
                             <td class="px-4 py-3 text-sm text-right text-ink-900 dark:text-ink-50">{{ number_format($entry->items->sum('credit'), 2) }}</td>
                         </tr>

@@ -19,7 +19,7 @@
                     <form method="POST" action="{{ route('stock-adjustments.assign-unassigned') }}" class="grid grid-cols-1 sm:grid-cols-5 gap-3 items-end mt-4 text-sm">
                         @csrf
                         <div class="sm:col-span-2">
-                            <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">Product</label>
+                            <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ __('common.product') }}</label>
                             <select name="product_id" required class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                                 <option value="">Select</option>
                                 @foreach ($products as $product)
@@ -28,19 +28,19 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">Quantity</label>
+                            <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ __('common.quantity') }}</label>
                             <input type="number" name="quantity" step="0.01" min="0.01" required class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                         </div>
                         <div>
-                            <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">Date</label>
+                            <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ __('common.date') }}</label>
                             <input type="date" name="adjustment_date" value="{{ date('Y-m-d') }}" required class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                         </div>
                         <div>
-                            <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">Reason</label>
+                            <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ __('common.reason') }}</label>
                             <select name="reason" required class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                                 <option value="">Select</option>
                                 @foreach ($reasons as $reason)
-                                    <option value="{{ $reason }}">{{ $reason }}</option>
+                                    <option value="{{ enum_label($reason) }}">{{ enum_label($reason) }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -66,11 +66,11 @@
         <x-ui.card>
             <form method="GET" class="grid grid-cols-2 sm:grid-cols-4 gap-3 items-end text-sm">
                 <div>
-                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">Status</label>
+                    <label class="block text-xs text-ink-500 dark:text-ink-400 mb-1">{{ __('common.status') }}</label>
                     <select name="status" onchange="this.form.submit()" class="w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg text-sm focus:border-brand-500 focus:ring-brand-500">
                         <option value="">All</option>
                         @foreach ($statuses as $status)
-                            <option value="{{ $status }}" @selected(request('status') === $status)>{{ $status }}</option>
+                            <option value="{{ enum_label($status) }}" @selected(request('status') === $status)>{{ enum_label($status) }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -83,12 +83,12 @@
                     <thead class="bg-ink-50/80 dark:bg-ink-800/80">
                         <tr>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Adjustment #</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Product</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.product') }}</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Type</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Qty</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Reason</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Status</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Actions</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.qty') }}</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.reason') }}</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.status') }}</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
@@ -99,12 +99,12 @@
                                 </td>
                                 <td class="px-4 py-3.5 text-sm text-ink-700 dark:text-ink-200">{{ $adjustment->product->name }}</td>
                                 <td class="px-4 py-3.5 text-sm">
-                                    <x-ui.badge :variant="$adjustment->type === 'Increase' ? 'success' : 'warning'">{{ $adjustment->type }}</x-ui.badge>
+                                    <x-ui.badge :variant="$adjustment->type === 'Increase' ? 'success' : 'warning'">{{ enum_label($adjustment->type) }}</x-ui.badge>
                                 </td>
                                 <td class="px-4 py-3.5 text-sm text-right text-ink-600 dark:text-ink-300">{{ number_format($adjustment->quantity, 2) }}</td>
-                                <td class="px-4 py-3.5 text-sm text-ink-600 dark:text-ink-300">{{ $adjustment->reason }}</td>
+                                <td class="px-4 py-3.5 text-sm text-ink-600 dark:text-ink-300">{{ enum_label($adjustment->reason) }}</td>
                                 <td class="px-4 py-3.5 text-sm">
-                                    <x-ui.badge :variant="match($adjustment->status) { 'Approved' => 'success', 'Rejected' => 'danger', default => 'neutral' }">{{ $adjustment->status }}</x-ui.badge>
+                                    <x-ui.badge :variant="match($adjustment->status) { 'Approved' => 'success', 'Rejected' => 'danger', default => 'neutral' }">{{ enum_label($adjustment->status) }}</x-ui.badge>
                                 </td>
                                 <td class="px-4 py-3.5 text-right text-sm">
                                     <a href="{{ route('stock-adjustments.show', $adjustment) }}" class="text-brand-600 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 font-medium">View</a>

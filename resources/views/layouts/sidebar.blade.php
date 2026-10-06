@@ -2,32 +2,32 @@
 $navGroups = [];
 
 if (auth()->user()->can('expenses.view')) {
-    $items = [['route' => 'expenses.index', 'label' => 'All Expenses', 'pattern' => 'expenses.index']];
+    $items = [['route' => 'expenses.index', 'label' => __('nav.all_expenses'), 'pattern' => 'expenses.index']];
     if (auth()->user()->can('expenses.manage')) {
-        $items[] = ['route' => 'expenses.create', 'label' => 'Add Expense', 'pattern' => 'expenses.create'];
+        $items[] = ['route' => 'expenses.create', 'label' => __('nav.add_expense'), 'pattern' => 'expenses.create'];
     }
     if (auth()->user()->can('expense-categories.manage')) {
-        $items[] = ['route' => 'expense-categories.index', 'label' => 'Categories', 'pattern' => 'expense-categories.*'];
-        $items[] = ['route' => 'expense-sub-categories.index', 'label' => 'Sub Categories', 'pattern' => 'expense-sub-categories.*'];
+        $items[] = ['route' => 'expense-categories.index', 'label' => __('nav.categories'), 'pattern' => 'expense-categories.*'];
+        $items[] = ['route' => 'expense-sub-categories.index', 'label' => __('nav.sub_categories'), 'pattern' => 'expense-sub-categories.*'];
     }
     $navGroups['Expenses'] = ['icon' => 'banknotes', 'items' => $items];
 }
 
 if (auth()->user()->can('parties.manage')) {
     $navGroups['Parties'] = ['icon' => 'users', 'items' => [
-        ['route' => 'parties.index', 'label' => 'All Parties', 'pattern' => 'parties.*'],
-        ['route' => 'party-ledger.index', 'label' => 'Party Ledger', 'pattern' => 'party-ledger.*'],
+        ['route' => 'parties.index', 'label' => __('nav.all_parties'), 'pattern' => 'parties.*'],
+        ['route' => 'party-ledger.index', 'label' => __('nav.party_ledger'), 'pattern' => 'party-ledger.*'],
     ]];
 }
 
 $inventoryItems = [];
 if (auth()->user()->can('inventory.view')) {
-    $inventoryItems[] = ['route' => 'products.index', 'label' => 'Products', 'pattern' => 'products.*'];
-    $inventoryItems[] = ['route' => 'product-categories.index', 'label' => 'Product Categories', 'pattern' => 'product-categories.*'];
-    $inventoryItems[] = ['route' => 'stock-adjustments.index', 'label' => 'Stock Adjustments', 'pattern' => 'stock-adjustments.*'];
-    $inventoryItems[] = ['route' => 'stock-transfers.index', 'label' => 'Stock Transfers', 'pattern' => 'stock-transfers.*'];
-    $inventoryItems[] = ['route' => 'inventory-reports.low-stock', 'label' => 'Low Stock Report', 'pattern' => 'inventory-reports.low-stock'];
-    $inventoryItems[] = ['route' => 'inventory-reports.movements', 'label' => 'Stock Movements', 'pattern' => 'inventory-reports.movements'];
+    $inventoryItems[] = ['route' => 'products.index', 'label' => __('nav.products'), 'pattern' => 'products.*'];
+    $inventoryItems[] = ['route' => 'product-categories.index', 'label' => __('nav.product_categories'), 'pattern' => 'product-categories.*'];
+    $inventoryItems[] = ['route' => 'stock-adjustments.index', 'label' => __('nav.stock_adjustments'), 'pattern' => 'stock-adjustments.*'];
+    $inventoryItems[] = ['route' => 'stock-transfers.index', 'label' => __('nav.stock_transfers'), 'pattern' => 'stock-transfers.*'];
+    $inventoryItems[] = ['route' => 'inventory-reports.low-stock', 'label' => __('nav.low_stock_report'), 'pattern' => 'inventory-reports.low-stock'];
+    $inventoryItems[] = ['route' => 'inventory-reports.movements', 'label' => __('nav.stock_movements'), 'pattern' => 'inventory-reports.movements'];
 }
 if ($inventoryItems) {
     $navGroups['Inventory'] = ['icon' => 'box', 'items' => $inventoryItems];
@@ -35,8 +35,8 @@ if ($inventoryItems) {
 
 $procurementItems = [];
 if (auth()->user()->can('inventory.view')) {
-    $procurementItems[] = ['route' => 'purchase-orders.index', 'label' => 'Purchase Orders', 'pattern' => 'purchase-orders.index'];
-    $procurementItems[] = ['route' => 'purchase-bills.index', 'label' => 'Purchase Bills', 'pattern' => 'purchase-bills.*'];
+    $procurementItems[] = ['route' => 'purchase-orders.index', 'label' => __('nav.purchase_orders'), 'pattern' => 'purchase-orders.index'];
+    $procurementItems[] = ['route' => 'purchase-bills.index', 'label' => __('nav.purchase_bills'), 'pattern' => 'purchase-bills.*'];
 }
 if ($procurementItems) {
     $navGroups['Procurement'] = ['icon' => 'clipboard', 'items' => $procurementItems];
@@ -44,9 +44,9 @@ if ($procurementItems) {
 
 $salesItems = [];
 if (auth()->user()->can('inventory.view')) {
-    $salesItems[] = ['route' => 'sale-orders.index', 'label' => 'Sale Orders', 'pattern' => 'sale-orders.*'];
-    $salesItems[] = ['route' => 'delivery-challans.index', 'label' => 'Delivery Challans', 'pattern' => 'delivery-challans.*'];
-    $salesItems[] = ['route' => 'sale-invoices.index', 'label' => 'Sale Invoices', 'pattern' => 'sale-invoices.*'];
+    $salesItems[] = ['route' => 'sale-orders.index', 'label' => __('nav.sale_orders'), 'pattern' => 'sale-orders.*'];
+    $salesItems[] = ['route' => 'delivery-challans.index', 'label' => __('nav.delivery_challans'), 'pattern' => 'delivery-challans.*'];
+    $salesItems[] = ['route' => 'sale-invoices.index', 'label' => __('nav.sale_invoices'), 'pattern' => 'sale-invoices.*'];
 }
 if ($salesItems) {
     $navGroups['Sales'] = ['icon' => 'cart', 'items' => $salesItems];
@@ -54,25 +54,25 @@ if ($salesItems) {
 
 if (auth()->user()->can('reports.view')) {
     $navGroups['Reports'] = ['icon' => 'chart', 'items' => [
-        ['route' => 'reports.index', 'label' => 'All Reports', 'pattern' => 'reports.index'],
-        ['route' => 'reports.category-wise', 'label' => 'Category-wise', 'pattern' => 'reports.category-wise'],
-        ['route' => 'reports.vendor-wise', 'label' => 'Vendor-wise', 'pattern' => 'reports.vendor-wise'],
-        ['route' => 'reports.payment-wise', 'label' => 'Payment-wise', 'pattern' => 'reports.payment-wise'],
-        ['route' => 'reports.bank-cash-book', 'label' => 'Cash & Bank Book', 'pattern' => 'reports.bank-cash-book'],
-        ['route' => 'reports.monthly-comparison', 'label' => 'Monthly Comparison', 'pattern' => 'reports.monthly-comparison'],
-        ['route' => 'reports.financial-year-summary', 'label' => 'Financial Year Summary', 'pattern' => 'reports.financial-year-summary'],
+        ['route' => 'reports.index', 'label' => __('nav.all_reports'), 'pattern' => 'reports.index'],
+        ['route' => 'reports.category-wise', 'label' => __('nav.category_wise'), 'pattern' => 'reports.category-wise'],
+        ['route' => 'reports.vendor-wise', 'label' => __('nav.vendor_wise'), 'pattern' => 'reports.vendor-wise'],
+        ['route' => 'reports.payment-wise', 'label' => __('nav.payment_wise'), 'pattern' => 'reports.payment-wise'],
+        ['route' => 'reports.bank-cash-book', 'label' => __('nav.cash_bank_book'), 'pattern' => 'reports.bank-cash-book'],
+        ['route' => 'reports.monthly-comparison', 'label' => __('nav.monthly_comparison'), 'pattern' => 'reports.monthly-comparison'],
+        ['route' => 'reports.financial-year-summary', 'label' => __('nav.financial_year_summary'), 'pattern' => 'reports.financial-year-summary'],
     ]];
 }
 
 $masterItems = [];
 if (auth()->user()->can('masters.manage')) {
-    $masterItems[] = ['route' => 'units.index', 'label' => 'Units', 'pattern' => 'units.*'];
-    $masterItems[] = ['route' => 'payment-methods.index', 'label' => 'Payment Methods', 'pattern' => 'payment-methods.*'];
-    $masterItems[] = ['route' => 'gst-rates.index', 'label' => 'GST Rates', 'pattern' => 'gst-rates.*'];
-    $masterItems[] = ['route' => 'tds-sections.index', 'label' => 'TDS Sections', 'pattern' => 'tds-sections.*'];
+    $masterItems[] = ['route' => 'units.index', 'label' => __('nav.units'), 'pattern' => 'units.*'];
+    $masterItems[] = ['route' => 'payment-methods.index', 'label' => __('nav.payment_methods'), 'pattern' => 'payment-methods.*'];
+    $masterItems[] = ['route' => 'gst-rates.index', 'label' => __('nav.gst_rates'), 'pattern' => 'gst-rates.*'];
+    $masterItems[] = ['route' => 'tds-sections.index', 'label' => __('nav.tds_sections'), 'pattern' => 'tds-sections.*'];
 }
 if (auth()->user()->can('bank-accounts.manage')) {
-    $masterItems[] = ['route' => 'bank-accounts.index', 'label' => 'Bank & Cash Accounts', 'pattern' => 'bank-accounts.*'];
+    $masterItems[] = ['route' => 'bank-accounts.index', 'label' => __('nav.bank_cash_accounts'), 'pattern' => 'bank-accounts.*'];
 }
 if ($masterItems) {
     $navGroups['Masters'] = ['icon' => 'wrench', 'items' => $masterItems];
@@ -80,13 +80,13 @@ if ($masterItems) {
 
 $companyItems = [];
 if (auth()->user()->can('financial-years.manage')) {
-    $companyItems[] = ['route' => 'financial-years.index', 'label' => 'Financial Years', 'pattern' => 'financial-years.*'];
+    $companyItems[] = ['route' => 'financial-years.index', 'label' => __('nav.financial_years'), 'pattern' => 'financial-years.*'];
 }
 if (auth()->user()->can('companies.manage')) {
-    $companyItems[] = ['route' => 'companies.index', 'label' => 'Companies', 'pattern' => 'companies.*'];
+    $companyItems[] = ['route' => 'companies.index', 'label' => __('nav.companies'), 'pattern' => 'companies.*'];
 }
 if (auth()->user()->can('branches.manage')) {
-    $companyItems[] = ['route' => 'branches.index', 'label' => 'Branches', 'pattern' => 'branches.*'];
+    $companyItems[] = ['route' => 'branches.index', 'label' => __('nav.branches'), 'pattern' => 'branches.*'];
 }
 if ($companyItems) {
     $navGroups['Company'] = ['icon' => 'building', 'items' => $companyItems];
@@ -94,24 +94,24 @@ if ($companyItems) {
 
 if (auth()->user()->can('accounting.view')) {
     $navGroups['Accounting'] = ['icon' => 'ledger', 'items' => [
-        ['route' => 'accounting.chart-of-accounts', 'label' => 'Chart of Accounts', 'pattern' => 'accounting.chart-of-accounts'],
-        ['route' => 'accounting.journal.index', 'label' => 'Journal', 'pattern' => 'accounting.journal.*'],
-        ['route' => 'accounting.ledger', 'label' => 'Ledger', 'pattern' => 'accounting.ledger'],
-        ['route' => 'accounting.trial-balance', 'label' => 'Trial Balance', 'pattern' => 'accounting.trial-balance'],
-        ['route' => 'accounting.profit-loss', 'label' => 'Profit & Loss', 'pattern' => 'accounting.profit-loss'],
-        ['route' => 'accounting.balance-sheet', 'label' => 'Balance Sheet', 'pattern' => 'accounting.balance-sheet'],
+        ['route' => 'accounting.chart-of-accounts', 'label' => __('nav.chart_of_accounts'), 'pattern' => 'accounting.chart-of-accounts'],
+        ['route' => 'accounting.journal.index', 'label' => __('nav.journal'), 'pattern' => 'accounting.journal.*'],
+        ['route' => 'accounting.ledger', 'label' => __('nav.ledger'), 'pattern' => 'accounting.ledger'],
+        ['route' => 'accounting.trial-balance', 'label' => __('nav.trial_balance'), 'pattern' => 'accounting.trial-balance'],
+        ['route' => 'accounting.profit-loss', 'label' => __('nav.profit_loss'), 'pattern' => 'accounting.profit-loss'],
+        ['route' => 'accounting.balance-sheet', 'label' => __('nav.balance_sheet'), 'pattern' => 'accounting.balance-sheet'],
     ]];
 }
 
 $adminItems = [];
 if (auth()->user()->can('users.manage')) {
-    $adminItems[] = ['route' => 'settings.users.index', 'label' => 'Users', 'pattern' => 'settings.users.*'];
+    $adminItems[] = ['route' => 'settings.users.index', 'label' => __('nav.users'), 'pattern' => 'settings.users.*'];
 }
 if (auth()->user()->can('roles.manage')) {
-    $adminItems[] = ['route' => 'settings.roles.index', 'label' => 'Roles & Permissions', 'pattern' => 'settings.roles.*'];
+    $adminItems[] = ['route' => 'settings.roles.index', 'label' => __('nav.roles_permissions'), 'pattern' => 'settings.roles.*'];
 }
 if (auth()->user()->can('audit-logs.view')) {
-    $adminItems[] = ['route' => 'settings.audit-logs.index', 'label' => 'Audit Logs', 'pattern' => 'settings.audit-logs.*'];
+    $adminItems[] = ['route' => 'settings.audit-logs.index', 'label' => __('nav.audit_logs'), 'pattern' => 'settings.audit-logs.*'];
 }
 if ($adminItems) {
     $navGroups['Administration'] = ['icon' => 'shield', 'items' => $adminItems];
@@ -217,8 +217,23 @@ $icons = [
 
     </div>
 
+    <?php
+        $defaultOpenGroup = array_key_first($navGroups);
+        foreach ($navGroups as $groupLabel => $group) {
+            foreach ($group['items'] as $item) {
+                if (request()->routeIs($item['pattern'])) {
+                    $defaultOpenGroup = $groupLabel;
+                    break 2;
+                }
+            }
+        }
+    ?>
+
     <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1"
-         x-data
+         x-data="{
+             openGroups: @js([$defaultOpenGroup => true]),
+             toggle(label) { this.openGroups[label] = ! this.openGroups[label]; },
+         }"
          x-init="$nextTick(() => $el.querySelector('a.bg-brand-50')?.scrollIntoView({ block: 'nearest' }))">
         <a href="{{ route('dashboard') }}"
            @class([
@@ -227,7 +242,7 @@ $icons = [
                'text-ink-600 dark:text-ink-300 hover:bg-ink-50 dark:hover:bg-ink-800 hover:text-ink-900 dark:hover:text-ink-50' => ! request()->routeIs('dashboard'),
            ])>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $icons['home'] }}" /></svg>
-            Dashboard
+            {{ __('nav.dashboard') }}
         </a>
 
         @can('daily-notes.view')
@@ -238,16 +253,19 @@ $icons = [
                    'text-ink-600 dark:text-ink-300 hover:bg-ink-50 dark:hover:bg-ink-800 hover:text-ink-900 dark:hover:text-ink-50' => ! request()->routeIs('calendar.index'),
                ])>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $icons['calendar'] }}" /></svg>
-                Calendar
+                {{ __('nav.calendar') }}
             </a>
         @endcan
 
         @foreach ($navGroups as $groupLabel => $group)
             <div class="pt-4">
-                <p class="flex items-center gap-1.5 px-3 text-xs font-semibold uppercase tracking-wider text-ink-400 dark:text-ink-500 mb-1">
+                <button type="button" x-on:click="toggle('{{ $groupLabel }}')"
+                        class="flex w-full items-center gap-1.5 px-3 text-xs font-semibold uppercase tracking-wider text-ink-400 dark:text-ink-500 hover:text-ink-600 dark:hover:text-ink-300 mb-1">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $icons[$group['icon']] }}" /></svg>
-                    {{ $groupLabel }}
-                </p>
+                    <span class="flex-1 text-left">{{ __('nav.group.'.\Illuminate\Support\Str::slug($groupLabel)) }}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 transition-transform" :class="openGroups['{{ $groupLabel }}'] ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                </button>
+                <div x-show="openGroups['{{ $groupLabel }}']" x-transition.opacity>
                 @foreach ($group['items'] as $item)
                     <a href="{{ route($item['route']) }}"
                        @class([
@@ -258,6 +276,7 @@ $icons = [
                         {{ $item['label'] }}
                     </a>
                 @endforeach
+                </div>
             </div>
         @endforeach
     </nav>
@@ -269,7 +288,7 @@ $icons = [
             </div>
             <div class="min-w-0 flex-1">
                 <p class="truncate text-sm font-medium text-ink-800 dark:text-ink-100">{{ Auth::user()->name }}</p>
-                <a href="{{ route('profile.edit') }}" class="text-xs text-ink-400 dark:text-ink-500 hover:text-brand-600 dark:hover:text-brand-400">Profile settings</a>
+                <a href="{{ route('profile.edit') }}" class="text-xs text-ink-400 dark:text-ink-500 hover:text-brand-600 dark:hover:text-brand-400">{{ __('nav.profile_settings') }}</a>
             </div>
         </div>
     </div>
