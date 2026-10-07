@@ -26,6 +26,7 @@
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Email</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Role</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Companies</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Branches</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.status') }}</th>
                             <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.actions') }}</th>
                         </tr>
@@ -38,6 +39,9 @@
                                 <td class="px-4 py-3.5 text-sm text-ink-600 dark:text-ink-300">{{ $user->roles->pluck('name')->join(', ') ?: '—' }}</td>
                                 <td class="px-4 py-3.5 text-sm text-ink-600 dark:text-ink-300">
                                     {{ $user->hasRole('Super Admin') ? 'All companies' : ($user->companies->pluck('name')->join(', ') ?: '—') }}
+                                </td>
+                                <td class="px-4 py-3.5 text-sm text-ink-600 dark:text-ink-300">
+                                    {{ $user->hasRole('Super Admin') ? 'All branches' : ($user->branches->pluck('name')->join(', ') ?: '-') }}
                                 </td>
                                 <td class="px-4 py-3.5 text-sm">
                                     <x-ui.badge :variant="$user->status === 'active' ? 'success' : 'neutral'">{{ enum_label(ucfirst($user->status)) }}</x-ui.badge>

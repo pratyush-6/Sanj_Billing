@@ -28,6 +28,8 @@ class UserRequest extends FormRequest
             'password' => [$user ? 'nullable' : 'required', 'string', 'min:8', 'confirmed'],
             'companies' => ['nullable', 'array'],
             'companies.*' => [Rule::in($accessibleCompanyIds)],
+            'branches' => ['nullable', 'array'],
+            'branches.*' => [Rule::exists('branches', 'id')->whereIn('company_id', $accessibleCompanyIds)],
         ];
     }
 }

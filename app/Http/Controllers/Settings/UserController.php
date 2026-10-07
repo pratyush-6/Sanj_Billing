@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserRequest;
+use App\Models\Branch;
 use App\Models\User;
 use App\Services\CompanyContextService;
 use App\Services\UserManagementService;
@@ -19,7 +20,7 @@ class UserController extends Controller
 
     public function index()
     {
-        $users = User::with(['roles', 'companies'])->orderBy('name')->get();
+        $users = User::with(['roles', 'companies', 'branches'])->orderBy('name')->get();
 
         return view('settings.users.index', ['users' => $users]);
     }
@@ -29,6 +30,7 @@ class UserController extends Controller
         return view('settings.users.create', [
             'roles' => Role::pluck('name'),
             'companies' => $this->companyContext->accessibleCompanies(),
+            'branches' => $this->accessibleBranches(),
         ]);
     }
 
@@ -42,9 +44,10 @@ class UserController extends Controller
     public function edit(User $user)
     {
         return view('settings.users.edit', [
-            'user' => $user->load(['roles', 'companies']),
+            'user' => $user->load(['roles', 'companies', 'branches']),
             'roles' => Role::pluck('name'),
             'companies' => $this->companyContext->accessibleCompanies(),
+            'branches' => $this->accessibleBranches(),
         ]);
     }
 
@@ -53,5 +56,16 @@ class UserController extends Controller
         $this->userManagementService->update($user, $request->validated());
 
         return redirect()->route('settings.users.index')->with('status', 'User updated.');
+    }
+
+    private function accessibleBranches()
+    {
+        $companyIds = $this->companyContext->accessibleCompanies()->pluck('id');
+
+        return Branch::with('company')
+            ->whereIn('company_id', $companyIds)
+            ->orderBy('company_id')
+            ->orderBy('name')
+            ->get();
     }
 }

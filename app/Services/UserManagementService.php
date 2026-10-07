@@ -24,6 +24,7 @@ class UserManagementService
 
             $user->syncRoles([$data['role']]);
             $user->companies()->sync($data['companies'] ?? []);
+            $user->branches()->sync($data['branches'] ?? []);
 
             $this->auditLog->log('User Created', 'User', $user, null, $user->toArray());
 
@@ -55,6 +56,10 @@ class UserManagementService
 
             if (array_key_exists('companies', $data)) {
                 $user->companies()->sync($data['companies'] ?? []);
+            }
+
+            if (array_key_exists('branches', $data)) {
+                $user->branches()->sync($data['branches'] ?? []);
             }
 
             $this->auditLog->log('User Updated', 'User', $user, $old, $user->toArray());

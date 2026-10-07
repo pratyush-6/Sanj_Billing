@@ -10,7 +10,7 @@ return [
         'expenses' => 'Expenses',
         'parties' => 'Parties',
         'inventory' => 'Inventory',
-        'procurement' => 'Procurement',
+        'procurement' => 'Purchase Section',
         'sales' => 'Sales',
         'reports' => 'Reports',
         'company' => 'Company',
@@ -37,9 +37,9 @@ return [
     'purchase_orders' => 'Purchase Orders',
     'purchase_bills' => 'Purchase Bills',
 
-    'sale_orders' => 'Sale Orders',
+    'sale_orders' => 'Customer Orders',
     'delivery_challans' => 'Delivery Challans',
-    'sale_invoices' => 'Sale Invoices',
+    'sale_invoices' => 'Sale Bills',
 
     'all_reports' => 'All Reports',
     'category_wise' => 'Category-wise',

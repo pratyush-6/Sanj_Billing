@@ -66,3 +66,28 @@
     </div>
     <x-input-error :messages="$errors->get('companies')" class="mt-2" />
 </div>
+
+<div class="mt-6 pt-6 border-t border-ink-100 dark:border-ink-800">
+    <x-input-label :value="ui_label('Branch Access')" />
+    <p class="text-xs text-ink-400 dark:text-ink-500 mb-3">Which branches can this user work in. Super Admins automatically have access to every branch.</p>
+    <div class="space-y-4">
+        @php($selectedBranches = old('branches', $user?->branches->pluck('id')->all() ?? []))
+        @forelse ($branches->groupBy('company.name') as $companyName => $companyBranches)
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-wide text-ink-500 dark:text-ink-400">{{ $companyName }}</p>
+                <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    @foreach ($companyBranches as $branch)
+                        <label class="flex items-center gap-2 text-sm text-ink-700 dark:text-ink-200">
+                            <input type="checkbox" name="branches[]" value="{{ $branch->id }}" class="rounded bg-white dark:bg-ink-800 border-ink-300 dark:border-ink-600 text-brand-600 dark:text-brand-400 focus:ring-brand-500"
+                                @checked(in_array($branch->id, $selectedBranches))>
+                            {{ $branch->name }}
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+        @empty
+            <p class="text-sm text-ink-400 dark:text-ink-500">No branches exist yet.</p>
+        @endforelse
+    </div>
+    <x-input-error :messages="$errors->get('branches')" class="mt-2" />
+</div>
