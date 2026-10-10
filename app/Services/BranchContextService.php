@@ -33,7 +33,7 @@ class BranchContextService
             }
         }
 
-        $branch = $this->accessibleBranchesQuery($user)->orderByDesc('is_primary')->orderBy('name')->first();
+        $branch = $this->accessibleBranchesQuery($user)->orderByRaw('primary_company_id is not null desc')->orderBy('name')->first();
 
         if ($branch) {
             Session::put('current_branch_id', $branch->id);
@@ -90,7 +90,7 @@ class BranchContextService
             return new Collection;
         }
 
-        return $this->accessibleBranchesQuery($user)->orderByDesc('is_primary')->orderBy('name')->get();
+        return $this->accessibleBranchesQuery($user)->orderByRaw('primary_company_id is not null desc')->orderBy('name')->get();
     }
 
     public function switchTo(int $branchId): bool

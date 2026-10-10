@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,9 +23,17 @@ class Branch extends Model
         'status',
     ];
 
-    protected $casts = [
-        'is_primary' => 'boolean',
-    ];
+    /**
+     * Derived from primary_company_id rather than its own stored column — a MySQL/
+     * MariaDB generated-column limitation on some hosts makes a physical is_primary
+     * column unreliable to add via migration, and primary_company_id is already the
+     * single source of truth (its unique index is what guarantees one head per
+     * company), so this is never out of sync.
+     */
+    protected function isPrimary(): Attribute
+    {
+        return Attribute::make(get: fn () => $this->primary_company_id !== null);
+    }
 
     public function company(): BelongsTo
     {

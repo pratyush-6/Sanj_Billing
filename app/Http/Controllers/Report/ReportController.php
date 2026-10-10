@@ -38,7 +38,7 @@ class ReportController extends Controller
             'trend' => $this->salesReports->invoicedTrend($company->id, 6, $branchId),
             'pipeline' => $this->salesReports->orderPipeline($company->id, $dateFrom, $dateTo, $branchId),
             'lines' => $this->salesReports->invoiceLines($company->id, $dateFrom, $dateTo, $branchId),
-            'branches' => Branch::where('company_id', $company->id)->orderByDesc('is_primary')->orderBy('name')->get(),
+            'branches' => Branch::where('company_id', $company->id)->orderByRaw('primary_company_id is not null desc')->orderBy('name')->get(),
             'branchId' => $branchId,
             'dateFrom' => $dateFrom,
             'dateTo' => $dateTo,
