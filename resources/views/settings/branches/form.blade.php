@@ -10,6 +10,14 @@
     </x-slot>
 
     <div class="max-w-2xl space-y-4">
+        @if (session('error'))
+            <x-ui.alert variant="danger">{{ session('error') }}</x-ui.alert>
+        @endif
+
+        @if ($isEdit && $branch->is_primary)
+            <x-ui.alert variant="info">{{ ui_label('This is the head branch. Make another branch head first before deactivating it.') }}</x-ui.alert>
+        @endif
+
         <x-ui.card>
             <form method="POST" action="{{ $isEdit ? route('branches.update', $branch) : route('branches.store') }}" class="space-y-6">
                 @csrf
@@ -51,7 +59,7 @@
                         <x-input-label for="status" :value="ui_label('Status *')" />
                         <select id="status" name="status" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
                             <option value="active" @selected(old('status', $branch?->status ?? 'active') === 'active')>Active</option>
-                            <option value="inactive" @selected(old('status', $branch?->status) === 'inactive')>Inactive</option>
+                            <option value="inactive" @selected(old('status', $branch?->status) === 'inactive') @disabled($isEdit && $branch->is_primary)>Inactive</option>
                         </select>
                         <x-input-error :messages="$errors->get('status')" class="mt-2" />
                     </div>

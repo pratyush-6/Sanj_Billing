@@ -6,11 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\BranchRequest;
 use App\Models\Branch;
 use App\Services\BranchContextService;
+use App\Services\BranchService;
 use Illuminate\Http\RedirectResponse;
+use RuntimeException;
 
 class BranchController extends Controller
 {
-    public function __construct(private BranchContextService $branchContext) {}
+    public function __construct(
+        private BranchContextService $branchContext,
+        private BranchService $branchService,
+    ) {}
 
     public function index()
     {
@@ -34,7 +39,7 @@ class BranchController extends Controller
     {
         $company = current_company_or_fail();
 
-        $branch = Branch::create([...$request->safe()->except('user_ids'), 'company_id' => $company->id]);
+        $branch = $this->branchService->create($request->safe()->except('user_ids'), $company);
         $branch->users()->sync($request->input('user_ids', []));
 
         return redirect()->route('branches.index')->with('status', "Branch {$branch->name} created.");
@@ -55,10 +60,24 @@ class BranchController extends Controller
     {
         $this->ensureBelongsToCurrentCompany($branch);
 
-        $branch->update($request->safe()->except('user_ids'));
+        try {
+            $this->branchService->update($branch, $request->safe()->except('user_ids'));
+        } catch (RuntimeException $exception) {
+            return redirect()->route('branches.edit', $branch)->withInput()->with('error', $exception->getMessage());
+        }
+
         $branch->users()->sync($request->input('user_ids', []));
 
         return redirect()->route('branches.index')->with('status', "Branch {$branch->name} saved.");
+    }
+
+    public function makeHead(Branch $branch): RedirectResponse
+    {
+        $this->ensureBelongsToCurrentCompany($branch);
+
+        $this->branchService->makeHead($branch);
+
+        return redirect()->route('branches.index')->with('status', "{$branch->name} is now the head branch.");
     }
 
     public function switch(Branch $branch): RedirectResponse

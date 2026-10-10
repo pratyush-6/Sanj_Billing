@@ -14,11 +14,16 @@ class Branch extends Model
 
     protected $fillable = [
         'company_id',
+        'primary_company_id',
         'name',
         'code',
         'address',
         'state',
         'status',
+    ];
+
+    protected $casts = [
+        'is_primary' => 'boolean',
     ];
 
     public function company(): BelongsTo
@@ -34,5 +39,10 @@ class Branch extends Model
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('status', 'active');
+    }
+
+    public function scopeHead(Builder $query): Builder
+    {
+        return $query->whereNotNull('primary_company_id');
     }
 }

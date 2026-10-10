@@ -64,6 +64,7 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('can:branches.manage')->group(function () {
         Route::resource('branches', BranchController::class)->except(['show', 'destroy']);
+        Route::post('/branches/{branch}/make-head', [BranchController::class, 'makeHead'])->name('branches.make-head');
     });
 
     Route::middleware('can:companies.manage')->group(function () {
@@ -309,6 +310,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [ReportController::class, 'index'])->name('index');
         Route::get('/category-wise', [ReportController::class, 'categoryWise'])->name('category-wise');
         Route::get('/branch-wise', [ReportController::class, 'branchWise'])->name('branch-wise');
+        Route::get('/sales', [ReportController::class, 'sales'])->name('sales');
         Route::get('/vendor-wise', [ReportController::class, 'vendorWise'])->name('vendor-wise');
         Route::get('/payment-wise', [ReportController::class, 'paymentWise'])->name('payment-wise');
         Route::get('/monthly-comparison', [ReportController::class, 'monthlyComparison'])->name('monthly-comparison');

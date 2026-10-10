@@ -42,6 +42,7 @@ return [
     'sale_invoices' => 'बिक्री इनवॉइस',
 
     'all_reports' => 'सभी रिपोर्ट',
+    'sales_report' => 'बिक्री रिपोर्ट',
     'category_wise' => 'श्रेणी-वार',
     'vendor_wise' => 'विक्रेता-वार',
     'payment_wise' => 'भुगतान-वार',

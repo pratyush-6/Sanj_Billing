@@ -55,6 +55,7 @@ if ($salesItems) {
 if (auth()->user()->can('reports.view')) {
     $navGroups['Reports'] = ['icon' => 'chart', 'items' => [
         ['route' => 'reports.index', 'label' => __('nav.all_reports'), 'pattern' => 'reports.index'],
+        ['route' => 'reports.sales', 'label' => __('nav.sales_report'), 'pattern' => 'reports.sales'],
         ['route' => 'reports.category-wise', 'label' => __('nav.category_wise'), 'pattern' => 'reports.category-wise'],
         ['route' => 'reports.vendor-wise', 'label' => __('nav.vendor_wise'), 'pattern' => 'reports.vendor-wise'],
         ['route' => 'reports.payment-wise', 'label' => __('nav.payment_wise'), 'pattern' => 'reports.payment-wise'],
@@ -194,6 +195,9 @@ $icons = [
                                 'text-ink-700 dark:text-ink-200' => $branchContext->isAllBranches() || $currentBranch?->id !== $branch->id,
                             ])>
                                 {{ $branch->name }}
+                                @if ($branch->is_primary)
+                                    <span class="text-[10px] font-semibold uppercase tracking-wide text-ink-400 dark:text-ink-500">{{ ui_label('Head') }}</span>
+                                @endif
                             </button>
                         </form>
                     @empty

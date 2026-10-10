@@ -42,6 +42,7 @@ return [
     'sale_invoices' => 'Sale Bills',
 
     'all_reports' => 'All Reports',
+    'sales_report' => 'Sales Report',
     'category_wise' => 'Category-wise',
     'vendor_wise' => 'Vendor-wise',
     'payment_wise' => 'Payment-wise',

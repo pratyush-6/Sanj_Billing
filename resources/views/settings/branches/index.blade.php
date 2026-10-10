@@ -30,7 +30,12 @@
                     <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
                         @forelse ($branches as $branch)
                             <tr class="hover:bg-ink-50/60 dark:hover:bg-ink-800/60">
-                                <td class="px-4 py-3.5 text-sm font-medium text-ink-900 dark:text-ink-50">{{ $branch->name }}</td>
+                                <td class="px-4 py-3.5 text-sm font-medium text-ink-900 dark:text-ink-50">
+                                    {{ $branch->name }}
+                                    @if ($branch->is_primary)
+                                        <x-ui.badge variant="brand" class="ml-2">{{ ui_label('Head') }}</x-ui.badge>
+                                    @endif
+                                </td>
                                 <td class="px-4 py-3.5 text-sm text-ink-600 dark:text-ink-300">{{ $branch->code }}</td>
                                 <td class="px-4 py-3.5 text-sm text-ink-600 dark:text-ink-300">{{ $branch->state ?? '—' }}</td>
                                 <td class="px-4 py-3.5 text-sm text-right text-ink-600 dark:text-ink-300">{{ $branch->users_count }}</td>
@@ -39,6 +44,12 @@
                                 </td>
                                 <td class="px-4 py-3.5 text-right text-sm">
                                     <a href="{{ route('branches.edit', $branch) }}" class="text-brand-600 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 font-medium">{{ __('common.edit') }}</a>
+                                    @if (! $branch->is_primary && $branch->status === 'active')
+                                        <form method="POST" action="{{ route('branches.make-head', $branch) }}" class="inline" onsubmit="return confirm('{{ ui_label('Make this the head branch?') }}');">
+                                            @csrf
+                                            <button type="submit" class="ml-3 text-ink-500 dark:text-ink-400 hover:text-brand-600 dark:hover:text-brand-400 font-medium">{{ ui_label('Make Head') }}</button>
+                                        </form>
+                                    @endif
                                 </td>
                             </tr>
                         @empty

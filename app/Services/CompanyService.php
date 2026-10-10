@@ -10,7 +10,10 @@ use Illuminate\Support\Facades\DB;
 
 class CompanyService
 {
-    public function __construct(private AuditLogService $auditLog) {}
+    public function __construct(
+        private AuditLogService $auditLog,
+        private BranchService $branchService,
+    ) {}
 
     public function save(array $data, ?Company $company = null): Company
     {
@@ -26,6 +29,7 @@ class CompanyService
             $company = Company::create($data);
             $this->auditLog->log('Company Created', 'Company', $company, null, $company->toArray());
             $this->seedDefaultMasters($company);
+            $this->branchService->create(['name' => 'Head Office', 'code' => 'HO', 'status' => 'active'], $company);
 
             return $company;
         });

@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Report;
 use App\Exports\ArrayExport;
 use App\Http\Controllers\Controller;
 use App\Models\BankAccount;
+use App\Models\Branch;
 use App\Models\FinancialYear;
 use App\Services\AccountingService;
 use App\Services\BranchContextService;
 use App\Services\ReportService;
+use App\Services\SalesReportService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -19,7 +21,29 @@ class ReportController extends Controller
     public function __construct(
         private ReportService $reports,
         private AccountingService $accountingService,
+        private SalesReportService $salesReports,
     ) {}
+
+    public function sales(Request $request)
+    {
+        $company = current_company_or_fail();
+        $dateFrom = $request->input('date_from');
+        $dateTo = $request->input('date_to');
+        $branchId = $request->integer('branch_id') ?: null;
+
+        return view('reports.sales', [
+            'summary' => $this->salesReports->invoicedSummary($company->id, $dateFrom, $dateTo, $branchId),
+            'byBranch' => $this->salesReports->invoicedByBranch($company->id, $dateFrom, $dateTo),
+            'byParty' => $this->salesReports->invoicedByParty($company->id, $dateFrom, $dateTo, $branchId)->take(10),
+            'trend' => $this->salesReports->invoicedTrend($company->id, 6, $branchId),
+            'pipeline' => $this->salesReports->orderPipeline($company->id, $dateFrom, $dateTo, $branchId),
+            'lines' => $this->salesReports->invoiceLines($company->id, $dateFrom, $dateTo, $branchId),
+            'branches' => Branch::where('company_id', $company->id)->orderByDesc('is_primary')->orderBy('name')->get(),
+            'branchId' => $branchId,
+            'dateFrom' => $dateFrom,
+            'dateTo' => $dateTo,
+        ]);
+    }
 
     private function reportScope(): ?array
     {

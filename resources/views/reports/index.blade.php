@@ -9,6 +9,7 @@
             ['route' => 'reports.daily', 'title' => 'Daily Expense', 'description' => 'Totals and breakdown for a single day.'],
             ['route' => 'reports.monthly', 'title' => 'Monthly Expense', 'description' => 'Totals and breakdown for a month.'],
             ['route' => 'reports.category-wise', 'title' => 'Category-wise', 'description' => 'Spending grouped by expense category.'],
+            ['route' => 'reports.sales', 'title' => 'Sales Report', 'description' => 'Consolidated invoiced sales and order pipeline across every branch.'],
             ['route' => 'reports.vendor-wise', 'title' => 'Vendor-wise', 'description' => 'Spending grouped by vendor/supplier.'],
             ['route' => 'reports.branch-wise', 'title' => 'Branch-wise', 'description' => 'Expenses split across every branch of the company.'],
             ['route' => 'reports.payment-wise', 'title' => 'Payment-wise', 'description' => 'Spending by payment method and account.'],
