@@ -22,7 +22,7 @@
                   class="space-y-8"
                   @if (! $invoice)
                   x-data="{
-                      products: @js($products->map(fn ($product) => ['id' => $product->id, 'label' => $product->displayLabel(), 'unit_code' => $product->unit?->name, 'secondary_unit_code' => $product->secondaryUnit?->name, 'conversion_factor' => $product->conversion_factor ? (float) $product->conversion_factor : null])),
+                      products: @js($products->map(fn ($product) => ['id' => $product->id, 'label' => $product->displayLabel(), 'unit_code' => $product->unit?->name, 'secondary_unit_code' => $product->secondaryUnit?->name, 'conversion_factor' => $product->conversion_factor ? (float) $product->conversion_factor : null, 'stock' => (float) ($stockLevels[$product->id] ?? 0)])),
                       lockedItems: {{ $challan ? 'true' : 'false' }},
                       items: @js($challan
                           ? $challanLines->map(fn ($line) => ['delivery_challan_item_id' => $line['delivery_challan_item_id'], 'product_id' => $line['product_id'], 'product_label' => $line['product_label'], 'quantity' => $line['remaining'], 'max' => $line['remaining'], 'unit_price' => null])
@@ -37,13 +37,26 @@
                               this.items.splice(index, 1);
                           }
                       },
+                      product(item) {
+                          return this.products.find(p => p.id == item.product_id) ?? null;
+                      },
                       unitCode(item) {
-                          return this.products.find(p => p.id == item.product_id)?.unit_code ?? null;
+                          return this.product(item)?.unit_code ?? null;
                       },
                       secondaryHint(item) {
-                          const product = this.products.find(p => p.id == item.product_id);
+                          const product = this.product(item);
                           if (!product || !product.secondary_unit_code || !product.conversion_factor) return null;
                           return '= ' + ((parseFloat(item.quantity) || 0) * product.conversion_factor).toFixed(2) + ' ' + product.secondary_unit_code;
+                      },
+                      stockLabel(item) {
+                          const product = this.product(item);
+                          if (!product) return null;
+                          return '{{ ui_label('In stock') }}: ' + product.stock.toFixed(2) + ' ' + (product.unit_code ?? '');
+                      },
+                      lowStock(item) {
+                          const product = this.product(item);
+                          if (!product) return false;
+                          return (parseFloat(item.quantity) || 0) > product.stock;
                       },
                       get total() {
                           return this.items.reduce((sum, item) => sum + ((parseFloat(item.quantity) || 0) * (parseFloat(item.unit_price) || 0)), 0).toFixed(2);
@@ -167,6 +180,9 @@
                                                     <span class="text-xs text-ink-400 dark:text-ink-500 whitespace-nowrap" x-text="unitCode(item)"></span>
                                                 </div>
                                                 <p class="text-xs text-ink-400 dark:text-ink-500 mt-1" x-show="item.max" x-text="'Max: ' + item.max"></p>
+                                                <template x-if="!lockedItems">
+                                                    <p class="text-xs mt-1" :class="lowStock(item) ? 'text-rose-500 dark:text-rose-400 font-medium' : 'text-ink-400 dark:text-ink-500'" x-show="item.product_id" x-text="stockLabel(item)"></p>
+                                                </template>
                                                 <p class="text-xs text-ink-400 dark:text-ink-500 mt-1" x-show="secondaryHint(item)" x-text="secondaryHint(item)"></p>
                                             </td>
                                             <td class="px-3 py-2">

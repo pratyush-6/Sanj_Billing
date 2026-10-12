@@ -72,6 +72,7 @@ return [
     'Sale Details' => 'बिक्री विवरण',
     'No sale lines found' => 'कोई बिक्री पंक्ति नहीं मिली',
     'Unassigned' => 'असाइन नहीं किया गया',
+    'In stock' => 'स्टॉक में',
     'Make Head' => 'मुख्यालय बनाएँ',
     'Make this the head branch?' => 'इसे मुख्यालय शाखा बनाएँ?',
     'This is the head branch. Make another branch head first before deactivating it.' => 'यह मुख्यालय शाखा है। इसे निष्क्रिय करने से पहले किसी अन्य शाखा को मुख्यालय बनाएँ।',

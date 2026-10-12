@@ -13,7 +13,7 @@
                   action="{{ $order ? route('sale-orders.update', $order) : route('sale-orders.store') }}"
                   class="space-y-8"
                   x-data="{
-                      products: @js($products->map(fn ($product) => ['id' => $product->id, 'label' => $product->displayLabel(), 'unit_code' => $product->unit?->name, 'secondary_unit_code' => $product->secondaryUnit?->name, 'conversion_factor' => $product->conversion_factor ? (float) $product->conversion_factor : null])),
+                      products: @js($products->map(fn ($product) => ['id' => $product->id, 'label' => $product->displayLabel(), 'unit_code' => $product->unit?->name, 'secondary_unit_code' => $product->secondaryUnit?->name, 'conversion_factor' => $product->conversion_factor ? (float) $product->conversion_factor : null, 'stock' => (float) ($stockLevels[$product->id] ?? 0)])),
                       items: @js($order
                           ? $order->items->map(fn ($item) => ['product_id' => $item->product_id, 'quantity' => (float) $item->quantity, 'unit_price' => (float) $item->unit_price, 'unit_type' => 'primary', 'notes' => $item->notes])
                           : [['product_id' => '', 'quantity' => null, 'unit_price' => null, 'unit_type' => 'primary', 'notes' => '']]),
@@ -44,6 +44,19 @@
                           return item.unit_type === 'secondary'
                               ? '= ' + (qty / product.conversion_factor).toFixed(2) + ' ' + product.unit_code
                               : '= ' + (qty * product.conversion_factor).toFixed(2) + ' ' + product.secondary_unit_code;
+                      },
+                      stockInSelectedUnit(item) {
+                          const product = this.product(item);
+                          if (!product) return null;
+                          return item.unit_type === 'secondary' ? product.stock * product.conversion_factor : product.stock;
+                      },
+                      stockLabel(item) {
+                          const product = this.product(item);
+                          if (!product) return null;
+                          return '{{ ui_label('In stock') }}: ' + this.stockInSelectedUnit(item).toFixed(2) + ' ' + (this.unitCode(item) ?? '');
+                      },
+                      lowStock(item) {
+                          return (parseFloat(item.quantity) || 0) > (this.stockInSelectedUnit(item) ?? Infinity);
                       },
                       get total() {
                           return this.items.reduce((sum, item) => sum + ((parseFloat(item.quantity) || 0) * (parseFloat(item.unit_price) || 0)), 0).toFixed(2);
@@ -118,6 +131,7 @@
                                             <div class="flex items-center gap-1.5">
                                                 <input type="number" step="0.01" min="0.01" :name="`items[${index}][quantity]`" x-model.number="item.quantity" class="block w-28 min-w-[6rem] text-right bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
                                             </div>
+                                            <p class="text-xs mt-1" :class="lowStock(item) ? 'text-rose-500 dark:text-rose-400 font-medium' : 'text-ink-400 dark:text-ink-500'" x-show="item.product_id" x-text="stockLabel(item)"></p>
                                             <p class="text-xs text-ink-400 dark:text-ink-500 mt-1" x-show="conversionHint(item)" x-text="conversionHint(item)"></p>
                                         </td>
                                         <td class="px-3 py-2">

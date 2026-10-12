@@ -13,7 +13,9 @@ use App\Models\Product;
 use App\Models\SaleInvoice;
 use App\Models\SaleInvoiceItem;
 use App\Models\TdsSection;
+use App\Services\BranchContextService;
 use App\Services\SaleInvoiceService;
+use App\Services\StockLevelService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -223,6 +225,8 @@ class SaleInvoiceController extends Controller
     private function formData(?SaleInvoice $invoice = null, ?DeliveryChallan $challan = null, $challanLines = null, ?array $prefill = null)
     {
         $company = current_company_or_fail();
+        $products = Product::where('company_id', $company->id)->where('status', 'active')->with(['unit', 'secondaryUnit'])->orderBy('name')->get();
+        $scope = app(BranchContextService::class)->scope();
 
         return view('sale-invoices.form', [
             'invoice' => $invoice,
@@ -230,7 +234,8 @@ class SaleInvoiceController extends Controller
             'challanLines' => $challanLines ?? collect(),
             'prefill' => $prefill,
             'parties' => Party::where('company_id', $company->id)->where('is_customer', true)->where('status', 'active')->orderBy('name')->get(),
-            'products' => Product::where('company_id', $company->id)->where('status', 'active')->with(['unit', 'secondaryUnit'])->orderBy('name')->get(),
+            'products' => $products,
+            'stockLevels' => app(StockLevelService::class)->currentStock($products, $scope['branchId'], $scope['allBranches']),
             'tdsSections' => TdsSection::where('company_id', $company->id)->where('status', 'active')->orderBy('section')->get(),
         ]);
     }
