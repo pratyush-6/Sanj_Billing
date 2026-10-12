@@ -68,6 +68,7 @@ class SaleInvoiceController extends Controller
                         'product_id' => $item->product_id,
                         'quantity' => (float) $item->quantity,
                         'unit_price' => (float) $item->unit_price,
+                        'unit_type' => 'primary',
                     ])->all(),
                 ];
             }
@@ -129,7 +130,7 @@ class SaleInvoiceController extends Controller
             return redirect()->route('sale-invoices.create')->withInput()->with('error', $exception->getMessage());
         }
 
-        return redirect()->route('sale-invoices.show', $invoice)->with('status', "Sale Invoice {$invoice->invoice_number} saved as draft.");
+        return redirect()->route('sale-invoices.show', $invoice)->with('status', "Sale product bill {$invoice->invoice_number} saved as draft.");
     }
 
     public function show(SaleInvoice $saleInvoice)

@@ -44,7 +44,7 @@
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Challan #</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Customer</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.date') }}</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Sale Order</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">Order Invoice</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.status') }}</th>
                             <th class="px-4 py-3 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.actions') }}</th>
                         </tr>
@@ -74,7 +74,7 @@
                         @empty
                             <tr>
                                 <td colspan="6">
-                                    <x-ui.empty-state title="No delivery challans yet" description="Create a delivery challan directly, or convert a confirmed sale order." />
+                                    <x-ui.empty-state title="No delivery challans yet" description="Create a delivery challan directly, or convert a confirmed order invoice." />
                                 </td>
                             </tr>
                         @endforelse

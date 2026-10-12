@@ -37,9 +37,9 @@ return [
     'purchase_orders' => 'खरीद आदेश',
     'purchase_bills' => 'खरीद बिल',
 
-    'sale_orders' => 'बिक्री आदेश',
+    'sale_orders' => 'ऑर्डर इनवॉइस',
     'delivery_challans' => 'डिलीवरी चालान',
-    'sale_invoices' => 'बिक्री इनवॉइस',
+    'sale_invoices' => 'बिक्री उत्पाद बिल',
 
     'all_reports' => 'सभी रिपोर्ट',
     'sales_report' => 'बिक्री रिपोर्ट',

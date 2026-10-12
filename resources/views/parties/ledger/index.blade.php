@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <x-ui.page-header title="Party Ledger" description="Outstanding balances derived from posted sale invoices, purchase bills and payments." />
+        <x-ui.page-header title="Party Ledger" description="Outstanding balances derived from posted sale product bills, purchase bills and payments." />
     </x-slot>
 
     <div class="space-y-4">
@@ -32,7 +32,7 @@
                         @empty
                             <tr>
                                 <td colspan="5">
-                                    <x-ui.empty-state title="No party activity yet" description="Balances appear once a sale invoice or purchase bill is posted." />
+                                    <x-ui.empty-state title="No party activity yet" description="Balances appear once a sale product bill or purchase bill is posted." />
                                 </td>
                             </tr>
                         @endforelse

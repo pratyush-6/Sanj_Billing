@@ -58,7 +58,7 @@ class SaleOrderController extends Controller
 
         $order = $this->saleOrderService->create($request->validated(), $company, current_branch_or_fail(), $financialYear, Auth::user());
 
-        return redirect()->route('sale-orders.show', $order)->with('status', "Sale Order {$order->order_number} saved as draft.");
+        return redirect()->route('sale-orders.show', $order)->with('status', "Order Invoice {$order->order_number} saved as draft.");
     }
 
     public function show(SaleOrder $saleOrder)

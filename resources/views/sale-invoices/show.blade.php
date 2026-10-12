@@ -1,11 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
-        <x-ui.page-header :title="'Sale Invoice '.$invoice->invoice_number">
+        <x-ui.page-header :title="'Sale product bill '.$invoice->invoice_number">
             <x-slot name="actions">
                 <a href="{{ route('sale-invoices.print', $invoice) }}" target="_blank">
                     <x-secondary-button>{{ __('common.print') }}</x-secondary-button>
                 </a>
-                <a href="{{ route('sale-invoices.index') }}" class="text-sm text-ink-500 dark:text-ink-400 hover:text-ink-700 dark:hover:text-ink-200">&larr; Back to Sale Invoices</a>
+                <a href="{{ route('sale-invoices.index') }}" class="text-sm text-ink-500 dark:text-ink-400 hover:text-ink-700 dark:hover:text-ink-200">&larr; Back to Sale product bills</a>
             </x-slot>
         </x-ui.page-header>
     </x-slot>
@@ -73,7 +73,7 @@
                             @csrf
                             <x-secondary-button type="submit">Edit Quantity</x-secondary-button>
                         </form>
-                        <form method="POST" action="{{ route('sale-invoices.cancel', $invoice) }}" onsubmit="return confirm('Cancel this sale invoice?');">
+                        <form method="POST" action="{{ route('sale-invoices.cancel', $invoice) }}" onsubmit="return confirm('Cancel this sale product bill?');">
                             @csrf
                             <x-danger-button type="submit">{{ __('common.cancel') }}</x-danger-button>
                         </form>

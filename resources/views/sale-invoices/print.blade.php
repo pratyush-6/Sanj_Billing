@@ -39,7 +39,7 @@
             </p>
         </div>
         <div class="meta">
-            <h2>SALE INVOICE</h2>
+            <h2>SALE PRODUCT BILL</h2>
             <p class="muted">
                 Invoice #: <strong>{{ $invoice->invoice_number }}</strong><br>
                 Date: {{ $invoice->invoice_date->format('d-M-Y') }}<br>

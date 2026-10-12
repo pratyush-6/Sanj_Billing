@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <x-ui.page-header title="TDS Sections" description="TDS sections and rates applied on purchase bills and sale invoices." />
+        <x-ui.page-header title="TDS Sections" description="TDS sections and rates applied on purchase bills and sale product bills." />
     </x-slot>
 
     <div class="max-w-3xl space-y-4">

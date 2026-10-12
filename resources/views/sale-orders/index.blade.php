@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <x-ui.page-header title="Sale Orders" :description="$orders->total().' order(s)'" />
+        <x-ui.page-header title="Order Invoices" :description="$orders->total().' order(s)'" />
     </x-slot>
 
     <div class="space-y-4">
@@ -16,7 +16,7 @@
                 <a href="{{ route('sale-orders.create') }}">
                     <x-primary-button>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-                        New Sale Order
+                        New Order Invoice
                     </x-primary-button>
                 </a>
             @endcan
@@ -82,7 +82,7 @@
                         @empty
                             <tr>
                                 <td colspan="6">
-                                    <x-ui.empty-state title="No sale orders yet" description="Create an order to start selling to a customer." />
+                                    <x-ui.empty-state title="No order invoices yet" description="Create an order to start selling to a customer." />
                                 </td>
                             </tr>
                         @endforelse

@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <x-ui.page-header :title="$invoice ? 'Edit Sale Invoice '.$invoice->invoice_number : 'New Sale Invoice'" />
+        <x-ui.page-header :title="$invoice ? 'Edit Sale product bill '.$invoice->invoice_number : 'New Sale product bill'" />
     </x-slot>
 
     <div class="max-w-5xl space-y-4">
@@ -17,14 +17,14 @@
         @endif
 
         @if ($saleOrder ?? null)
-            <x-ui.alert variant="info">{{ ui_label('Invoicing sale order') }} {{ $saleOrder->order_number }} ({{ $saleOrder->party->name }}). {{ ui_label('Products and quantities are fetched from the order and cannot be changed here.') }} <a href="{{ route('sale-invoices.create') }}" class="underline font-medium">{{ ui_label('Change selection') }}</a></x-ui.alert>
+            <x-ui.alert variant="info">{{ ui_label('Invoicing order invoice') }} {{ $saleOrder->order_number }} ({{ $saleOrder->party->name }}). {{ ui_label('Products and quantities are fetched from the order and cannot be changed here.') }} <a href="{{ route('sale-invoices.create') }}" class="underline font-medium">{{ ui_label('Change selection') }}</a></x-ui.alert>
         @elseif (! $invoice && ! $challan && ! ($prefill ?? null) && $saleOrders->isNotEmpty())
             <x-ui.card>
                 <form method="GET" action="{{ route('sale-invoices.create') }}" class="flex items-end gap-3 text-sm">
                     <div class="flex-1">
-                        <x-input-label for="sale_order_id" :value="ui_label('Create from Sale Order (optional)')" />
+                        <x-input-label for="sale_order_id" :value="ui_label('Create from Order Invoice (optional)')" />
                         <select id="sale_order_id" name="sale_order_id" onchange="this.form.submit()" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
-                            <option value="">{{ ui_label('Select a confirmed sale order, or skip to create a direct invoice') }}</option>
+                            <option value="">{{ ui_label('Select a confirmed order invoice, or skip to create a direct invoice') }}</option>
                             @foreach ($saleOrders as $order)
                                 <option value="{{ $order->id }}">{{ $order->order_number }} — {{ $order->party->name }}</option>
                             @endforeach
@@ -49,9 +49,9 @@
                               ? $saleOrder->items->map(fn ($item) => ['product_id' => $item->product_id, 'product_label' => $item->product->displayLabel(), 'quantity' => (float) $item->quantity, 'unit_price' => (float) $item->unit_price])
                               : (($prefill['items'] ?? null)
                                   ? $prefill['items']
-                                  : [['product_id' => '', 'quantity' => null, 'unit_price' => null]]))),
+                                  : [['product_id' => '', 'quantity' => null, 'unit_price' => null, 'unit_type' => 'primary']]))),
                       addItem() {
-                          this.items.push({ product_id: '', quantity: null, unit_price: null });
+                          this.items.push({ product_id: '', quantity: null, unit_price: null, unit_type: 'primary' });
                       },
                       removeItem(index) {
                           if (this.items.length > 1) {
@@ -61,23 +61,35 @@
                       product(item) {
                           return this.products.find(p => p.id == item.product_id) ?? null;
                       },
-                      unitCode(item) {
-                          return this.product(item)?.unit_code ?? null;
+                      hasSecondaryUnit(item) {
+                          const product = this.product(item);
+                          return !!(product && product.secondary_unit_code && product.conversion_factor);
                       },
-                      secondaryHint(item) {
+                      unitCode(item) {
+                          const product = this.product(item);
+                          if (!product) return null;
+                          return item.unit_type === 'secondary' ? product.secondary_unit_code : product.unit_code;
+                      },
+                      conversionHint(item) {
                           const product = this.product(item);
                           if (!product || !product.secondary_unit_code || !product.conversion_factor) return null;
-                          return '= ' + ((parseFloat(item.quantity) || 0) * product.conversion_factor).toFixed(2) + ' ' + product.secondary_unit_code;
+                          const qty = parseFloat(item.quantity) || 0;
+                          return item.unit_type === 'secondary'
+                              ? '= ' + (qty / product.conversion_factor).toFixed(2) + ' ' + product.unit_code
+                              : '= ' + (qty * product.conversion_factor).toFixed(2) + ' ' + product.secondary_unit_code;
+                      },
+                      stockInSelectedUnit(item) {
+                          const product = this.product(item);
+                          if (!product) return null;
+                          return item.unit_type === 'secondary' ? product.stock * product.conversion_factor : product.stock;
                       },
                       stockLabel(item) {
                           const product = this.product(item);
                           if (!product) return null;
-                          return '{{ ui_label('In stock') }}: ' + product.stock.toFixed(2) + ' ' + (product.unit_code ?? '');
+                          return '{{ ui_label('In stock') }}: ' + this.stockInSelectedUnit(item).toFixed(2) + ' ' + (this.unitCode(item) ?? '');
                       },
                       lowStock(item) {
-                          const product = this.product(item);
-                          if (!product) return false;
-                          return (parseFloat(item.quantity) || 0) > product.stock;
+                          return (parseFloat(item.quantity) || 0) > (this.stockInSelectedUnit(item) ?? Infinity);
                       },
                       get total() {
                           return this.items.reduce((sum, item) => sum + ((parseFloat(item.quantity) || 0) * (parseFloat(item.unit_price) || 0)), 0).toFixed(2);
@@ -172,6 +184,9 @@
                                 <thead>
                                     <tr>
                                         <th class="px-6 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[16rem]">{{ __('common.product') }}</th>
+                                        @unless ($challan || $saleOrder)
+                                            <th class="px-3 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[8rem]">{{ ui_label('Unit') }}</th>
+                                        @endunless
                                         <th class="px-3 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[11rem]">{{ __('common.qty') }}</th>
                                         <th class="px-3 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[8rem]">{{ __('common.unit_price') }}</th>
                                         <th class="px-3 py-2 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[8rem]">{{ __('common.amount') }}</th>
@@ -192,7 +207,7 @@
                                                     </div>
                                                 </template>
                                                 <template x-if="!lockedItems">
-                                                    <select :name="`items[${index}][product_id]`" x-model="item.product_id" class="block w-full min-w-[14rem] bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
+                                                    <select :name="`items[${index}][product_id]`" x-model="item.product_id" @change="item.unit_type = 'primary'" class="block w-full min-w-[14rem] bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
                                                         <option value="">Select product</option>
                                                         <template x-for="product in products" :key="product.id">
                                                             <option :value="product.id" x-text="product.label" :selected="item.product_id == product.id"></option>
@@ -200,6 +215,22 @@
                                                     </select>
                                                 </template>
                                             </td>
+                                            @unless ($challan || $saleOrder)
+                                                <td class="px-3 py-2">
+                                                    <template x-if="hasSecondaryUnit(item)">
+                                                        <select :name="`items[${index}][unit_type]`" x-model="item.unit_type" class="block w-full min-w-[7rem] bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
+                                                            <option value="primary" x-text="product(item).unit_code"></option>
+                                                            <option value="secondary" x-text="product(item).secondary_unit_code"></option>
+                                                        </select>
+                                                    </template>
+                                                    <template x-if="!hasSecondaryUnit(item)">
+                                                        <div>
+                                                            <input type="hidden" :name="`items[${index}][unit_type]`" value="primary">
+                                                            <span class="text-sm text-ink-500 dark:text-ink-400" x-text="unitCode(item) ?? '—'"></span>
+                                                        </div>
+                                                    </template>
+                                                </td>
+                                            @endunless
                                             <td class="px-3 py-2">
                                                 <template x-if="quantityLocked">
                                                     <div>
@@ -217,7 +248,7 @@
                                                         <template x-if="!lockedItems">
                                                             <p class="text-xs mt-1" :class="lowStock(item) ? 'text-rose-500 dark:text-rose-400 font-medium' : 'text-ink-400 dark:text-ink-500'" x-show="item.product_id" x-text="stockLabel(item)"></p>
                                                         </template>
-                                                        <p class="text-xs text-ink-400 dark:text-ink-500 mt-1" x-show="secondaryHint(item)" x-text="secondaryHint(item)"></p>
+                                                        <p class="text-xs text-ink-400 dark:text-ink-500 mt-1" x-show="conversionHint(item)" x-text="conversionHint(item)"></p>
                                                     </div>
                                                 </template>
                                             </td>

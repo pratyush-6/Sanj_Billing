@@ -5,7 +5,9 @@ namespace App\Services;
 use App\Models\BankAccount;
 use App\Models\Company;
 use App\Models\PaymentMethod;
+use App\Models\TdsSection;
 use App\Models\Unit;
+use Database\Seeders\TdsSectionSeeder;
 use Illuminate\Support\Facades\DB;
 
 class CompanyService
@@ -51,5 +53,15 @@ class CompanyService
             'account_type' => 'cash',
             'opening_balance' => 0,
         ]);
+
+        foreach (TdsSectionSeeder::defaults() as $section) {
+            TdsSection::create([
+                'company_id' => $company->id,
+                'section' => $section['section'],
+                'description' => $section['description'],
+                'rate' => $section['rate'],
+                'status' => 'active',
+            ]);
+        }
     }
 }

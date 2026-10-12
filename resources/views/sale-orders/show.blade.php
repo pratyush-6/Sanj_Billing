@@ -1,8 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
-        <x-ui.page-header :title="'Sale Order '.$order->order_number">
+        <x-ui.page-header :title="'Order Invoice '.$order->order_number">
             <x-slot name="actions">
-                <a href="{{ route('sale-orders.index') }}" class="text-sm text-ink-500 dark:text-ink-400 hover:text-ink-700 dark:hover:text-ink-200">&larr; Back to Sale Orders</a>
+                <a href="{{ route('sale-orders.index') }}" class="text-sm text-ink-500 dark:text-ink-400 hover:text-ink-700 dark:hover:text-ink-200">&larr; Back to Order Invoices</a>
             </x-slot>
         </x-ui.page-header>
     </x-slot>
@@ -57,12 +57,12 @@
                     @if ($order->status === 'Confirmed')
                         @can('sale-invoices.manage')
                             <a href="{{ route('sale-invoices.create', ['sale_order_id' => $order->id]) }}">
-                                <x-primary-button type="button">{{ ui_label('Create Sale Invoice') }}</x-primary-button>
+                                <x-primary-button type="button">{{ ui_label('Create Sale product bill') }}</x-primary-button>
                             </a>
                         @endcan
                     @endif
                     @if (in_array($order->status, ['Draft', 'Confirmed']))
-                        <form method="POST" action="{{ route('sale-orders.cancel', $order) }}" onsubmit="return confirm('Cancel this sale order?');">
+                        <form method="POST" action="{{ route('sale-orders.cancel', $order) }}" onsubmit="return confirm('Cancel this order invoice?');">
                             @csrf
                             <x-danger-button type="submit">{{ __('common.cancel') }}</x-danger-button>
                         </form>

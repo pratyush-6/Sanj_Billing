@@ -17,7 +17,7 @@
 
         @if ($challan->saleOrder)
             <x-ui.alert variant="info">
-                Converted from sale order
+                Converted from order invoice
                 <a href="{{ route('sale-orders.show', $challan->saleOrder) }}" class="underline font-medium">{{ $challan->saleOrder->order_number }}</a>.
             </x-ui.alert>
         @endif

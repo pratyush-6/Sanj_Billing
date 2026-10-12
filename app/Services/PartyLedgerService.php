@@ -86,7 +86,7 @@ class PartyLedgerService
         foreach (SaleInvoice::where('party_id', $party->id)->where('status', 'Posted')->get() as $invoice) {
             $rows->push([
                 'date' => $invoice->invoice_date,
-                'type' => 'Sale Invoice',
+                'type' => 'Sale product bill',
                 'reference' => $invoice->invoice_number,
                 'route' => route('sale-invoices.show', $invoice),
                 'debit' => round((float) $invoice->total_amount - (float) $invoice->tds_amount, 2),

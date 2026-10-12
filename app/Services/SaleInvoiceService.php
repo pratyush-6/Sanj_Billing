@@ -273,13 +273,33 @@ class SaleInvoiceService
         return $challanItems;
     }
 
+    /**
+     * Quantity and unit price are always stored in the product's primary unit, same
+     * as everywhere else in the app (stock movements, purchase orders, sale orders).
+     * When a line is sold in the secondary unit, the entered quantity/price are
+     * converted to their primary-unit equivalents before saving; the taxable amount
+     * is computed from the pair as entered, so the conversion never changes it.
+     */
     private function buildLines(array $items, Company $company, Party $party): array
     {
         return collect($items)->map(function ($item) use ($company, $party) {
             $product = Product::where('company_id', $company->id)->with('gstRate')->findOrFail($item['product_id']);
-            $quantity = round((float) $item['quantity'], 2);
-            $unitPrice = round((float) $item['unit_price'], 2);
-            $taxableAmount = round($quantity * $unitPrice, 2);
+            $enteredQuantity = round((float) $item['quantity'], 2);
+            $enteredUnitPrice = round((float) $item['unit_price'], 2);
+            $taxableAmount = round($enteredQuantity * $enteredUnitPrice, 2);
+
+            $quantity = $enteredQuantity;
+            $unitPrice = $enteredUnitPrice;
+
+            if (($item['unit_type'] ?? 'primary') === 'secondary') {
+                $conversionFactor = $product->conversion_factor ? (float) $product->conversion_factor : null;
+
+                if ($product->secondary_unit_id && $conversionFactor) {
+                    $quantity = round($enteredQuantity / $conversionFactor, 2);
+                    $unitPrice = round($enteredUnitPrice * $conversionFactor, 2);
+                }
+            }
+
             $gstRate = (float) ($product->gstRate?->rate ?? 0);
 
             $gstSplit = $this->gstCalculator->splitGst($taxableAmount, $gstRate, $company->state, $party->state);

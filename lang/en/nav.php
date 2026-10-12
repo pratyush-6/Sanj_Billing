@@ -37,9 +37,9 @@ return [
     'purchase_orders' => 'Purchase Orders',
     'purchase_bills' => 'Purchase Bills',
 
-    'sale_orders' => 'Customer Orders',
+    'sale_orders' => 'Order Invoices',
     'delivery_challans' => 'Delivery Challans',
-    'sale_invoices' => 'Sale Bills',
+    'sale_invoices' => 'Sale product bills',
 
     'all_reports' => 'All Reports',
     'sales_report' => 'Sales Report',

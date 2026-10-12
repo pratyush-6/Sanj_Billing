@@ -28,6 +28,17 @@ class HeadBranchTest extends TestCase
         $this->assertSame('Head Office', $branches->first()->name);
     }
 
+    public function test_creating_a_company_auto_seeds_standard_tds_sections(): void
+    {
+        $company = app(CompanyService::class)->save(['name' => 'Acme', 'status' => 'active']);
+
+        $sections = \App\Models\TdsSection::where('company_id', $company->id)->pluck('section');
+
+        $this->assertCount(8, $sections);
+        $this->assertTrue($sections->contains('194C'));
+        $this->assertTrue($sections->contains('194J'));
+    }
+
     public function test_a_companys_first_branch_becomes_head_automatically(): void
     {
         $company = Company::create(['name' => 'No Default Masters Co', 'status' => 'active']);

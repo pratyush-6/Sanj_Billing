@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <x-ui.page-header :title="$order ? 'Edit Sale Order '.$order->order_number : 'New Sale Order'" />
+        <x-ui.page-header :title="$order ? 'Edit Order Invoice '.$order->order_number : 'New Order Invoice'" />
     </x-slot>
 
     <div class="max-w-5xl space-y-4">

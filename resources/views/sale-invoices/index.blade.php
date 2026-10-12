@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <x-ui.page-header title="Sale Invoices" :description="$invoices->total().' invoice(s)'" />
+        <x-ui.page-header title="Sale product bills" :description="$invoices->total().' invoice(s)'" />
     </x-slot>
 
     <div class="space-y-4">
@@ -16,7 +16,7 @@
                 <a href="{{ route('sale-invoices.create') }}">
                     <x-primary-button>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-                        New Sale Invoice
+                        New Sale product bill
                     </x-primary-button>
                 </a>
             @endcan
@@ -70,7 +70,7 @@
                         @empty
                             <tr>
                                 <td colspan="7">
-                                    <x-ui.empty-state title="No sale invoices yet" description="Create an invoice directly, or bill a completed delivery challan." />
+                                    <x-ui.empty-state title="No sale product bills yet" description="Create an invoice directly, or bill a completed delivery challan." />
                                 </td>
                             </tr>
                         @endforelse

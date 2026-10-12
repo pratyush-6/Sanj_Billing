@@ -9,7 +9,7 @@
         @endif
 
         @if ($saleOrder)
-            <x-ui.alert variant="info">Converting from sale order {{ $saleOrder->order_number }} ({{ $saleOrder->party->name }}). Review the pre-filled items before saving.</x-ui.alert>
+            <x-ui.alert variant="info">Converting from order invoice {{ $saleOrder->order_number }} ({{ $saleOrder->party->name }}). Review the pre-filled items before saving.</x-ui.alert>
         @endif
 
         <x-ui.card>
