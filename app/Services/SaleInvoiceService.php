@@ -11,6 +11,7 @@ use App\Models\Party;
 use App\Models\Product;
 use App\Models\SaleInvoice;
 use App\Models\SaleInvoiceItem;
+use App\Models\SaleOrder;
 use App\Models\StockMovement;
 use App\Models\TdsSection;
 use App\Models\User;
@@ -27,6 +28,7 @@ class SaleInvoiceService
         private StockMovementService $stockMovementService,
         private GstCalculationService $gstCalculator,
         private AccountingService $accountingService,
+        private SaleOrderService $saleOrderService,
     ) {}
 
     /**
@@ -34,7 +36,10 @@ class SaleInvoiceService
      * (stock already moved when that challan was completed — never posted again here),
      * or none do (a direct sale, where this is the only document, so it posts the
      * stock-out itself). Mixing the two within one invoice is rejected outright,
-     * matching scope decision 4.
+     * matching scope decision 4. A sale order's items arrive as direct-sale lines too
+     * (a sale order never moves stock on its own), so creating straight from one goes
+     * through the exact same direct-sale path — the only extra step is marking that
+     * order Converted once the invoice is saved, so it can't be invoiced again.
      */
     public function create(array $data, Company $company, Branch $branch, FinancialYear $financialYear, User $creator): SaleInvoice
     {
@@ -46,8 +51,11 @@ class SaleInvoiceService
         }
 
         $isFromChallan = $linkedCount > 0;
+        $saleOrder = ! empty($data['sale_order_id'])
+            ? SaleOrder::where('company_id', $company->id)->where('status', 'Confirmed')->find($data['sale_order_id'])
+            : null;
 
-        return DB::transaction(function () use ($data, $items, $isFromChallan, $company, $branch, $financialYear, $creator) {
+        return DB::transaction(function () use ($data, $items, $isFromChallan, $saleOrder, $company, $branch, $financialYear, $creator) {
             $party = Party::where('company_id', $company->id)->where('is_customer', true)->findOrFail($data['party_id']);
 
             $challanItems = collect();
@@ -55,7 +63,11 @@ class SaleInvoiceService
                 $challanItems = $this->validateChallanLines($items, $company, $party);
             }
 
-            $branchId = $isFromChallan ? $challanItems->first()->deliveryChallan->branch_id : $branch->id;
+            $branchId = match (true) {
+                $isFromChallan => $challanItems->first()->deliveryChallan->branch_id,
+                $saleOrder !== null => $saleOrder->branch_id,
+                default => $branch->id,
+            };
 
             $lines = $this->buildLines($items, $company, $party);
             $totals = $this->sumTotals($lines);
@@ -118,6 +130,10 @@ class SaleInvoiceService
                 $challanItems->pluck('delivery_challan_id')->unique()->each(
                     fn ($challanId) => $this->refreshDeliveryChallanStatus(DeliveryChallan::findOrFail($challanId))
                 );
+            }
+
+            if ($saleOrder !== null) {
+                $this->saleOrderService->markConverted($saleOrder);
             }
 
             $this->auditLog->log('Sale Invoice Created', 'Sale Invoice', $invoice, null, $invoice->toArray());

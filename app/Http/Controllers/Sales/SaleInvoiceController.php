@@ -12,6 +12,7 @@ use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\SaleInvoice;
 use App\Models\SaleInvoiceItem;
+use App\Models\SaleOrder;
 use App\Models\TdsSection;
 use App\Services\BranchContextService;
 use App\Services\SaleInvoiceService;
@@ -72,6 +73,15 @@ class SaleInvoiceController extends Controller
             }
         }
 
+        $saleOrder = null;
+
+        if ($request->filled('sale_order_id')) {
+            $saleOrder = SaleOrder::where('company_id', $company->id)
+                ->where('status', 'Confirmed')
+                ->with(['party', 'items.product'])
+                ->findOrFail($request->integer('sale_order_id'));
+        }
+
         if ($request->filled('from_challan')) {
             $challan = DeliveryChallan::where('company_id', $company->id)
                 ->whereIn('status', ['Completed', 'Partially Invoiced'])
@@ -101,7 +111,7 @@ class SaleInvoiceController extends Controller
             }
         }
 
-        return $this->formData(null, $challan, $challanLines, $prefill);
+        return $this->formData(null, $challan, $challanLines, $prefill, $saleOrder);
     }
 
     public function store(SaleInvoiceRequest $request): RedirectResponse
@@ -222,7 +232,7 @@ class SaleInvoiceController extends Controller
         return redirect()->route('sale-invoices.create', ['prefill_from' => $saleInvoice->id]);
     }
 
-    private function formData(?SaleInvoice $invoice = null, ?DeliveryChallan $challan = null, $challanLines = null, ?array $prefill = null)
+    private function formData(?SaleInvoice $invoice = null, ?DeliveryChallan $challan = null, $challanLines = null, ?array $prefill = null, ?SaleOrder $saleOrder = null)
     {
         $company = current_company_or_fail();
         $products = Product::where('company_id', $company->id)->where('status', 'active')->with(['unit', 'secondaryUnit'])->orderBy('name')->get();
@@ -233,6 +243,9 @@ class SaleInvoiceController extends Controller
             'challan' => $challan,
             'challanLines' => $challanLines ?? collect(),
             'prefill' => $prefill,
+            'saleOrder' => $saleOrder,
+            'saleOrders' => $invoice ? collect() : scope_to_branch(SaleOrder::where('company_id', $company->id)->where('status', 'Confirmed'))
+                ->with('party')->orderByDesc('order_date')->get(),
             'parties' => Party::where('company_id', $company->id)->where('is_customer', true)->where('status', 'active')->orderBy('name')->get(),
             'products' => $products,
             'stockLevels' => app(StockLevelService::class)->currentStock($products, $scope['branchId'], $scope['allBranches']),

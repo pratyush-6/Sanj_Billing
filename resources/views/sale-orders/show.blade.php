@@ -54,6 +54,13 @@
                             <x-primary-button type="submit">Confirm Order</x-primary-button>
                         </form>
                     @endif
+                    @if ($order->status === 'Confirmed')
+                        @can('sale-invoices.manage')
+                            <a href="{{ route('sale-invoices.create', ['sale_order_id' => $order->id]) }}">
+                                <x-primary-button type="button">{{ ui_label('Create Sale Invoice') }}</x-primary-button>
+                            </a>
+                        @endcan
+                    @endif
                     @if (in_array($order->status, ['Draft', 'Confirmed']))
                         <form method="POST" action="{{ route('sale-orders.cancel', $order) }}" onsubmit="return confirm('Cancel this sale order?');">
                             @csrf

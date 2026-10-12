@@ -83,6 +83,24 @@ class SaleOrderService
         return $order;
     }
 
+    /**
+     * A sale order converts in one shot when a sale invoice is created directly from
+     * it (every line, no partial conversion) — see SaleInvoiceService::create(). Once
+     * Converted it can no longer be selected for another invoice, so the same order
+     * can't be sold twice.
+     */
+    public function markConverted(SaleOrder $order): SaleOrder
+    {
+        if ($order->status !== 'Confirmed') {
+            throw new RuntimeException('Only a confirmed sale order can be converted.');
+        }
+
+        $order->update(['status' => 'Converted']);
+        $this->auditLog->log('Sale Order Converted', 'Sale Order', $order, null, ['status' => 'Converted']);
+
+        return $order;
+    }
+
     public function cancel(SaleOrder $order): SaleOrder
     {
         if (! in_array($order->status, ['Draft', 'Confirmed'], true)) {

@@ -21,6 +21,7 @@ class SaleInvoiceRequest extends FormRequest
             'invoice_date' => ['required', 'date'],
             'due_date' => ['nullable', 'date', 'after_or_equal:invoice_date'],
             'tds_section_id' => ['nullable', Rule::exists('tds_sections', 'id')->where('company_id', $companyId)],
+            'sale_order_id' => ['nullable', Rule::exists('sale_orders', 'id')->where('company_id', $companyId)->where('status', 'Confirmed')],
             'notes' => ['nullable', 'string', 'max:2000'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.delivery_challan_item_id' => ['nullable', Rule::exists('delivery_challan_items', 'id')],

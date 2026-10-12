@@ -16,6 +16,24 @@
             <x-ui.alert variant="info">Pre-filled from cancelled invoice {{ $prefill['source_invoice_number'] }} — adjust the quantity and save to create the corrected invoice.</x-ui.alert>
         @endif
 
+        @if ($saleOrder ?? null)
+            <x-ui.alert variant="info">{{ ui_label('Invoicing sale order') }} {{ $saleOrder->order_number }} ({{ $saleOrder->party->name }}). {{ ui_label('Products and quantities are fetched from the order and cannot be changed here.') }} <a href="{{ route('sale-invoices.create') }}" class="underline font-medium">{{ ui_label('Change selection') }}</a></x-ui.alert>
+        @elseif (! $invoice && ! $challan && ! ($prefill ?? null) && $saleOrders->isNotEmpty())
+            <x-ui.card>
+                <form method="GET" action="{{ route('sale-invoices.create') }}" class="flex items-end gap-3 text-sm">
+                    <div class="flex-1">
+                        <x-input-label for="sale_order_id" :value="ui_label('Create from Sale Order (optional)')" />
+                        <select id="sale_order_id" name="sale_order_id" onchange="this.form.submit()" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500">
+                            <option value="">{{ ui_label('Select a confirmed sale order, or skip to create a direct invoice') }}</option>
+                            @foreach ($saleOrders as $order)
+                                <option value="{{ $order->id }}">{{ $order->order_number }} — {{ $order->party->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </form>
+            </x-ui.card>
+        @endif
+
         <x-ui.card>
             <form method="POST"
                   action="{{ $invoice ? route('sale-invoices.update', $invoice) : route('sale-invoices.store') }}"
@@ -23,12 +41,15 @@
                   @if (! $invoice)
                   x-data="{
                       products: @js($products->map(fn ($product) => ['id' => $product->id, 'label' => $product->displayLabel(), 'unit_code' => $product->unit?->name, 'secondary_unit_code' => $product->secondaryUnit?->name, 'conversion_factor' => $product->conversion_factor ? (float) $product->conversion_factor : null, 'stock' => (float) ($stockLevels[$product->id] ?? 0)])),
-                      lockedItems: {{ $challan ? 'true' : 'false' }},
+                      lockedItems: {{ ($challan || $saleOrder) ? 'true' : 'false' }},
+                      quantityLocked: {{ $saleOrder ? 'true' : 'false' }},
                       items: @js($challan
                           ? $challanLines->map(fn ($line) => ['delivery_challan_item_id' => $line['delivery_challan_item_id'], 'product_id' => $line['product_id'], 'product_label' => $line['product_label'], 'quantity' => $line['remaining'], 'max' => $line['remaining'], 'unit_price' => null])
-                          : (($prefill['items'] ?? null)
-                              ? $prefill['items']
-                              : [['product_id' => '', 'quantity' => null, 'unit_price' => null]])),
+                          : ($saleOrder
+                              ? $saleOrder->items->map(fn ($item) => ['product_id' => $item->product_id, 'product_label' => $item->product->displayLabel(), 'quantity' => (float) $item->quantity, 'unit_price' => (float) $item->unit_price])
+                              : (($prefill['items'] ?? null)
+                                  ? $prefill['items']
+                                  : [['product_id' => '', 'quantity' => null, 'unit_price' => null]]))),
                       addItem() {
                           this.items.push({ product_id: '', quantity: null, unit_price: null });
                       },
@@ -69,6 +90,9 @@
                 @endif
                 @if ($challan)
                     <input type="hidden" name="party_id" value="{{ $challan->party_id }}">
+                @elseif ($saleOrder)
+                    <input type="hidden" name="party_id" value="{{ $saleOrder->party_id }}">
+                    <input type="hidden" name="sale_order_id" value="{{ $saleOrder->id }}">
                 @endif
 
                 <x-ui.section title="Invoice Details">
@@ -79,6 +103,8 @@
                                 <div class="mt-1 text-sm font-medium text-ink-900 dark:text-ink-50 py-2">{{ $invoice->party->name }}</div>
                             @elseif ($challan)
                                 <div class="mt-1 text-sm font-medium text-ink-900 dark:text-ink-50 py-2">{{ $challan->party->name }}</div>
+                            @elseif ($saleOrder)
+                                <div class="mt-1 text-sm font-medium text-ink-900 dark:text-ink-50 py-2">{{ $saleOrder->party->name }}</div>
                             @else
                                 <select id="party_id" name="party_id" class="mt-1 block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
                                     <option value="">Select</option>
@@ -142,14 +168,14 @@
                         <p class="text-xs text-ink-400 dark:text-ink-500 mt-2">Line items are locked once an invoice is created. Cancel and create a new invoice to change quantities or pricing.</p>
                     @else
                         <div class="overflow-x-auto -mx-6">
-                            <table class="min-w-full divide-y divide-ink-100 dark:divide-ink-800">
+                            <table class="w-full min-w-[56rem] divide-y divide-ink-100 dark:divide-ink-800">
                                 <thead>
                                     <tr>
-                                        <th class="px-6 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide">{{ __('common.product') }}</th>
-                                        <th class="px-3 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide w-28">{{ __('common.qty') }}</th>
-                                        <th class="px-3 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide w-32">{{ __('common.unit_price') }}</th>
-                                        <th class="px-3 py-2 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide w-28">{{ __('common.amount') }}</th>
-                                        @unless ($challan)
+                                        <th class="px-6 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[16rem]">{{ __('common.product') }}</th>
+                                        <th class="px-3 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[11rem]">{{ __('common.qty') }}</th>
+                                        <th class="px-3 py-2 text-left text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[8rem]">{{ __('common.unit_price') }}</th>
+                                        <th class="px-3 py-2 text-right text-xs font-semibold text-ink-500 dark:text-ink-400 uppercase tracking-wide min-w-[8rem]">{{ __('common.amount') }}</th>
+                                        @unless ($challan || $saleOrder)
                                             <th class="px-3 py-2 w-10"></th>
                                         @endunless
                                     </tr>
@@ -161,12 +187,12 @@
                                                 <template x-if="lockedItems">
                                                     <div>
                                                         <span x-text="item.product_label" class="text-sm text-ink-900 dark:text-ink-50"></span>
-                                                        <input type="hidden" :name="`items[${index}][delivery_challan_item_id]`" :value="item.delivery_challan_item_id">
+                                                        <input type="hidden" :name="`items[${index}][delivery_challan_item_id]`" :value="item.delivery_challan_item_id ?? ''">
                                                         <input type="hidden" :name="`items[${index}][product_id]`" :value="item.product_id">
                                                     </div>
                                                 </template>
                                                 <template x-if="!lockedItems">
-                                                    <select :name="`items[${index}][product_id]`" x-model="item.product_id" class="block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
+                                                    <select :name="`items[${index}][product_id]`" x-model="item.product_id" class="block w-full min-w-[14rem] bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
                                                         <option value="">Select product</option>
                                                         <template x-for="product in products" :key="product.id">
                                                             <option :value="product.id" x-text="product.label" :selected="item.product_id == product.id"></option>
@@ -175,18 +201,28 @@
                                                 </template>
                                             </td>
                                             <td class="px-3 py-2">
-                                                <div class="flex items-center gap-1.5">
-                                                    <input type="number" step="0.01" min="0.01" :max="item.max ?? null" :name="`items[${index}][quantity]`" x-model.number="item.quantity" class="block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
-                                                    <span class="text-xs text-ink-400 dark:text-ink-500 whitespace-nowrap" x-text="unitCode(item)"></span>
-                                                </div>
-                                                <p class="text-xs text-ink-400 dark:text-ink-500 mt-1" x-show="item.max" x-text="'Max: ' + item.max"></p>
-                                                <template x-if="!lockedItems">
-                                                    <p class="text-xs mt-1" :class="lowStock(item) ? 'text-rose-500 dark:text-rose-400 font-medium' : 'text-ink-400 dark:text-ink-500'" x-show="item.product_id" x-text="stockLabel(item)"></p>
+                                                <template x-if="quantityLocked">
+                                                    <div>
+                                                        <input type="hidden" :name="`items[${index}][quantity]`" :value="item.quantity">
+                                                        <span class="text-sm text-ink-700 dark:text-ink-200" x-text="(parseFloat(item.quantity) || 0).toFixed(2) + ' ' + (unitCode(item) ?? '')"></span>
+                                                    </div>
                                                 </template>
-                                                <p class="text-xs text-ink-400 dark:text-ink-500 mt-1" x-show="secondaryHint(item)" x-text="secondaryHint(item)"></p>
+                                                <template x-if="!quantityLocked">
+                                                    <div>
+                                                        <div class="flex items-center gap-1.5">
+                                                            <input type="number" step="0.01" min="0.01" :max="item.max ?? null" :name="`items[${index}][quantity]`" x-model.number="item.quantity" class="block w-28 min-w-[6rem] text-right bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
+                                                            <span class="text-xs text-ink-400 dark:text-ink-500 whitespace-nowrap" x-text="unitCode(item)"></span>
+                                                        </div>
+                                                        <p class="text-xs text-ink-400 dark:text-ink-500 mt-1" x-show="item.max" x-text="'Max: ' + item.max"></p>
+                                                        <template x-if="!lockedItems">
+                                                            <p class="text-xs mt-1" :class="lowStock(item) ? 'text-rose-500 dark:text-rose-400 font-medium' : 'text-ink-400 dark:text-ink-500'" x-show="item.product_id" x-text="stockLabel(item)"></p>
+                                                        </template>
+                                                        <p class="text-xs text-ink-400 dark:text-ink-500 mt-1" x-show="secondaryHint(item)" x-text="secondaryHint(item)"></p>
+                                                    </div>
+                                                </template>
                                             </td>
                                             <td class="px-3 py-2">
-                                                <input type="number" step="0.01" min="0" :name="`items[${index}][unit_price]`" x-model.number="item.unit_price" class="block w-full bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
+                                                <input type="number" step="0.01" min="0" :name="`items[${index}][unit_price]`" x-model.number="item.unit_price" class="block w-full min-w-[6rem] text-right bg-white dark:bg-ink-800 text-ink-900 dark:text-ink-100 border-ink-300 dark:border-ink-600 rounded-lg shadow-sm text-sm focus:border-brand-500 focus:ring-brand-500" required>
                                             </td>
                                             <td class="px-3 py-2 text-right text-sm text-ink-700 dark:text-ink-200" x-text="((parseFloat(item.quantity) || 0) * (parseFloat(item.unit_price) || 0)).toFixed(2)"></td>
                                             <template x-if="!lockedItems">
