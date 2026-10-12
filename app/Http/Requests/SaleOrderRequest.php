@@ -24,6 +24,7 @@ class SaleOrderRequest extends FormRequest
             'items.*.product_id' => ['required', Rule::exists('products', 'id')->where('company_id', $companyId)],
             'items.*.quantity' => ['required', 'numeric', 'min:0.01'],
             'items.*.unit_price' => ['required', 'numeric', 'min:0'],
+            'items.*.unit_type' => ['nullable', Rule::in(['primary', 'secondary'])],
             'items.*.notes' => ['nullable', 'string', 'max:500'],
         ];
     }

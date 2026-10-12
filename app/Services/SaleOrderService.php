@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Branch;
 use App\Models\Company;
 use App\Models\FinancialYear;
+use App\Models\Product;
 use App\Models\SaleOrder;
 use App\Models\User;
 use App\Services\Concerns\GeneratesSequentialNumbers;
@@ -94,19 +95,41 @@ class SaleOrderService
         return $order;
     }
 
+    /**
+     * Quantity and unit price are always stored in the product's primary unit, same
+     * as everywhere else in the app (stock movements, purchase orders, ...). When a
+     * line is sold in the secondary unit, the entered quantity/price are converted
+     * to their primary-unit equivalents before saving; the line amount (qty × price)
+     * is unaffected by the conversion, since it's computed from the pair entered
+     * together, in whichever unit the user chose.
+     */
     private function syncItems(SaleOrder $order, array $items): void
     {
         $order->items()->delete();
 
         foreach ($items as $item) {
-            $quantity = round((float) $item['quantity'], 2);
-            $unitPrice = round((float) $item['unit_price'], 2);
+            $enteredQuantity = round((float) $item['quantity'], 2);
+            $enteredUnitPrice = round((float) $item['unit_price'], 2);
+            $amount = round($enteredQuantity * $enteredUnitPrice, 2);
+
+            $quantity = $enteredQuantity;
+            $unitPrice = $enteredUnitPrice;
+
+            if (($item['unit_type'] ?? 'primary') === 'secondary') {
+                $product = Product::find($item['product_id']);
+                $conversionFactor = $product ? (float) $product->conversion_factor : null;
+
+                if ($product && $product->secondary_unit_id && $conversionFactor) {
+                    $quantity = round($enteredQuantity / $conversionFactor, 4);
+                    $unitPrice = round($enteredUnitPrice * $conversionFactor, 4);
+                }
+            }
 
             $order->items()->create([
                 'product_id' => $item['product_id'],
                 'quantity' => $quantity,
                 'unit_price' => $unitPrice,
-                'amount' => round($quantity * $unitPrice, 2),
+                'amount' => $amount,
                 'notes' => $item['notes'] ?? null,
             ]);
         }
